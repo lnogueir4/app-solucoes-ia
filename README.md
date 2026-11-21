@@ -67,6 +67,16 @@ Depois, as duas opções ficam em **Configurações → Soluções**:
 - "Carregar os exemplos" acrescenta os que faltam e não mexe nos que já estão no banco.
 - "Apagar todas as soluções" mantém o perfil da empresa e as configurações, e antes guarda uma cópia do banco em `data/backups/antes-de-apagar-<data e hora>.json`.
 
+## Importar soluções
+
+Em **Configurações → Importar soluções**, escolha um arquivo CSV ou JSON. O app pode estar aberto.
+
+- **CSV:** use as colunas que a página mostra. "Colunas e valores aceitos", na mesma tela, lista cada coluna, os valores que ela aceita e o campo correspondente no JSON. "Baixar modelo CSV" traz o cabeçalho e uma linha de exemplo. O CSV de "Exportar CSV" também serve: exporte, mude o que quiser numa planilha e importe de volta.
+- **JSON:** uma lista de soluções com os nomes internos dos campos (`nome`, `setor`, `codigo`, `notas`...), ou um objeto com a lista em `solucoes`. Na nota, `tecnico` vale como `dados`.
+- **Como a solução é achada:** pelo `id`, no JSON, ou pelo código. Sem uma solução igual, ela entra como nova no roadmap.
+- **O que muda:** no CSV, a célula vazia mantém o valor atual. As colunas calculadas (facilidade, faixa, carga, ganho) são ignoradas. A importação não muda a situação das soluções nem a aprovação da regra de acesso.
+- **Antes de gravar,** a tela mostra o que entra, o que muda e o que tem erro. Com qualquer erro, nada é gravado. Ao gravar, o app guarda uma cópia do banco em `data/backups/antes-de-importar-<data e hora>.json`.
+
 ## Dados
 
 | Arquivo | Conteúdo |

@@ -449,6 +449,18 @@
   .cfg-key.ok { border-color:color-mix(in srgb,var(--good) 35%,transparent); background:var(--good-soft); }
   .cfg-key.off { border-color:color-mix(in srgb,var(--warn) 40%,transparent); background:var(--warn-soft); }
   .cfg-key code, .cfg-hint code { font-family:var(--font-mono); font-size:.85em; background:var(--surface); border:1px solid var(--line); border-radius:5px; padding:1px 5px; overflow-wrap:anywhere; }
+  .imp-res:not([hidden]) { display:flex; flex-direction:column; gap:10px; }
+  .imp-tab { max-height:320px; overflow:auto; border:1px solid var(--line); border-radius:8px; }
+  .imp-tab table { width:100%; border-collapse:collapse; font-size:13px; }
+  .imp-tab th, .imp-tab td { text-align:left; padding:6px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  .imp-tab th { position:sticky; top:0; background:var(--surface-2); font-family:var(--font-mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+  .imp-tab td.e { color:var(--crit); }
+  .imp-tab td.n { color:var(--good); }
+  .imp-tab td.m { color:var(--ink); }
+  .imp-tab td.i { color:var(--muted); }
+  .imp-ajuda summary { cursor:pointer; font-size:13.5px; color:var(--accent-ink); }
+  .imp-ajuda[open] { display:flex; flex-direction:column; gap:8px; }
+  .imp-ajuda code { font-family:var(--font-mono); font-size:.9em; overflow-wrap:anywhere; }
   .cfg-logos { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
   @media (max-width:640px){ .cfg-logos { grid-template-columns:1fr; } }
   .cfg-logo { display:flex; flex-direction:column; gap:8px; min-width:0; }
@@ -1076,6 +1088,28 @@
       </div>
       <p class="cfg-hint">Carregar os exemplos não substitui nada: um exemplo que já está no banco continua como está. Antes de apagar, o app guarda uma cópia do banco em <code>data/backups</code>. Essas ações valem na hora, sem precisar clicar em Salvar.</p>
       <p class="cfg-hint" id="c-sol-st" aria-live="polite"></p>
+
+      <p class="ed-sep">Importar soluções</p>
+      <p class="cfg-hint">Use um arquivo CSV, com as colunas que a página mostra, ou JSON. O CSV exportado pela página também serve: exporte, mude o que quiser numa planilha e importe de volta. A solução é achada pelo código; sem código igual, ela entra como nova no roadmap. Célula vazia mantém o valor atual. A importação não muda a situação das soluções nem a aprovação da regra de acesso.</p>
+      <div class="cfg-inline">
+        <input type="file" id="imp-arq" accept=".csv,.json,text/csv,application/json" hidden>
+        <button type="button" class="btn plain" id="imp-escolher">Escolher arquivo…</button>
+        <button type="button" class="btn plain" id="imp-modelo">Baixar modelo CSV</button>
+      </div>
+      <details class="imp-ajuda" id="imp-ajuda">
+        <summary>Colunas e valores aceitos</summary>
+        <div class="imp-tab" id="imp-ajuda-tab"></div>
+        <p class="cfg-hint">Linha 1 é o cabeçalho; a ordem das colunas não importa, e a coluna que falta fica como está. Separador ponto e vírgula ou vírgula. No JSON, use o campo da última coluna; ele também aceita <code>processo</code> e <code>operacao</code> no formato que o app grava.</p>
+      </details>
+      <div class="imp-res" id="imp-res" hidden>
+        <p class="cfg-hint" id="imp-resumo" aria-live="polite"></p>
+        <div class="imp-tab" id="imp-tab"></div>
+        <div class="cfg-inline">
+          <button type="button" class="btn" id="imp-gravar">Importar</button>
+          <button type="button" class="btn plain" id="imp-limpar">Descartar</button>
+        </div>
+      </div>
+      <p class="cfg-hint" id="imp-st" aria-live="polite"></p>
     </div>
     <div class="ed-f">
       <p class="form-err" id="c-err" aria-live="polite"></p>
@@ -2785,6 +2819,236 @@ async function aplicarPropostas(){
   setPf(falha ? `${ok} soluções atualizadas, ${falha} não puderam ser salvas.` : `${plural(alteradas, 'nota alterada', 'notas alteradas')}; explicações da IA salvas em ${plural(ok, 'solução', 'soluções')}.`, !!falha);
   toast('Revisão aplicada');
 }
+
+/* ---------- Importar soluções (Configurações; grava pelo servidor local) ---------- */
+const normT = v => String(v == null ? '' : v).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\(\d+\)/g, '').replace(/\s+/g, ' ').trim();
+const numBR = n => String(n).replace('.', ',');
+const pelaEtiqueta = (mapa, txt) => { const t = normT(txt); const k = Object.keys(mapa).find(x => normT(mapa[x]) === t || normT(x) === t); return k; };
+const ERRO_IMP = (msg) => { throw Object.assign(new Error(msg), { imp: true }); };
+const ymdDoTexto = t => { const a = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(t), b = /^\d{4}-\d{2}-\d{2}$/.test(t); return a ? `${a[3]}-${a[2]}-${a[1]}` : b ? t : ERRO_IMP(`data "${t}" fora do formato DD/MM/AAAA`); };
+const notaDoTexto = (t, c) => { const x = Number(String(t).replace(',', '.')); if (![0, c.peso / 2, c.peso].includes(x)) ERRO_IMP(`${c.n} vale 0, ${numBR(c.peso / 2)} ou ${c.peso}, e não "${t}"`); return x; };
+const setFundo = (o, k, campo, v) => { o[k] = Object.assign({}, o[k] || {}, { [campo]: v }); };
+/* Colunas importáveis: o texto que a exportação gera (get) e como ler a célula de volta (set). */
+const IMP_COLS = [
+  { h:'Código', get: i => codigoDe(i), set: (o, t) => { o.codigo = t; } },
+  { h:'Solução', al:['nome'], get: i => i.nome || '', set: (o, t) => { o.nome = t; } },
+  { h:'Área', get: i => i.setor || '', set: (o, t) => { o.setor = t; } },
+  { h:'Setor dono', get: i => donosDe(i).join(', '), set: (o, t) => { o.donos = t.split(/\s*[,|]\s*/).filter(Boolean); } },
+  { h:'O que faz', get: i => i.descricao || '', set: (o, t) => { o.descricao = t; } },
+  { h:'O que resolve', get: i => i.resolve || '', set: (o, t) => { o.resolve = t; } },
+  { h:'Justificativa', get: i => i.justificativa || '', set: (o, t) => { o.justificativa = t; } },
+  { h:'Natureza', get: i => NATUREZAS[i.natureza] || '', set: (o, t) => { o.natureza = pelaEtiqueta(NATUREZAS, t) || ERRO_IMP(`natureza "${t}" não existe`); } },
+  { h:'Metas', get: i => metasDe(i).map(m => m.n).join(', '), set: (o, t) => { o.metas = t.split(/\s*[,|]\s*/).filter(Boolean).map(x => (METAS.find(m => normT(m.n) === normT(x) || m.k === normT(x)) || ERRO_IMP(`meta "${x}" não existe`)).k); } },
+  ...CRIT.map(c => ({ h:`${c.n} (${c.peso})`, al: c.k === 'dados' ? ['time tecnico', 'tecnico', 'dados'] : [c.k], get: i => numBR(nota(i, c)), set: (o, t) => setFundo(o, 'notas', c.k, notaDoTexto(t, c)) })),
+  { h:'Valor', get: i => nivelValor(i) ? VALORES[nivelValor(i)].l : '', set: (o, t) => setFundo(o, 'valor', 'nivel', Object.keys(VALORES).find(k => normT(VALORES[k].l) === normT(t)) || ERRO_IMP(`valor "${t}" não existe (use alto, médio ou baixo)`)) },
+  { h:'Origem do valor', get: i => nivelValor(i) ? (CONFS[i.valor.nivelOrigem] || 'hipótese') : '', set: (o, t) => setFundo(o, 'valor', 'nivelOrigem', pelaEtiqueta(CONFS, t) || ERRO_IMP(`origem "${t}" não existe`)) },
+  ...CHECKS.map(c => ({ h:`Chk ${c.n.toLowerCase()}`, get: i => { const v = i.checagens && i.checagens[c.k]; return v ? (CHK_NIVEIS.find(x => x.v === v) || { l:v }).l : ''; },
+    set: (o, t) => setFundo(o, 'checagens', c.k, (CHK_NIVEIS.find(x => normT(x.l) === normT(t) || x.v === normT(t)) || ERRO_IMP(`checagem "${t}" não existe (use OK, Parcial, Falha ou Não sei)`)).v) })),
+  { h:'Dado pessoal', get: i => DADOS_P[dadoPDe(i).nivel] || '', set: (o, t) => setFundo(o, 'dadoPessoal', 'nivel', pelaEtiqueta(DADOS_P, t) || ERRO_IMP(`dado pessoal "${t}" não existe`)) },
+  { h:'Qual dado', get: i => dadoPDe(i).qual, set: (o, t) => setFundo(o, 'dadoPessoal', 'qual', t) },
+  { h:'Até onde o agente vai', get: i => autDe(i).nivel ? `${autDe(i).nivel}. ${AUTONOMIA[autDe(i).nivel].l}` : '',
+    set: (o, t) => { const m = /^([1-4])\b/.exec(t), k = m ? Number(m[1]) : Number(Object.keys(AUTONOMIA).find(n => normT(AUTONOMIA[n].l) === normT(t) || normT(AUTONOMIA[n].c) === normT(t))); if (!AUTONOMIA[k]) ERRO_IMP(`nível "${t}" não existe (use de 1 a 4)`); setFundo(o, 'autonomia', 'nivel', k); } },
+  { h:'Fica com uma pessoa', get: i => autDe(i).comPessoa, set: (o, t) => setFundo(o, 'autonomia', 'comPessoa', t) },
+  { h:'Responsável', get: i => i.responsavel || '', set: (o, t) => { o.responsavel = t; } },
+  { h:'Previsão', get: i => fmtDia(i.previsao), set: (o, t) => { o.previsao = ymdDoTexto(t); } },
+  { h:'Meta (resultado esperado)', get: i => i.resultadoEsperado || '', set: (o, t) => { o.resultadoEsperado = t; } },
+  { h:'Indicador', get: i => (i.medicao || {}).indicador || '', set: (o, t) => setFundo(o, 'medicao', 'indicador', t) },
+  { h:'Método', get: i => (i.medicao || {}).metodo || '', set: (o, t) => setFundo(o, 'medicao', 'metodo', t) },
+  { h:'Linha de base do indicador', get: i => (i.medicao || {}).base || '', set: (o, t) => setFundo(o, 'medicao', 'base', t) },
+  { h:'Depende de', get: i => depsDe(i).map(curto).join(' | '), set: (o, t, ctx) => { o.dependeDe = t.split(/\s*[|,]\s*/).filter(Boolean).map(x => ctx.idPorRef(x) || ERRO_IMP(`"${x}" em "Depende de" não é código nem nome de solução`)); } }
+];
+/* Campos do JSON que a importação aceita; os outros (situação, datas, aprovações, IA) ficam como estão. */
+const IMP_JSON = ['codigo','nome','setor','donos','descricao','resolve','justificativa','natureza','metas','notas','valor','checagens','processo','operacao','dadoPessoal','autonomia','responsavel','previsao','resultadoEsperado','medicao','dependeDe'];
+const IMP_LIM = { nome:90, setor:40, codigo:12, descricao:500, resolve:500, justificativa:400, responsavel:80 };
+
+function lerCSV(txt){
+  txt = txt.replace(/^﻿/, '');
+  const prim = txt.split(/\r?\n/, 1)[0] || '';
+  const sep = (prim.match(/;/g) || []).length >= (prim.match(/,/g) || []).length ? ';' : ',';
+  const linhas = []; let lin = [], cel = '', q = false;
+  for (let i = 0; i < txt.length; i++) {
+    const ch = txt[i];
+    if (q) { if (ch === '"') { if (txt[i + 1] === '"') { cel += '"'; i++; } else q = false; } else cel += ch; continue; }
+    if (ch === '"') q = true;
+    else if (ch === sep) { lin.push(cel); cel = ''; }
+    else if (ch === '\n' || ch === '\r') { if (ch === '\r' && txt[i + 1] === '\n') i++; lin.push(cel); linhas.push(lin); lin = []; cel = ''; }
+    else cel += ch;
+  }
+  if (cel !== '' || lin.length) { lin.push(cel); linhas.push(lin); }
+  return linhas.filter(l => l.some(c => c.trim() !== ''));
+}
+
+/* Lê o arquivo e devolve o plano: o que entra, o que muda e o que tem erro. Nada é gravado aqui. */
+function planoImportacao(nomeArq, txt){
+  const ehJSON = /\.json$/i.test(nomeArq) || /^\s*[\[{]/.test(txt.replace(/^﻿/, ''));
+  const porId = new Map(items.map(i => [i.id, i]));
+  const porCod = new Map(items.filter(codigoDe).map(i => [codigoDe(i).toLowerCase(), i]));
+  const linhas = [], ignoradas = new Set();
+  let brutos;
+  if (ehJSON) {
+    let j; try { j = JSON.parse(txt.replace(/^﻿/, '')); } catch (e) { return { erroGeral: 'O arquivo JSON não pôde ser lido: ' + e.message }; }
+    const lista = Array.isArray(j) ? j : j && Array.isArray(j.solucoes) ? j.solucoes : j && j.solucoes && typeof j.solucoes === 'object' ? Object.entries(j.solucoes).map(([id, d]) => ({ id, ...d })) : null;
+    if (!lista) return { erroGeral: 'O JSON precisa ser uma lista de soluções, ou ter a lista em "solucoes".' };
+    brutos = lista.map((o, i) => ({ n: i + 1, o: o && typeof o === 'object' ? o : {} }));
+  } else {
+    const t = lerCSV(txt);
+    if (t.length < 2) return { erroGeral: 'O CSV precisa do cabeçalho e de pelo menos uma linha.' };
+    const cols = t[0].map(h => { const nh = normT(h); return IMP_COLS.find(c => normT(c.h) === nh || (c.al || []).includes(nh)) || (ignoradas.add(h.trim()), null); });
+    if (!cols.some(c => c && c.h === 'Solução') && !cols.some(c => c && c.h === 'Código')) return { erroGeral: 'O CSV precisa da coluna "Código" ou da coluna "Solução".' };
+    brutos = t.slice(1).map((l, i) => ({ n: i + 2, cels: cols.map((c, k) => c ? [c, String(l[k] == null ? '' : l[k]).trim()] : null).filter(Boolean) }));
+  }
+  // Primeiro acha o destino de cada linha, para "Depende de" poder citar uma solução nova do mesmo arquivo.
+  const novosRef = new Map();
+  brutos.forEach(b => {
+    const cod = ehJSON ? String(b.o.codigo || '').trim() : ((b.cels.find(([c]) => c.h === 'Código') || [])[1] || '');
+    const nome = ehJSON ? String(b.o.nome || '').trim() : ((b.cels.find(([c]) => c.h === 'Solução') || [])[1] || '');
+    const alvo = (ehJSON && b.o.id && porId.get(String(b.o.id))) || (cod && porCod.get(cod.toLowerCase())) || null;
+    b.alvo = alvo;
+    b.id = alvo ? alvo.id : (ehJSON && b.o.id && /^[A-Za-z0-9_\-.~:@+]{1,200}$/.test(String(b.o.id)) ? String(b.o.id) : slug(nome) + '-' + Math.random().toString(36).slice(2, 6));
+    if (!alvo) { if (cod) novosRef.set(cod.toLowerCase(), b.id); if (nome) novosRef.set(normT(nome), b.id); }
+  });
+  const ctx = { idPorRef: x => { const k = x.toLowerCase(); const i = porCod.get(k) || items.find(i => normT(i.nome) === normT(x)); return i ? i.id : (novosRef.get(k) || novosRef.get(normT(x)) || null); } };
+  const usados = new Map();
+  brutos.forEach(b => {
+    const atual = b.alvo, l = { n: b.n, id: b.id, atual };
+    try {
+      const o = atual ? JSON.parse(JSON.stringify(atual)) : { status:'ativa', origem:'importada', motivosUsuario:{}, notas:{ manual:0, infra:0, dados:0, cultura:0 }, metas:[] };
+      if (ehJSON) {
+        Object.keys(b.o).forEach(k => { if (!IMP_JSON.includes(k) && k !== 'id') ignoradas.add(k); });
+        IMP_JSON.forEach(k => { if (b.o[k] !== undefined) o[k] = b.o[k]; });
+        if (o.notas && o.notas.tecnico !== undefined && o.notas.dados === undefined) { o.notas.dados = o.notas.tecnico; delete o.notas.tecnico; }
+        if (Array.isArray(b.o.dependeDe)) o.dependeDe = b.o.dependeDe.map(x => porId.has(x) || brutos.some(z => z.id === x) ? x : (ctx.idPorRef(String(x)) || ERRO_IMP(`"${x}" em dependeDe não é uma solução`)));
+        CRIT.forEach(c => { const v = o.notas && o.notas[c.k]; if (v !== undefined && ![0, c.peso / 2, c.peso].includes(Number(v))) ERRO_IMP(`nota ${c.n} = ${v}`); });
+        if (o.metas && (!Array.isArray(o.metas) || o.metas.some(m => !METAS.some(x => x.k === m)))) ERRO_IMP('meta que não existe');
+        if (o.natureza && !NATUREZAS[o.natureza]) ERRO_IMP(`natureza "${o.natureza}" não existe`);
+        if (o.checagens && Object.values(o.checagens).some(v => !CHK_NIVEIS.some(x => x.v === v))) ERRO_IMP('checagem com valor que não existe');
+        if (o.valor && o.valor.nivel && !VALORES[o.valor.nivel]) ERRO_IMP(`valor "${o.valor.nivel}" não existe`);
+        if (o.dadoPessoal && o.dadoPessoal.nivel && !DADOS_P[o.dadoPessoal.nivel]) ERRO_IMP(`dado pessoal "${o.dadoPessoal.nivel}" não existe`);
+        if (o.autonomia && o.autonomia.nivel && !AUTONOMIA[o.autonomia.nivel]) ERRO_IMP(`nível de autonomia "${o.autonomia.nivel}" não existe`);
+        if (o.previsao && !/^\d{4}-\d{2}-\d{2}$/.test(o.previsao)) ERRO_IMP(`previsão "${o.previsao}" fora do formato AAAA-MM-DD`);
+      } else {
+        b.cels.forEach(([c, t]) => {
+          if (t === '' || (atual && t === c.get(atual))) return; // vazio ou igual ao que a página mostra: mantém
+          try { c.set(o, t, ctx); } catch (e) { if (e.imp) ERRO_IMP(`coluna "${c.h}": ${e.message}`); throw e; }
+        });
+      }
+      ['nome', 'setor'].forEach(k => { o[k] = String(o[k] || '').trim(); });
+      if (!o.nome) ERRO_IMP('falta o nome da solução');
+      if (!o.setor) ERRO_IMP('falta a área');
+      Object.entries(IMP_LIM).forEach(([k, lim]) => { if (String(o[k] || '').length > lim) ERRO_IMP(`${k === 'setor' ? 'área' : k} com mais de ${lim} caracteres`); });
+      if (String((o.autonomia || {}).comPessoa || '').length > 200) ERRO_IMP('"Fica com uma pessoa" com mais de 200 caracteres');
+      if (String((o.dadoPessoal || {}).qual || '').length > 160) ERRO_IMP('"Qual dado" com mais de 160 caracteres');
+      if ((o.dependeDe || []).includes(b.id)) ERRO_IMP('a solução depende dela mesma');
+      if (usados.has(b.id)) ERRO_IMP(`é a mesma solução da linha ${usados.get(b.id)}`);
+      usados.set(b.id, b.n);
+      delete o.id;
+      const campos = atual ? [...new Set([...Object.keys(o), ...Object.keys(atual)])].filter(k => k !== 'id' && JSON.stringify(o[k]) !== JSON.stringify(atual[k])) : [];
+      Object.assign(l, { o, acao: !atual ? 'nova' : campos.length ? 'muda' : 'igual', campos });
+    } catch (e) {
+      if (!e.imp) throw e;
+      Object.assign(l, { acao: 'erro', msg: e.message, nome: ehJSON ? b.o.nome : ((b.cels.find(([c]) => c.h === 'Solução') || [])[1]) });
+    }
+    linhas.push(l);
+  });
+  // Código repetido entre soluções diferentes, depois de aplicar o arquivo.
+  const finais = new Map(items.map(i => [i.id, i])); linhas.forEach(l => { if (l.o) finais.set(l.id, l.o); });
+  const porCodFinal = new Map();
+  finais.forEach((v, id) => { const c = String(v.codigo || '').trim().toLowerCase(); if (!c) return; if (porCodFinal.has(c) && porCodFinal.get(c) !== id) { const l = linhas.find(x => x.id === id && x.o) || linhas.find(x => x.id === porCodFinal.get(c) && x.o); if (l) Object.assign(l, { acao: 'erro', msg: `o código ${v.codigo} já é usado por outra solução` }); } else porCodFinal.set(c, id); });
+  return { linhas, ignoradas: [...ignoradas].filter(Boolean), formato: ehJSON ? 'JSON' : 'CSV' };
+}
+
+/* Lista de colunas e valores aceitos, montada das mesmas regras que conferem o arquivo. */
+function ajudaImpHTML(){
+  const lst = a => a.join(', ');
+  const tam = n => `Texto, até ${n} caracteres.`;
+  const A = {
+    'Código': ['codigo', 'Até 12 caracteres. Acha a solução que já existe; sem código igual, a linha entra como nova.'],
+    'Solução': ['nome', 'Obrigatório na solução nova. ' + tam(90)],
+    'Área': ['setor', `Obrigatório na solução nova. ${tam(40)} Sugeridas: ${lst(SETORES)}.`],
+    'Setor dono': ['donos (lista)', 'Um ou mais, separados por vírgula.'],
+    'O que faz': ['descricao', tam(500)], 'O que resolve': ['resolve', tam(500)], 'Justificativa': ['justificativa', tam(400)],
+    'Natureza': ['natureza: ' + lst(Object.keys(NATUREZAS)), lst(Object.values(NATUREZAS)) + '.'],
+    'Metas': ['metas (lista): ' + lst(METAS.map(m => m.k)), 'Separadas por vírgula: ' + lst(METAS.map(m => m.n)) + '.'],
+    'Valor': ['valor.nivel: ' + lst(Object.keys(VALORES)), lst(Object.values(VALORES).map(v => v.l)) + '.'],
+    'Origem do valor': ['valor.nivelOrigem: ' + lst(Object.keys(CONFS)), lst(Object.values(CONFS)) + '.'],
+    'Dado pessoal': ['dadoPessoal.nivel: ' + lst(Object.keys(DADOS_P)), lst(Object.values(DADOS_P)) + '.'],
+    'Qual dado': ['dadoPessoal.qual', tam(160)],
+    'Até onde o agente vai': ['autonomia.nivel: 1 a 4', 'O número de 1 a 4, sozinho ou com o texto: ' + Object.entries(AUTONOMIA).map(([n, a]) => `${n}. ${a.l}`).join('; ') + '.'],
+    'Fica com uma pessoa': ['autonomia.comPessoa', tam(200)],
+    'Responsável': ['responsavel', tam(80)],
+    'Previsão': ['previsao: AAAA-MM-DD', 'Data no formato DD/MM/AAAA.'],
+    'Meta (resultado esperado)': ['resultadoEsperado', 'Texto.'],
+    'Indicador': ['medicao.indicador', 'Texto.'], 'Método': ['medicao.metodo', 'Texto.'], 'Linha de base do indicador': ['medicao.base', 'Texto.'],
+    'Depende de': ['dependeDe (lista de ids ou códigos)', 'Códigos ou nomes de soluções, separados por | ou vírgula. Pode citar uma solução nova do mesmo arquivo.']
+  };
+  CRIT.forEach(c => { A[`${c.n} (${c.peso})`] = [`notas.${c.k}${c.k === 'dados' ? ' (ou notas.tecnico)' : ''}: 0, ${c.peso / 2} ou ${c.peso}`, `0, ${numBR(c.peso / 2)} ou ${c.peso}. ${c.d}.`]; });
+  CHECKS.forEach(c => { A[`Chk ${c.n.toLowerCase()}`] = [`checagens.${c.k}: ` + lst(CHK_NIVEIS.map(x => x.v)), lst(CHK_NIVEIS.map(x => x.l)) + '.']; });
+  return `<table><thead><tr><th>Coluna do CSV</th><th>Valores aceitos</th><th>Campo no JSON</th></tr></thead><tbody>${IMP_COLS.map(c => {
+    const [j, v] = A[c.h] || ['', ''];
+    return `<tr><td>${esc(c.h)}</td><td>${esc(v)}</td><td><code>${esc(j)}</code></td></tr>`;
+  }).join('')}</tbody></table>`;
+}
+const ROT_CAMPO = { codigo:'código', nome:'nome', setor:'área', donos:'setor dono', descricao:'o que faz', resolve:'o que resolve', justificativa:'justificativa', natureza:'natureza', metas:'metas', notas:'notas', valor:'valor', checagens:'checagens', processo:'processo', operacao:'tempo depois', dadoPessoal:'dado pessoal', autonomia:'até onde vai', responsavel:'responsável', previsao:'previsão', resultadoEsperado:'meta', medicao:'medição', dependeDe:'depende de' };
+let planoImp = null;
+function mostrarPlano(){
+  const box = $('#imp-res'), p = planoImp;
+  box.hidden = !p;
+  if (!p) return;
+  const c = { nova:0, muda:0, igual:0, erro:0 };
+  p.linhas.forEach(l => { c[l.acao]++; });
+  const grava = c.nova + c.muda;
+  $('#imp-resumo').innerHTML = `${p.formato}: <b>${plural(c.nova, 'nova', 'novas')}</b>, <b>${c.muda} ${c.muda === 1 ? 'muda' : 'mudam'}</b>, ${plural(c.igual, 'igual', 'iguais')}${c.erro ? `, <b style="color:var(--crit)">${plural(c.erro, 'com erro', 'com erro')}</b>. Corrija o arquivo e escolha de novo: nada é gravado enquanto houver erro` : ''}.`
+    + (p.ignoradas.length ? ` Ignoradas por serem calculadas ou fora da importação: ${esc(p.ignoradas.slice(0, 12).join(', '))}${p.ignoradas.length > 12 ? ` e mais ${p.ignoradas.length - 12}` : ''}.` : '');
+  const ord = { erro:0, nova:1, muda:2, igual:3 };
+  const txt = l => l.acao === 'erro' ? `Erro: ${esc(l.msg)}` : l.acao === 'nova' ? 'Entra no roadmap' : l.acao === 'muda' ? 'Muda: ' + esc(l.campos.map(k => ROT_CAMPO[k] || k).join(', ')) : 'Nada muda';
+  const cls = { erro:'e', nova:'n', muda:'m', igual:'i' };
+  $('#imp-tab').innerHTML = `<table><thead><tr><th>Linha</th><th>Solução</th><th>O que acontece</th></tr></thead><tbody>${[...p.linhas].sort((a, b) => ord[a.acao] - ord[b.acao] || a.n - b.n).map(l => {
+    const o = l.o || l.atual || {}; const nome = l.o ? rotulo(l.o) : (l.atual ? rotulo(l.atual) : (l.nome || '–'));
+    return `<tr><td>${l.n}</td><td>${esc(nome)}</td><td class="${cls[l.acao]}">${txt(l)}</td></tr>`;
+  }).join('')}</tbody></table>`;
+  const bt = $('#imp-gravar');
+  bt.disabled = !!c.erro || !grava;
+  bt.textContent = grava ? `Importar ${plural(grava, 'solução', 'soluções')}` : 'Nada para importar';
+}
+async function escolherArquivoImp(input){
+  const f = input.files && input.files[0]; input.value = '';
+  $('#imp-st').textContent = '';
+  if (!f) return;
+  if (f.size > 4 * 1024 * 1024) { planoImp = null; mostrarPlano(); $('#imp-st').textContent = 'O arquivo passa de 4 MB.'; return; }
+  const txt = await f.text();
+  const p = planoImportacao(f.name, txt);
+  if (p.erroGeral) { planoImp = null; mostrarPlano(); $('#imp-st').textContent = p.erroGeral; return; }
+  planoImp = p; mostrarPlano();
+}
+async function gravarImportacao(){
+  const p = planoImp; if (!p || !window.LOCAL || !LOCAL.importar) return;
+  const agora = new Date().toISOString();
+  const itens = p.linhas.filter(l => l.acao === 'nova' || l.acao === 'muda').map(l => ({ id: l.id, data: Object.assign({}, l.o, { criadoEm: l.atual && l.atual.criadoEm || agora, atualizadoEm: agora }) }));
+  if (!itens.length || p.linhas.some(l => l.acao === 'erro')) return;
+  const bt = $('#imp-gravar'); bt.disabled = true; $('#imp-st').textContent = 'Gravando…';
+  try {
+    const r = await LOCAL.importar(itens);
+    planoImp = null; mostrarPlano();
+    $('#imp-st').innerHTML = `${plural(r.gravadas, 'solução gravada', 'soluções gravadas')}. A cópia do banco de antes ficou em <code>data/backups/${esc(r.copia)}</code>.`;
+    toast(`${plural(r.gravadas, 'solução importada', 'soluções importadas')}`);
+  } catch (e) { bt.disabled = false; $('#imp-st').textContent = 'Não foi possível gravar: ' + (e.message || 'erro desconhecido') + '. Nada foi alterado.'; }
+}
+async function baixarModeloImp(){
+  const cel = v => { const s = String(v == null ? '' : v); return /[";\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  const ex = { 'Código':'COM-01', 'Solução':'Resposta a Cotações', 'Área':'Vendas', 'O que faz':'Lê o pedido de cotação e prepara a proposta com a tabela de preços.', 'O que resolve':'A cotação demora porque depende de uma pessoa montar tudo à mão.',
+    'Natureza':'IA + automação', 'Metas':'Receita, Produtividade', 'Manual (4)':'4', 'Infra (3)':'1,5', 'Técnico (2)':'1', 'Cultura (1)':'1', 'Valor':'alto', 'Origem do valor':'hipótese',
+    'Chk dado':'Parcial', 'Dado pessoal':'Dado pessoal', 'Qual dado':'Nome e telefone do contato', 'Até onde o agente vai':'2. Sugere, e uma pessoa aprova antes', 'Fica com uma pessoa':'Preço fora da tabela e desconto acima da política' };
+  const cab = IMP_COLS.map(c => c.h === 'Time técnico (2)' ? 'Técnico (2)' : c.h);
+  const csv = '﻿' + [cab.map(cel).join(';'), cab.map(h => cel(ex[h] || '')).join(';')].join('\r\n');
+  try { await downloads.save({ filename: 'modelo-importar-solucoes.csv', data: csv }); }
+  catch (e) { $('#imp-st').textContent = 'Não foi possível baixar o modelo.'; }
+}
+$('#imp-escolher').addEventListener('click', () => $('#imp-arq').click());
+$('#imp-arq').addEventListener('change', e => escolherArquivoImp(e.target));
+$('#imp-gravar').addEventListener('click', gravarImportacao);
+$('#imp-limpar').addEventListener('click', () => { planoImp = null; mostrarPlano(); $('#imp-st').textContent = ''; });
+$('#imp-modelo').addEventListener('click', baixarModeloImp);
+$('#imp-ajuda').addEventListener('toggle', e => { if (e.target.open) $('#imp-ajuda-tab').innerHTML = ajudaImpHTML(); });
 
 /* ---------- Exportar CSV ---------- */
 async function exportarCSV(){

@@ -390,8 +390,16 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ligarConfig); else ligarConfig();
 
+  // Grava de uma vez as soluções conferidas pela página (Configurações → Importar soluções).
+  async function importar(itens) {
+    const r = await api('POST', '/api/importar', { itens });
+    if (carregando) await carregando.catch(() => {});
+    await recarregar(true).catch(() => {});
+    return r;
+  }
+
   window.LOCAL = {
-    cfg, iaNome, abrirConfig,
+    cfg, iaNome, abrirConfig, importar,
     onCfg(fn) { ouvintesCfg.push(fn); if (estado) { try { fn(cfg()); } catch (e) { console.error(e); } } }
   };
 })();

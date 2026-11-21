@@ -125,6 +125,8 @@ async function api(req, res, url) {
     }
   }
 
+  if (p === '/api/importar' && m === 'POST') return importar(req, res);
+
   if (p === '/api/exemplos') {
     if (m === 'GET') return json(res, 200, { total: Object.keys(lerExemplos()).length });
     if (m === 'POST') return exemplos(req, res);
@@ -192,6 +194,22 @@ async function exemplos(req, res) {
     return json(res, 200, { rev, apagadas: ids.length });
   }
   return falha(res, 400, 'invalid_argument', 'Ação desconhecida.');
+}
+
+// Importação pela tela (Configurações): a página confere o arquivo e manda só o que muda.
+// Copia o banco antes e grava tudo de uma vez; se um item for recusado, nada é gravado.
+const LIMITE_IMPORTAR = 2000;
+async function importar(req, res) {
+  const b = await lerJSON(req) || {};
+  const itens = Array.isArray(b.itens) ? b.itens : null;
+  if (!itens || !itens.length) return falha(res, 400, 'invalid_argument', 'Nenhuma solução para importar.');
+  if (itens.length > LIMITE_IMPORTAR) return falha(res, 400, 'invalid_argument', `No máximo ${LIMITE_IMPORTAR} soluções por vez.`);
+  const lote = itens.map(i => ({ col: 'solucoes', id: String(i && i.id || ''), data: i && i.data }));
+  if (lote.some(i => !i.data || typeof i.data !== 'object' || Array.isArray(i.data) || !String(i.data.nome || '').trim())) return falha(res, 400, 'invalid_argument', 'Toda solução precisa de nome.');
+  const copia = `antes-de-importar-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+  store.copia(copia);
+  const rev = store.lote(lote);
+  return json(res, 200, { rev, gravadas: lote.length, copia });
 }
 
 // Resposta em NDJSON: {"t":"d","d":"trecho"} durante a geração, depois {"t":"fim",...} ou {"t":"erro",...}.
