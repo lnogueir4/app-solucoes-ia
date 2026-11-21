@@ -384,6 +384,14 @@
   .procs-lista { margin:8px 0 0; padding:0; list-style:none; font-family:var(--font-mono); font-size:11.5px; color:var(--muted); }
   .procs-lista li { margin:2px 0; }
   .procs-lista b { color:var(--ink-soft); font-weight:600; }
+  .oper-row { display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr) auto; gap:10px; align-items:end; }
+  @media (max-width:640px){ .oper-row { grid-template-columns:minmax(0,1fr) auto; } .oper-row .fld:first-child { grid-column:1 / -1; } }
+  .calc .late { color:var(--crit); font-weight:600; }
+  .tempo-func { margin:0 0 16px; }
+  .tempo-func:empty { display:none; }
+  .tempo-func .pk { font:600 10.5px var(--font-mono); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0; }
+  .tempo-func .facts { margin-top:6px; }
+  section.sec.fechada .sec-head .lim { display:none; }
   .ck { display:flex; gap:8px; align-items:flex-start; font-size:13.5px; cursor:pointer; }
   .ck input { margin-top:4px; width:16px; height:16px; flex:none; }
   .rad input:checked + span.fq { background:var(--surface-2); color:var(--ink); }
@@ -535,10 +543,14 @@
       <label class="lim spacer" for="f-limite">Em paralelo, no máximo
         <select id="f-limite"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
       </label>
+      <label class="lim" for="f-lim-horas" title="Quanto tempo por semana cada função pode dar às soluções em execução e implantadas. O app avisa ao iniciar uma solução que passa desse limite.">Por função, até
+        <select id="f-lim-horas"><option value="0">sem limite</option><option value="1">1 h/semana</option><option value="2">2 h/semana</option><option value="4">4 h/semana</option><option value="6">6 h/semana</option><option value="8">8 h/semana</option><option value="12">12 h/semana</option><option value="16">16 h/semana</option><option value="20">20 h/semana</option></select>
+      </label>
     </div>
     <div class="sec-body" id="sb-execucao">
       <p class="sec-intro">Execução em série: uma solução de cada vez, começando pela de retorno mais rápido. A próxima começa quando a anterior estiver em uso. As atrasadas aparecem primeiro.</p>
       <p class="fila" id="fila" aria-live="polite"></p>
+      <div class="tempo-func" id="tempo-func"></div>
       <div id="lista-exec"></div>
     </div>
   </section>
@@ -829,6 +841,17 @@
           <div><button type="button" class="btn-s" id="btn-proc-add">+ Outro processo</button></div>
           <p class="calc" id="calc-carga"></p>
           <label class="ck"><input type="checkbox" id="p-valid"><span>Linha de base validada com quem executa (3 casos cronometrados)</span></label>
+        </div>
+      </details>
+
+      <details class="ed-sec" id="sec-oper">
+        <summary><span class="sk">Tempo de quem opera depois</span><span class="sr" id="sr-oper"></span></summary>
+        <div class="in">
+          <p class="ed-hint">Quanto tempo por semana a solução vai pedir de cada função depois de implantada: aprovar, conferir, corrigir, alimentar. Escreva a função do mesmo jeito em todas as soluções, para o app somar o tempo de cada uma.</p>
+          <div class="procs-ed" id="opers"></div>
+          <datalist id="dl-funcoes"></datalist>
+          <div><button type="button" class="btn-s" id="btn-oper-add">+ Outra função</button></div>
+          <p class="calc" id="calc-oper"></p>
         </div>
       </details>
 
@@ -1365,6 +1388,29 @@ function textoCarga(it){
   if (!l.length) return '';
   return l.length === 1 ? textoItem(l[0]) : `${fmt(cargaH(it))} h/mês, soma de ${l.length} processos`;
 }
+/* Tempo que a solução pede de cada função depois de implantada, somado por função (M-08) */
+const chaveFunc = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+function operDe(it){ return (Array.isArray(it && it.operacao) ? it.operacao : []).filter(x => x && String(x.funcao || '').trim() && toNum(x.horasSemana) > 0); }
+const horasOper = it => operDe(it).reduce((s, x) => s + toNum(x.horasSemana), 0);
+function limiteHoras(){ const n = Number(perfil && perfil.limiteHorasFuncao); return n > 0 ? n : 0; }
+const ocupa = it => ['execucao', 'implantada'].includes(statusDe(it));
+function tempoPorFuncao(lista){
+  const m = new Map();
+  lista.forEach(it => operDe(it).forEach(x => {
+    const k = chaveFunc(x.funcao), h = toNum(x.horasSemana);
+    const e = m.get(k) || { nome: String(x.funcao).trim(), horas: 0, sols: [] };
+    e.horas += h; e.sols.push(`${curto(it)}: ${fmt(h)} h`);
+    m.set(k, e);
+  }));
+  return m;
+}
+/* Funções que passam do limite se esta solução ocupar tempo junto com as em execução e implantadas */
+function excessos(it){
+  const lim = limiteHoras(); if (!lim) return [];
+  const m = tempoPorFuncao(items.filter(i => ocupa(i) && i.id !== it.id).concat([it]));
+  const ks = [...new Set(operDe(it).map(x => chaveFunc(x.funcao)))];
+  return ks.map(k => m.get(k)).filter(e => e && e.horas > lim);
+}
 function procsListaHTML(it){
   const l = procsComCarga(it);
   if (l.length < 2) return '';
@@ -1504,6 +1550,13 @@ function factsHTML(it, modo){
   const c = cargaH(it), conf = confDe(it), np = procsComCarga(it).length;
   const selo = CONFS[conf] ? `<span class="selo">${CONFS[conf]}</span>` : '';
   if (c != null) f.push(`<span class="fact" title="${esc(np > 1 ? detalheProcs(it).join('; ') + '. A origem dos números é a mais fraca entre os processos.' : textoCarga(it))}">Carga <b>${fmt(c)} h/mês</b>${np > 1 ? ` em ${np} processos` : ''}${selo}</span>`);
+  const ops = operDe(it);
+  if (ops.length) {
+    const ex = modo === 'ativa' ? excessos(it) : [];
+    const tit = `Tempo por semana que a solução pede depois de implantada: ${ops.map(x => `${x.funcao} ${fmt(toNum(x.horasSemana))} h`).join('; ')}`
+      + (ex.length ? `. Se começar agora, passa do limite de ${fmt(limiteHoras())} h por semana: ${ex.map(e => `${e.nome} (${fmt(e.horas)} h)`).join(', ')}.` : '');
+    f.push(`<span class="fact${ex.length ? ' lock' : ''}" title="${esc(tit)}">Pede <b>${fmt(horasOper(it))} h/semana</b> de ${ops.length === 1 ? esc(ops[0].funcao) : ops.length + ' funções'}${ex.length ? ' · passa do limite' : ''}</span>`);
+  }
   const gc = ganho(it, 'Conservador'), gp = ganho(it, 'Provavel'), ca = custoAtual(it);
   if (gc != null || gp != null) {
     const faixaTxt = gc != null && gp != null && Math.round(gp) !== Math.round(gc) ? `${brl(gc)} a ${brl(gp)}` : brl(gc != null ? gc : gp);
@@ -1536,6 +1589,14 @@ function render(){
   const ls = $('#f-limite');
   ls.value = String(lim);
   ls.disabled = !(db && canWrite && loaded);
+  const limH = limiteHoras(), lh = $('#f-lim-horas');
+  lh.value = [...lh.options].some(o => o.value === String(limH)) ? String(limH) : '0';
+  lh.disabled = ls.disabled;
+  const tf = [...tempoPorFuncao(items.filter(ocupa)).values()].sort((a, b) => b.horas - a.horas);
+  $('#tempo-func').innerHTML = tf.length ? `<p class="pk">Tempo por semana que as soluções em execução e implantadas pedem de cada função</p><div class="facts">${tf.map(e => {
+    const acima = limH && e.horas > limH;
+    return `<span class="fact${acima ? ' bad' : ''}" title="${esc(e.sols.join('; '))}${acima ? '. Acima do limite.' : ''}">${esc(e.nome)} <b>${fmt(e.horas)} h</b>${limH ? ` de ${fmt(limH)}` : ''}</span>`;
+  }).join('')}</div>` : '';
 
   if (loaded) {
     const comecar = roadmap.filter(i => faixa(i) === FAIXAS.comecar).length;
@@ -1654,7 +1715,7 @@ function render(){
 
 /* ---------- Toast ---------- */
 let toastT = null;
-function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 3200); }
+function toast(msg, ms){ const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, ms || 3200); }
 
 /* ---------- Ações nas linhas ---------- */
 function onRowClick(e){
@@ -1669,10 +1730,11 @@ function onRowClick(e){
     if (nExec >= lim) avisos.push(`já há ${nExec} em execução e o limite é ${lim}`);
     const tv = travas(it);
     if (tv.length) avisos.push('trava: ' + tv.map(t => t.l.toLowerCase()).join(', '));
+    excessos(it).forEach(e => avisos.push(`${e.nome} passa a ${fmt(e.horas)} h por semana, acima do limite de ${fmt(limiteHoras())} h`));
     if (avisos.length && b.dataset.confirm !== '1') {
       b.dataset.confirm = '1'; b.classList.add('confirm'); b.textContent = 'Iniciar mesmo assim?';
-      toast('Atenção: ' + avisos.join('; ') + '.');
-      setTimeout(() => { if (b.isConnected) { b.dataset.confirm = ''; b.classList.remove('confirm'); b.textContent = 'Iniciar execução'; } }, 5000);
+      toast('Atenção: ' + avisos.join('; ') + '.', 7000);
+      setTimeout(() => { if (b.isConnected) { b.dataset.confirm = ''; b.classList.remove('confirm'); b.textContent = 'Iniciar execução'; } }, 7000);
       return;
     }
     return mover(id, { status:'execucao', inicioExecucao: agora }, 'Solução em execução. Defina responsável, previsão e plano de medição em Editar.');
@@ -1734,6 +1796,7 @@ function lerForm(){
       itens: lerProcs().filter(x => !procVazio(x)),
       baseValidada: $('#p-valid').checked
     },
+    operacao: lerOper().filter(x => x.funcao || x.horasSemana != null),
     checagens,
     valor: {
       custoHora: vNum('#v-ch'), supervisaoHoras: vNum('#v-sup'), custoHoraSupervisor: vNum('#v-chs'),
@@ -1758,6 +1821,8 @@ function preencherV2(it){
   $('#p-doc').value = DOCS[p.documentado] ? p.documentado : '';
   $('#p-ent').value = ENTRADAS[p.entrada] ? p.entrada : '';
   renderProcs(procsDe(it).map(x => ({ ...x })));
+  renderOper((Array.isArray(it.operacao) ? it.operacao : []).map(x => ({ ...x })));
+  $('#sec-oper').open = operDe(it).length > 0;
   $('#p-valid').checked = !!p.baseValidada;
   CHECKS.forEach(c => document.querySelectorAll(`input[name="k-${c.k}"]`).forEach(r => { r.checked = r.value === ch[c.k]; }));
   $('#v-ch').value = numTxt(v.custoHora); $('#v-sup').value = numTxt(v.supervisaoHoras); $('#v-chs').value = numTxt(v.custoHoraSupervisor);
@@ -1817,6 +1882,43 @@ function lerProcs(){
   });
 }
 const procVazio = x => !x.nome && !x.executor && x.frequencia == null && x.minutos == null && !x.confianca;
+/* Editor do tempo de quem opera depois: uma linha por função */
+function operRowHTML(i){
+  return `<div class="oper-row" data-oper="${i}">
+    <div class="fld"><label for="op-f-${i}">Função</label><input type="text" id="op-f-${i}" class="op-f" maxlength="80" list="dl-funcoes" placeholder="Ex.: Analista comercial"></div>
+    <div class="fld"><label for="op-h-${i}">Horas por semana</label><input type="text" inputmode="decimal" id="op-h-${i}" class="op-h" maxlength="5" placeholder="Ex.: 1,5"></div>
+    <button type="button" class="btn-s danger" data-oper-rm="${i}" aria-label="Remover a função ${i + 1}">Remover</button>
+  </div>`;
+}
+function renderOper(lista){
+  const l = (lista && lista.length ? lista : [{}]).slice(0, MAX_PROCS);
+  $('#opers').innerHTML = l.map((_, i) => operRowHTML(i)).join('');
+  [...document.querySelectorAll('#opers .oper-row')].forEach((r, i) => {
+    r.querySelector('.op-f').value = l[i].funcao || ''; r.querySelector('.op-h').value = numTxt(l[i].horasSemana);
+  });
+  $('#btn-oper-add').hidden = l.length >= MAX_PROCS;
+  const fs = new Map();
+  items.forEach(it => executoresDe(it).concat(operDe(it).map(x => x.funcao)).forEach(n => { const k = chaveFunc(n); if (k && !fs.has(k)) fs.set(k, String(n).trim()); }));
+  $('#dl-funcoes').innerHTML = [...fs.values()].sort((a, b) => a.localeCompare(b, 'pt-BR')).map(n => `<option value="${esc(n)}">`).join('');
+}
+function lerOper(){
+  return [...document.querySelectorAll('#opers .oper-row')].map(r => ({ funcao: r.querySelector('.op-f').value.trim(), horasSemana: toNum(r.querySelector('.op-h').value) }));
+}
+function atualizarOper(f){
+  const limH = limiteHoras(), ops = operDe(f);
+  const outros = tempoPorFuncao(items.filter(i => ocupa(i) && i.id !== editId));
+  const somaF = new Map(); ops.forEach(x => { const k = chaveFunc(x.funcao); somaF.set(k, { nome: x.funcao, h: (somaF.has(k) ? somaF.get(k).h : 0) + toNum(x.horasSemana) }); });
+  const linhas = [...somaF.entries()].map(([k, x]) => {
+    const e = outros.get(k), tot = (e ? e.horas : 0) + x.h, acima = limH && tot > limH;
+    return `${esc(x.nome)}: <b>${fmt(x.h)} h por semana</b> nesta solução${e ? `; com as em execução e implantadas, <b>${fmt(tot)} h</b>` : ''}${acima ? ` <span class="late">acima do limite de ${fmt(limH)} h</span>` : ''}.`;
+  });
+  const inc = f.operacao.some(x => !x.funcao || !(x.horasSemana > 0));
+  let t = linhas.length ? linhas.join('<br>') : 'Nenhum tempo informado. Preencha quando a solução vai pedir trabalho fixo de alguém depois de implantada.';
+  if (inc) t += ' Há uma linha incompleta: falta a função ou as horas.';
+  if (linhas.length && !limH) t += ' Defina o limite por função na seção 02 para o app avisar quando alguém passar dele.';
+  $('#calc-oper').innerHTML = t;
+  $('#sr-oper').textContent = ops.length ? `${fmt(horasOper(f))} h por semana` : 'não informado';
+}
 function atualizarV2(f){
   const rows = lerProcs(), els = [...document.querySelectorAll('#procs .proc')];
   els.forEach((r, i) => {
@@ -1851,6 +1953,7 @@ function atualizarV2(f){
   $('#v-nconf').disabled = !f.valor.nivel;
   const tv = travas(f);
   $('#travas-live').innerHTML = tv.map(t => `<span class="fact ${t.c}" title="${esc(t.d)}">${esc(t.l)}</span>`).join('');
+  atualizarOper(f);
   const npF = procsComCarga(f).length, confF = confDe(f);
   $('#sr-proc').textContent = c != null ? `${fmt(c)} h/mês${npF > 1 ? ` em ${npF} processos` : ''}${CONFS[confF] ? ' · ' + CONFS[confF] : ''}` : 'não preenchido';
   const nChk = Object.keys(f.checagens).length;
@@ -1951,6 +2054,8 @@ async function salvar(e){
   if (!f.setor) { $('#f-err').textContent = 'Escolha ou digite a área.'; $('#f-setor').focus(); return; }
   const dupCod = f.codigo && items.find(i => i.id !== editId && codigoDe(i).toLowerCase() === f.codigo.toLowerCase());
   if (dupCod) { $('#f-err').textContent = `O código ${f.codigo} já é usado por "${dupCod.nome || 'outra solução'}". Escolha outro ou deixe em branco.`; $('#f-cod').focus(); return; }
+  if (f.operacao.some(x => !x.funcao || !(x.horasSemana > 0))) { $('#f-err').textContent = 'Em "Tempo de quem opera depois", cada linha precisa da função e das horas por semana.'; $('#sec-oper').open = true; return; }
+  if (f.operacao.some(x => x.horasSemana > 60)) { $('#f-err').textContent = 'As horas por semana de uma função vão até 60.'; $('#sec-oper').open = true; return; }
   if (f.valor.nivel && !f.valor.nivelOrigem) f.valor.nivelOrigem = 'hipotese';
   const stF = $('#f-status').value, dIni = stF === 'ativa' ? '' : $('#f-ini').value, dImpl = stF === 'implantada' ? $('#f-impl').value : '';
   const hoje = hojeYMD();
@@ -2384,10 +2489,18 @@ async function salvarLimite(){
   try { await db.doc('config/perfil').set(p); toast(`Limite em paralelo: ${n}`); }
   catch (err) { falhaEscrita(err); render(); }
 }
+async function salvarLimiteHoras(){
+  if (!db) return;
+  const n = Number($('#f-lim-horas').value) || 0;
+  const p = Object.assign({}, perfil || {}, { limiteHorasFuncao: n });
+  try { await db.doc('config/perfil').set(p); toast(n ? `Limite por função: ${n} h por semana` : 'Sem limite de horas por função'); }
+  catch (err) { falhaEscrita(err); render(); }
+}
 async function salvarPerfil(){
   if (!db) return;
   const p = Object.assign(lerPerfil(), { atualizadoEm: new Date().toISOString() });
   if (perfil && perfil.limiteExec) p.limiteExec = perfil.limiteExec;
+  if (perfil && perfil.limiteHorasFuncao) p.limiteHorasFuncao = perfil.limiteHorasFuncao;
   PERFIL_LEGADO.forEach(i => { if (perfil && typeof perfil[i.k] === 'boolean' && !p.regua[i.dim]) p[i.k] = perfil[i.k]; });
   $('#btn-perfil').disabled = true;
   try { await db.doc('config/perfil').set(p); perfilSujo = false; setPf(`Perfil salvo em ${fmtData(p.atualizadoEm)}.`, false); toast('Perfil da empresa salvo'); }
@@ -2520,7 +2633,7 @@ async function exportarCSV(){
   const ordemStatus = { ativa:0, execucao:1, implantada:2, arquivada:3 };
   const lista = [...items].sort((a, b) => (ordemStatus[statusDe(a)] - ordemStatus[statusDe(b)]) || ordem(a, b));
   const cab = ['Situação','Área','Setor dono','Código','Solução','Facilidade','Valor','Origem do valor','Faixa','Base de (soluções na fila)','Depende de','Metas','Manual (4)','Infra (3)','Time técnico (2)','Cultura (1)','Justificativa','Responsável','Previsão','Início da execução','Implantada em','Meta (resultado esperado)','Resultado medido','Avaliação','O que faz','O que resolve','Ajustes manuais sobre a IA',
-    'Natureza','Travas','Chk dado','Chk integrações','Chk qualidade','Chk regras','Quem executa','Documentação','Entrada','Carga (h/mês)','Processos','Origem dos números','Linha de base validada',
+    'Natureza','Travas','Chk dado','Chk integrações','Chk qualidade','Chk regras','Quem executa','Documentação','Entrada','Carga (h/mês)','Processos','Origem dos números','Linha de base validada','Tempo depois de implantada (h por semana)',
     'Custo atual (R$/mês)','Ganho conservador (R$/mês)','Ganho provável (R$/mês)','Custo da solução (R$/mês)','Ganho de receita (R$/mês, não validado)','Base da receita',
     'Indicador','Linha de base do indicador','Prazo (dias)','Método','Cenário conservador','Cenário provável','Cenário otimista'];
   const r0 = n => n == null ? '' : String(Math.round(n));
@@ -2530,6 +2643,7 @@ async function exportarCSV(){
     const p = i.processo || {}, v = i.valor || {}, m = i.medicao || {};
     return [NATUREZAS[i.natureza] || '', travas(i).map(t => t.l).join(' | '), ...CHECKS.map(c => chkL(i, c.k)),
       executoresDe(i).join(', '), DOCS[p.documentado] || '', ENTRADAS[p.entrada] || '', n1(cargaH(i)), detalheProcs(i).join(' | '), CONFS[confDe(i)] || '', p.baseValidada ? 'sim' : 'não',
+      operDe(i).map(x => `${x.funcao}: ${n1(toNum(x.horasSemana))}`).join(' | '),
       r0(custoAtual(i)), r0(ganho(i, 'Conservador')), r0(ganho(i, 'Provavel')), r0(toNum(v.custoSolucao)), r0(toNum(v.receita)), BASES_REC[v.baseReceita] || '',
       m.indicador || '', m.base || '', r0(toNum(m.prazoDias)), m.metodo || '', m.conservador || '', m.provavel || '', m.otimista || ''];
   };
@@ -2588,7 +2702,7 @@ $('#frm').addEventListener('change', e => {
   atualizarLive();
   if (e.target.matches('input[name="meta"], #deps .rad input')) renderDiverg();
 });
-$('#frm').addEventListener('input', e => { if (e.target.matches('#sec-proc input[type="text"], #sec-valor input[type="text"], #m-ind')) atualizarLive(); });
+$('#frm').addEventListener('input', e => { if (e.target.matches('#sec-proc input[type="text"], #sec-oper input[type="text"], #sec-valor input[type="text"], #m-ind')) atualizarLive(); });
 $('#btn-base').addEventListener('click', () => {
   const f = lerForm(), t = textoCarga(f);
   if (!t) { toast('Preencha antes a frequência e os minutos em "Processo e linha de base".'); $('#sec-proc').open = true; return; }
@@ -2607,6 +2721,17 @@ $('#procs').addEventListener('click', e => {
   renderProcs(l); atualizarLive();
 });
 $('#f-limite').addEventListener('change', salvarLimite);
+$('#f-lim-horas').addEventListener('change', salvarLimiteHoras);
+$('#btn-oper-add').addEventListener('click', () => {
+  const l = lerOper(); if (l.length >= MAX_PROCS) return;
+  renderOper([...l, {}]); atualizarLive();
+  const novo = document.querySelector('#opers .oper-row:last-child .op-f'); if (novo) novo.focus();
+});
+$('#opers').addEventListener('click', e => {
+  const b = e.target.closest('button[data-oper-rm]'); if (!b) return;
+  const l = lerOper(); l.splice(Number(b.dataset.operRm), 1);
+  renderOper(l); atualizarLive();
+});
 $('#f-dep').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addDep(); } });
 $('#dep-chips').addEventListener('click', e => {
   const b = e.target.closest('button[data-dep-rm]'); if (!b) return;
