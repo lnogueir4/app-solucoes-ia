@@ -51,6 +51,133 @@ O navegador nunca recebe a chave: quem fala com o provedor é o servidor local.
 - **Empresa e logo:** o nome da empresa e as logos dos modos claro e escuro (PNG, JPG, WebP, GIF ou SVG, até 2 MB). Sem logo própria no modo escuro, vale a do modo claro. Sem nenhuma logo, aparece a logo padrão do app.
 - **Áreas:** a lista de áreas sugeridas no cadastro, uma por linha, na ordem de exibição. Também dá para digitar uma área nova direto no cadastro de uma solução.
 
+## Como a nota e a fila são calculadas
+
+Para cada solução, o app responde a duas perguntas: **vale a pena?** e **dá para fazer agora?** Depois, junta as duas
+respostas e monta uma fila, da primeira solução a fazer até a última. A seção 07 da página mostra o mesmo, de forma
+resumida.
+
+### 1. A solução ajuda em alguma meta?
+
+São seis metas. As três primeiras pesam mais: aumentar a receita, diminuir o custo e aumentar a margem. As outras três
+servem de desempate: diminuir o risco, aumentar a produtividade e aumentar o valor da empresa.
+
+Se a solução não ajuda em nenhuma delas, ela vai para "Abandonar", e o resto do cálculo nem importa.
+
+### 2. Facilidade, de 0 a 10
+
+Pense numa prova que vale 10 pontos. A solução ganha pontos por cada coisa de que ela **não** precisa. São quatro
+perguntas:
+
+| A solução precisa de... | Não precisa | Precisa em parte | Precisa |
+|---|---|---|---|
+| Gente fazendo trabalho na mão para ela continuar funcionando? (Manual) | 4 | 2 | 0 |
+| Tecnologia ou ligação entre sistemas que a empresa ainda não tem? (Infra) | 3 | 1,5 | 0 |
+| Gente técnica para ajustar e consertar depois? (Técnico) | 2 | 1 | 0 |
+| Que as pessoas mudem o jeito de trabalhar? (Cultura) | 1 | 0,5 | 0 |
+
+A nota é a soma. **Exemplo:** uma solução não precisa de trabalho na mão (4), precisa de uma peça nova de tecnologia
+(1,5), precisa de alguém ajustando de vez em quando (1) e não muda a rotina de ninguém (1). A nota é 4 + 1,5 + 1 + 1 =
+**7,5**.
+
+O trabalho na mão vale mais pontos porque é o que mais derruba uma solução: se alguém precisa alimentá-la todo dia,
+ela para quando essa pessoa sai de férias.
+
+Duas coisas **não** tiram pontos do Manual. A primeira é a conferência que a lei ou a segurança exige, que fica na
+checagem de regras. A segunda é o trabalho que as pessoas fazem com o resultado, como o vendedor que liga para o
+cliente indicado. Esse tempo entra no valor em reais (item 7): quem cadastra o desconta ao escolher o % do tempo
+eliminado.
+
+O que conta como "em parte" em cada pergunta está na seção 07 da página ("Como dar cada nota"). A IA do app usa a
+mesma régua.
+
+### 3. Valor: alto, médio ou baixo
+
+Quem cadastra diz quanto a solução devolve à empresa: valor alto, médio ou baixo. Um selo mostra de onde veio essa
+resposta: medido, informado, estimado ou só uma hipótese. Se o ganho em reais já foi calculado e o perfil da empresa
+tem os limites (seção 06), o app sugere o nível. Por exemplo: a partir de R$ 5.000 por mês é alto, e a partir de
+R$ 1.000 é médio.
+
+### 4. A faixa: valor × facilidade
+
+Uma solução é **fácil** quando a nota é 7 ou mais. Cruzando o valor com a facilidade, sai a faixa:
+
+| Valor | Fácil (7 a 10) | Difícil (abaixo de 7) |
+|---|---|---|
+| Alto | Começar já | Planejar como projeto |
+| Médio | Próxima onda | Avaliar com cuidado |
+| Baixo | Se sobrar tempo | Abandonar |
+
+**Exemplo:** a solução nota 7,5 com valor médio fica em "Próxima onda".
+
+Sem valor informado, a solução conta como valor médio na ordem, e a faixa sai só da nota: de 9 a 10 é "Começar já";
+de 7 a 8,5, "Próxima onda"; de 5 a 6,5, "Avaliar com cuidado"; abaixo de 5, "Projeto estrutural".
+
+### 5. Travas
+
+Uma trava é um problema que precisa ser resolvido antes de começar, por mais alta que seja a nota. Com trava, quem
+estaria em "Começar já" vai para "Destravar antes". As travas são:
+
+- a solução, na verdade, é organizar o processo;
+- só uma pessoa sabe fazer o processo;
+- uma checagem falhou (dado, integração, qualidade ou regra);
+- ninguém confirmou se há regra legal;
+- a solução trata dado sensível e ainda não tem a regra de quem pode ver o quê;
+- a solução depende de outra que ainda não foi implantada.
+
+### 6. A ordem da fila
+
+Funciona como a tabela de um campeonato: primeiro contam os pontos e, no empate, o saldo de gols, e assim por diante.
+Aqui, a ordem é esta:
+
+1. O valor: alto antes de médio, e médio antes de baixo.
+2. Quantas soluções da fila dependem desta. A solução que é base de outras vem antes.
+3. A faixa.
+4. A nota de facilidade.
+5. Quantas metas principais (receita, custo, margem) ela atinge.
+6. O ganho em reais no cenário conservador.
+
+### 7. O valor em reais
+
+São três contas, uma depois da outra:
+
+1. **Horas por mês (carga)** = vezes por mês × minutos de cada vez ÷ 60. Se a tarefa acontece por semana, multiplique
+   por 4,3, que é o número de semanas de um mês. Se acontece por dia, multiplique pelos dias de trabalho no mês (21, se
+   ninguém informar). Se a solução cobre vários processos, as horas são somadas.
+2. **Custo de hoje** = horas por mês × quanto custa uma hora de quem faz + horas de supervisão por mês × quanto custa
+   uma hora de quem supervisiona. A solução nunca economiza mais do que isso.
+3. **Ganho** = custo de hoje × % do tempo que a solução elimina − quanto a solução custa por mês. A conta é feita duas
+   vezes: com um % conservador (pessimista) e com um % provável. A página mostra o conservador primeiro.
+
+**Exemplo:** uma tarefa acontece 20 vezes por semana e leva 15 minutos.
+- Por mês: 20 × 4,3 = 86 vezes. São 86 × 15 = 1.290 minutos, ou 21,5 horas.
+- Custo de hoje: 21,5 h × R$ 40 = R$ 860, mais 2 h de supervisão × R$ 80 = R$ 160. O total é **R$ 1.020** por mês.
+- Ganho conservador, eliminando 50% do tempo, com a solução custando R$ 200 por mês: R$ 1.020 × 50% − R$ 200 = **R$ 310**
+  por mês.
+- Ganho provável, eliminando 70%: R$ 714 − R$ 200 = **R$ 514** por mês.
+
+A receita nova que a solução pode trazer é anotada à parte. Ela nunca é somada a essa conta, porque é mais difícil de
+provar.
+
+### 8. A prontidão da empresa
+
+A empresa recebe uma nota de 1 a 5 em seis pontos, e cada um tem um peso. A prontidão é a média com esses pesos:
+cada nota é multiplicada pelo seu peso, e os resultados são somados.
+
+| Ponto | Peso | Exemplo de nota | Conta |
+|---|---|---|---|
+| Dados | 25% | 3 | 0,75 |
+| Sistemas e integrações | 20% | 3 | 0,60 |
+| Time técnico | 20% | 2 | 0,40 |
+| Processos | 15% | 3 | 0,45 |
+| Orçamento | 10% | 2 | 0,20 |
+| Cultura | 10% | 4 | 0,40 |
+| **Prontidão** | | | **2,80** |
+
+Até 2,0, cuide primeiro da base: dados, sistemas e processos. Acima de 2,0 e até 3,5, faça uma solução de cada vez,
+começando pelas mais simples e de menor risco. Acima de 3,5, dá para fazer mais de uma ao mesmo tempo. Qualquer ponto
+com nota 1 é um bloqueio, mesmo que a média seja boa.
+
 ## Prompts da IA
 
 Os prompts ficam em `public/index.html`, nas funções `promptIA` (classificar uma solução), `promptReavaliar` (reavaliar com as suas justificativas) e `promptRecalc` (revisar todas com o perfil da empresa). Eles usam os blocos `perfilTexto`, `REGRAS`, `processoTexto`, `contextoTexto`, `FORMATO_V2` e `FORMATO_MOTIVOS`. O texto é o mesmo para todos os provedores. Depois de editar, basta recarregar a página.

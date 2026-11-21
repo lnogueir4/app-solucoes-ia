@@ -161,6 +161,9 @@
   .tiers { display:flex; flex-direction:column; gap:8px; margin:0; padding:0; list-style:none; }
   .tiers li { display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:center; font-size:13px; color:var(--ink-soft); }
   .tiers .rng { font-family:var(--font-mono); font-size:12px; color:var(--ink); text-align:right; font-variant-numeric:tabular-nums; }
+  .tiers.anc li { grid-template-columns:72px 1fr; align-items:start; line-height:1.5; }
+  .tiers.anc .rng { text-align:left; padding-top:1px; }
+  .tiers.anc br + b { display:inline-block; margin-top:6px; }
 
   /* Pills */
   .st { display:inline-flex; flex-direction:row; align-items:center; gap:7px; font-family:var(--font-mono); font-size:11.5px; font-weight:600; padding:3px 10px; border-radius:999px; white-space:nowrap; }
@@ -658,7 +661,7 @@
         </div>
         <div class="lg">
           <h3>Passo 2 · Facilidade ("Ok, mas como?")</h3>
-          <p class="hint">A soma vai de 0 a 10 e mede a <strong>facilidade</strong>, não o retorno. Pontos ganhos quando o projeto <strong>não depende</strong> de cada item. Dependência parcial vale metade. O que a empresa já tem (seção 06) reduz a dependência. A revisão humana exigida por segurança e o trabalho feito com o resultado não contam como manutenção manual: esse tempo entra no ganho.</p>
+          <p class="hint">A soma vai de 0 a 10 e mede a <strong>facilidade</strong>, não o retorno. Pontos ganhos quando o projeto <strong>não depende</strong> de cada item. Dependência parcial vale metade. O que a empresa já tem (seção 06) reduz a dependência. A revisão humana exigida por segurança e o trabalho feito com o resultado não contam como manutenção manual. Esse tempo não baixa a nota: desconte-o no "% do tempo eliminado" do valor em reais.</p>
           <table class="wt">
             <thead><tr><th>Depende de…</th><th>Não</th><th>Em parte</th><th>Sim</th></tr></thead>
             <tbody>
@@ -668,6 +671,16 @@
               <tr><td>Mudança de cultura</td><td class="g">1</td><td class="w">0,5</td><td class="c">0</td></tr>
             </tbody>
           </table>
+        </div>
+        <div class="lg">
+          <h3>Passo 2 em detalhe · Como dar cada nota</h3>
+          <p class="hint">A mesma régua vale para quem dá a nota na mão e para a IA. Na dúvida entre dois níveis, fique com o mais próximo e escreva a dúvida na justificativa.</p>
+          <ul class="tiers anc">
+            <li><span class="rng">Manual</span><span><b>Não depende:</b> o resultado vai para uma pessoa que decide ou age, e as entradas vêm dos sistemas.<br><b>Em parte:</b> a solução conversa sozinha com cliente, fornecedor ou colaborador e alguém confere; ou alguém alimenta à mão um dado que nenhum sistema captura; ou as regras mudam com frequência.<br><b>Depende:</b> uma pessoa precisa operar a solução todo dia.</span></li>
+            <li><span class="rng">Infra</span><span><b>Não depende:</b> usa só o que já funciona (seção 06), dado público, um cadastro próprio ou o resultado de outras soluções.<br><b>Em parte:</b> uma peça nova, como gravar num sistema que hoje só é lido, ler um sistema ainda não ligado, uma caixa de e-mail ou uma ferramenta nova.<br><b>Depende:</b> várias peças novas de uma vez.</span></li>
+            <li><span class="rng">Técnico</span><span><b>Não depende:</b> regra fixa sobre no máximo um sistema, sem ajuste técnico recorrente.<br><b>Em parte:</b> ajuste periódico de prompt ou regra, conferência técnica das respostas, gravação em sistema ou duas integrações.<br><b>Depende:</b> três ou mais sistemas ou soluções integrados, uma base de dados para construir e manter, ou regras que mudam por lei. A qualidade do dado não entra aqui: vai nas checagens.</span></li>
+            <li><span class="rng">Cultura</span><span><b>Não depende:</b> as pessoas recebem o resultado no canal e no formato que já usam.<br><b>Em parte:</b> uma função muda a rotina ou passa a seguir um passo novo.<br><b>Depende:</b> várias áreas mudam o jeito de trabalhar, ou a solução mexe com o controle ou a avaliação de pessoas.</span></li>
+          </ul>
         </div>
         <div class="lg">
           <h3>Passo 3 · Valor × facilidade</h3>
@@ -706,12 +719,12 @@
           <ul class="tiers">
             <li><span class="st good"><span class="dot"></span>Roadmap</span><span class="rng">priorizada, não iniciada</span></li>
             <li><span class="st warn"><span class="dot"></span>Aguardando decisão</span><span class="rng">parada à espera de uma pessoa</span></li>
-            <li><span class="st acc"><span class="dot"></span>Em execução</span><span class="rng">com responsável e prazo</span></li>
+            <li><span class="st acc"><span class="dot"></span>Em execução</span><span class="rng">iniciada; responsável, previsão e medição em Editar</span></li>
             <li><span class="st crit"><span class="dot"></span>Atrasada</span><span class="rng">previsão vencida</span></li>
-            <li><span class="st good"><span class="dot"></span>Implantada</span><span class="rng">resultado medido</span></li>
+            <li><span class="st good"><span class="dot"></span>Implantada</span><span class="rng">em uso; registre o resultado medido em Editar</span></li>
             <li><span class="st mute"><span class="dot"></span>Arquivada</span><span class="rng">fora das listas</span></li>
           </ul>
-          <p class="hint" style="margin:12px 0 0">Execução em série: ao iniciar uma solução acima do limite definido na seção 03, ou uma solução com trava, a página pede confirmação.</p>
+          <p class="hint" style="margin:12px 0 0">Execução em série: a página pede confirmação ao iniciar uma solução quando o número em execução já chegou ao limite da seção 03, quando a solução tem trava, quando uma função passa do limite de horas por semana da seção 03 ou quando o agente faz sozinho numa solução com a meta Risco.</p>
         </div>
         <div class="lg">
           <h3>Travas</h3>
@@ -747,7 +760,7 @@
               <tr><td>Processos</td><td>15%</td></tr><tr><td>Orçamento</td><td>10%</td></tr><tr><td>Cultura</td><td>10%</td></tr>
             </tbody>
           </table>
-          <p class="hint" style="margin:12px 0 0">Até 2,5: organize dados e processos primeiro. De 2,6 a 3,5: pilotos, um de cada vez. Acima de 3,5: dá para tocar várias soluções em paralelo. Uma dimensão em nível 1 é um bloqueio.</p>
+          <p class="hint" style="margin:12px 0 0">Até 2,0: cuide antes da base (dados, sistemas e processos). Acima de 2,0 e até 3,5: uma solução de cada vez, começando pelas mais estreitas e de menor risco. Acima de 3,5: dá para tocar mais de uma em paralelo. Uma dimensão em nível 1 é um bloqueio.</p>
         </div>
       </div>
     </div>
