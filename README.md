@@ -4,7 +4,7 @@ App local para cadastrar, classificar e priorizar as soluções de IA de uma emp
 
 Licença: [MIT](LICENSE). Desenvolvido por 3Value Brasil Tecnologia Dados Negócios LTDA - Leandro Nogueira.
 
-As seções 01 a 06 da página principal podem ser recolhidas e expandidas: uma a uma, clicando no título, ou todas de uma vez, pelos botões acima da seção 01. O navegador lembra quais ficaram recolhidas.
+As seções 01 a 07 da página principal podem ser recolhidas e expandidas: uma a uma, clicando no título, ou todas de uma vez, pelos botões acima da seção 01. O navegador lembra quais ficaram recolhidas.
 
 ## Como abrir
 

@@ -275,6 +275,7 @@
   .ed-h { padding:18px 22px 12px; border-bottom:1px solid var(--line); }
   .ed-h h2 { font-size:20px; }
   .ed-b { padding:18px 22px; overflow-y:auto; display:flex; flex-direction:column; gap:16px; }
+  #grp-decisao:not([hidden]) { display:flex; flex-direction:column; gap:16px; }
   .ed-f { padding:14px 22px; border-top:1px solid var(--line); display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; align-items:center; background:var(--surface); }
   .ed-f .r { display:flex; gap:10px; flex-wrap:wrap; }
   .ed-sep { font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent-ink); font-weight:700; border-top:1px solid var(--line); padding-top:14px; margin:0; }
@@ -479,6 +480,7 @@
   <div class="status-row">
     <span class="badge good"><span class="dot"></span><span id="b-comecar">Carregando…</span></span>
     <span class="badge acc"><span class="dot"></span><span id="b-exec">–</span></span>
+    <span class="badge warn" id="b-aguard" hidden><span class="dot"></span><span id="b-aguard-t"></span></span>
     <span class="badge crit" id="b-atraso" hidden><span class="dot"></span><span id="b-atraso-t"></span></span>
     <span class="badge mute"><span class="dot"></span><span id="b-impl">–</span></span>
     <span class="badge warn" id="b-modo" hidden><span class="dot"></span><span id="b-modo-t"></span></span>
@@ -512,7 +514,7 @@
     </div>
   </div>
 
-  <div class="sec-tools" role="group" aria-label="Mostrar ou esconder as seções 01 a 06">
+  <div class="sec-tools" role="group" aria-label="Mostrar ou esconder as seções 01 a 07">
     <span class="lbl">Seções</span>
     <div class="seg">
       <button type="button" id="sec-expandir">Expandir todas</button>
@@ -537,9 +539,18 @@
     </div>
   </section>
 
-  <!-- 02 Em execução -->
+  <!-- 02 Aguardando decisão -->
+  <section class="sec" id="aguardando">
+    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-aguardando"><span class="chev" aria-hidden="true"></span><span class="sec-num">02</span><span>Aguardando decisão</span></button></h2><span class="sec-count" id="c-aguard"></span></div>
+    <div class="sec-body" id="sb-aguardando">
+      <p class="sec-intro">Soluções paradas à espera de uma pessoa: quem decide e o que falta decidir. As mais antigas aparecem primeiro. Elas não entram na fila até a decisão sair.</p>
+      <div id="lista-aguard"></div>
+    </div>
+  </section>
+
+  <!-- 03 Em execução -->
   <section class="sec" id="execucao">
-    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-execucao"><span class="chev" aria-hidden="true"></span><span class="sec-num">02</span><span>Soluções em execução</span></button></h2><span class="sec-count" id="c-exec"></span>
+    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-execucao"><span class="chev" aria-hidden="true"></span><span class="sec-num">03</span><span>Soluções em execução</span></button></h2><span class="sec-count" id="c-exec"></span>
       <label class="lim spacer" for="f-limite">Em paralelo, no máximo
         <select id="f-limite"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
       </label>
@@ -555,18 +566,18 @@
     </div>
   </section>
 
-  <!-- 03 Implantadas -->
+  <!-- 04 Implantadas -->
   <section class="sec" id="implantadas">
-    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-implantadas"><span class="chev" aria-hidden="true"></span><span class="sec-num">03</span><span>Soluções já implantadas</span></button></h2><span class="sec-count" id="c-impl"></span></div>
+    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-implantadas"><span class="chev" aria-hidden="true"></span><span class="sec-num">04</span><span>Soluções já implantadas</span></button></h2><span class="sec-count" id="c-impl"></span></div>
     <div class="sec-body" id="sb-implantadas">
       <p class="sec-intro">Soluções que já estão rodando na empresa, com o resultado esperado e o resultado medido.</p>
       <div id="lista-impl"></div>
     </div>
   </section>
 
-  <!-- 04 Arquivadas -->
+  <!-- 05 Arquivadas -->
   <section class="sec" id="arquivadas">
-    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-arquivadas"><span class="chev" aria-hidden="true"></span><span class="sec-num">04</span><span>Arquivadas</span></button></h2></div>
+    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-arquivadas"><span class="chev" aria-hidden="true"></span><span class="sec-num">05</span><span>Arquivadas</span></button></h2></div>
     <div class="sec-body" id="sb-arquivadas">
       <p class="sec-intro">Soluções arquivadas saem das listas e das contas. Ao restaurar, cada uma volta para onde estava.</p>
       <details class="arch" id="arch">
@@ -576,9 +587,9 @@
     </div>
   </section>
 
-  <!-- 05 Perfil da empresa -->
+  <!-- 06 Perfil da empresa -->
   <section class="sec" id="perfil">
-    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-perfil"><span class="chev" aria-hidden="true"></span><span class="sec-num">05</span><span>Perfil da empresa</span></button></h2></div>
+    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-perfil"><span class="chev" aria-hidden="true"></span><span class="sec-num">06</span><span>Perfil da empresa</span></button></h2></div>
     <div class="sec-body" id="sb-perfil">
       <p class="sec-intro">Avalie a empresa em seis dimensões, de 1 a 5, e marque os sistemas que ela já tem. A IA usa essas respostas ao classificar cada solução e pode revisar todas as notas de uma vez. Nenhuma nota muda sem a sua aprovação.</p>
       <div class="perfil">
@@ -615,9 +626,9 @@
     </div>
   </section>
 
-  <!-- 06 Metodologia -->
+  <!-- 07 Metodologia -->
   <section class="sec" id="legenda">
-    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-legenda"><span class="chev" aria-hidden="true"></span><span class="sec-num">06</span><span>Como a fila é definida</span></button></h2></div>
+    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-legenda"><span class="chev" aria-hidden="true"></span><span class="sec-num">07</span><span>Como a fila é definida</span></button></h2></div>
     <div class="sec-body" id="sb-legenda">
       <div class="legend">
         <div class="lg">
@@ -631,7 +642,7 @@
         </div>
         <div class="lg">
           <h3>Passo 2 · Facilidade ("Ok, mas como?")</h3>
-          <p class="hint">A soma vai de 0 a 10 e mede a <strong>facilidade</strong>, não o retorno. Pontos ganhos quando o projeto <strong>não depende</strong> de cada item. Dependência parcial vale metade. O que a empresa já tem (seção 05) reduz a dependência. A revisão humana exigida por segurança e o trabalho feito com o resultado não contam como manutenção manual: esse tempo entra no ganho.</p>
+          <p class="hint">A soma vai de 0 a 10 e mede a <strong>facilidade</strong>, não o retorno. Pontos ganhos quando o projeto <strong>não depende</strong> de cada item. Dependência parcial vale metade. O que a empresa já tem (seção 06) reduz a dependência. A revisão humana exigida por segurança e o trabalho feito com o resultado não contam como manutenção manual: esse tempo entra no ganho.</p>
           <table class="wt">
             <thead><tr><th>Depende de…</th><th>Não</th><th>Em parte</th><th>Sim</th></tr></thead>
             <tbody>
@@ -644,7 +655,7 @@
         </div>
         <div class="lg">
           <h3>Passo 3 · Valor × facilidade</h3>
-          <p class="hint">O valor (alto, médio ou baixo) é a leitura de quanto a solução devolve à empresa, com o selo de origem. Com o ganho em reais calculado e os limites do perfil (seção 05), a página sugere o nível.</p>
+          <p class="hint">O valor (alto, médio ou baixo) é a leitura de quanto a solução devolve à empresa, com o selo de origem. Com o ganho em reais calculado e os limites do perfil (seção 06), a página sugere o nível.</p>
           <table class="wt">
             <thead><tr><th>Valor</th><th>Fácil (7 a 10)</th><th>Difícil (abaixo de 7)</th></tr></thead>
             <tbody>
@@ -678,12 +689,13 @@
           <p class="hint">Os botões de cada linha movem a solução entre as seções.</p>
           <ul class="tiers">
             <li><span class="st good"><span class="dot"></span>Roadmap</span><span class="rng">priorizada, não iniciada</span></li>
+            <li><span class="st warn"><span class="dot"></span>Aguardando decisão</span><span class="rng">parada à espera de uma pessoa</span></li>
             <li><span class="st acc"><span class="dot"></span>Em execução</span><span class="rng">com responsável e prazo</span></li>
             <li><span class="st crit"><span class="dot"></span>Atrasada</span><span class="rng">previsão vencida</span></li>
             <li><span class="st good"><span class="dot"></span>Implantada</span><span class="rng">resultado medido</span></li>
             <li><span class="st mute"><span class="dot"></span>Arquivada</span><span class="rng">fora das listas</span></li>
           </ul>
-          <p class="hint" style="margin:12px 0 0">Execução em série: ao iniciar uma solução acima do limite definido na seção 02, ou uma solução com trava, a página pede confirmação.</p>
+          <p class="hint" style="margin:12px 0 0">Execução em série: ao iniciar uma solução acima do limite definido na seção 03, ou uma solução com trava, a página pede confirmação.</p>
         </div>
         <div class="lg">
           <h3>Travas</h3>
@@ -752,6 +764,7 @@
         <div class="fld"><label for="f-status">Situação</label>
           <select id="f-status">
             <option value="ativa">No roadmap</option>
+            <option value="aguardando">Aguardando decisão</option>
             <option value="execucao">Em execução</option>
             <option value="implantada">Implantada</option>
           </select>
@@ -890,6 +903,14 @@
       <div class="row2">
         <div class="fld"><label for="f-resp">Responsável</label><input type="text" id="f-resp" maxlength="80" placeholder="Nome de quem conduz"></div>
         <div class="fld"><label for="f-prev">Previsão de entrega</label><input type="date" id="f-prev"></div>
+      </div>
+      <div id="grp-decisao" hidden>
+        <div class="row2">
+          <div class="fld"><label for="f-dec-quem">Quem decide</label><input type="text" id="f-dec-quem" maxlength="80" list="dl-decisores" placeholder="Função ou nome de quem precisa decidir" autocomplete="off"></div>
+          <div class="fld"><label for="f-dec-desde">Aguardando desde</label><input type="date" id="f-dec-desde"></div>
+        </div>
+        <datalist id="dl-decisores"></datalist>
+        <div class="fld"><label for="f-dec-falta">O que falta decidir</label><textarea id="f-dec-falta" rows="2" maxlength="300" placeholder="Ex.: quem aprova o texto e o prazo de resposta"></textarea></div>
       </div>
       <div id="grp-datas" hidden>
         <div class="row2">
@@ -1068,7 +1089,7 @@
   });
 })();
 
-/* ---------- Seções 01 a 06 recolhíveis (as recolhidas ficam em solucoes-ia-secoes) ---------- */
+/* ---------- Seções 01 a 07 recolhíveis (as recolhidas ficam em solucoes-ia-secoes) ---------- */
 (function(){
   const CHAVE = 'solucoes-ia-secoes';
   const secoes = [...document.querySelectorAll('section.sec')];
@@ -1141,7 +1162,8 @@ const FAIXAS = {
 const VALORES = { alto:{ l:'alto', r:0 }, medio:{ l:'médio', r:1 }, baixo:{ l:'baixo', r:2 } };
 const FACIL = 7; /* facilidade a partir da qual a solução conta como fácil no quadro valor × facilidade */
 const TIP_COD = 'Código: apelido curto que você dá à solução (ex.: sigla da área e número). Serve para citá-la em documentos, na busca e no campo “Depende de”. Não muda a nota nem a ordem.';
-const STATUS = { ativa:'No roadmap', execucao:'Em execução', implantada:'Implantada', arquivada:'Arquivada' };
+const STATUS = { ativa:'No roadmap', aguardando:'Aguardando decisão', execucao:'Em execução', implantada:'Implantada', arquivada:'Arquivada' };
+const ESPERA_LONGA = 30; /* dias de espera a partir dos quais a decisão aparece como parada há muito tempo */
 const AVAL = { atingido:{ l:'Resultado atingido', c:'good' }, parcial:{ l:'Atingido em parte', c:'warn' }, nao:{ l:'Não atingido', c:'crit' } };
 const PERFIL_ITENS = [
   { k:'crm', l:'Já usa um CRM' },
@@ -1241,6 +1263,8 @@ function total(it){ return CRIT.reduce((s,c) => s + nota(it,c), 0); }
 function metasDe(it){ const m = Array.isArray(it && it.metas) ? it.metas : []; return METAS.filter(x => m.includes(x.k)); }
 function primarias(it){ return metasDe(it).filter(m => m.p).length; }
 function statusDe(it){ return STATUS[it && it.status] ? it.status : 'ativa'; }
+function decisaoDe(it){ const d = it && it.decisao || {}; return { quem: String(d.quem || '').trim(), falta: String(d.falta || '').trim(), desde: d.desde || '' }; }
+function diasEsperando(it){ const d = new Date(decisaoDe(it).desde); return isNaN(d) ? null : Math.max(0, Math.floor((Date.now() - d.getTime()) / 86400000)); }
 function atrasada(it){ return statusDe(it) === 'execucao' && /^\d{4}-\d{2}-\d{2}$/.test(it.previsao || '') && it.previsao < hojeYMD(); }
 function travas(it){
   const t = [];
@@ -1262,13 +1286,13 @@ function depsDe(it){
   const ids = Array.isArray(it && it.dependeDe) ? it.dependeDe : [];
   return [...new Set(ids)].filter(id => id !== (it && it.id)).map(id => items.find(i => i.id === id)).filter(Boolean);
 }
-/* Quem espera por cada solução: só conta quem está no roadmap ou em execução */
+/* Quem espera por cada solução: só conta quem está no roadmap, aguardando decisão ou em execução */
 let baseCache = { ref:null, mapa:null };
 function mapaBase(){
   if (baseCache.ref === items) return baseCache.mapa;
   const mapa = new Map();
   items.forEach(i => {
-    if (!['ativa','execucao'].includes(statusDe(i))) return;
+    if (!['ativa','aguardando','execucao'].includes(statusDe(i))) return;
     [...new Set(Array.isArray(i.dependeDe) ? i.dependeDe : [])].forEach(id => {
       if (id === i.id) return;
       if (!mapa.has(id)) mapa.set(id, []);
@@ -1416,6 +1440,7 @@ function procsListaHTML(it){
   if (l.length < 2) return '';
   return `<ul class="procs-lista">${l.map((x, i) => `<li>${esc(nomeProc(x, i))}${x.executor ? ` · ${esc(x.executor)}` : ''}: <b>${esc(textoItem(x))}</b>${CONFS[x.confianca] ? ' · ' + CONFS[x.confianca] : ''}</li>`).join('')}</ul>`;
 }
+const porEspera = (a, b) => String(decisaoDe(a).desde || '9').localeCompare(String(decisaoDe(b).desde || '9')) || ordem(a, b);
 const porData = campo => (a, b) => String(b[campo] || '').localeCompare(String(a[campo] || '')) || ordem(a, b);
 function ordemExec(a, b){ const x = atrasada(b) - atrasada(a); return x || porData('inicioExecucao')(a, b); }
 function setorOrd(s){ const i = SETORES.indexOf(s); return i < 0 ? 100 : i; }
@@ -1455,7 +1480,8 @@ try { filtroDono = localStorage.getItem('ranking-ia-dono') || ''; } catch (e) {}
 
 /* ---------- Render das linhas ---------- */
 const ACOES = {
-  ativa:     [['editar','Editar'], ['iniciar','Iniciar execução','go'], ['arquivar','Arquivar'], ['excluir','Excluir','danger']],
+  ativa:     [['editar','Editar'], ['iniciar','Iniciar execução','go'], ['pedir-decisao','Aguardar decisão'], ['arquivar','Arquivar'], ['excluir','Excluir','danger']],
+  aguardando:[['editar','Editar'], ['iniciar','Iniciar execução','go'], ['voltar-roadmap','Voltar ao roadmap'], ['arquivar','Arquivar'], ['excluir','Excluir','danger']],
   execucao:  [['editar','Editar'], ['implantar','Marcar como implantada','go'], ['voltar-roadmap','Voltar ao roadmap'], ['arquivar','Arquivar'], ['excluir','Excluir','danger']],
   implantada:[['editar','Editar'], ['voltar-execucao','Voltar para execução'], ['arquivar','Arquivar'], ['excluir','Excluir','danger']],
   arquivada: [['restaurar','Restaurar','go'], ['excluir','Excluir','danger']]
@@ -1478,6 +1504,7 @@ function rowHTML(it, pos, modo){
     : '';
   let pill;
   if (modo === 'ativa') pill = `<span class="st ${fx.c}"><span class="dot"></span>${fx.l}</span>${it.id === proximaId ? '<span class="st acc"><span class="dot"></span>Próxima da fila</span>' : ''}`;
+  else if (modo === 'aguardando') { const dd = diasEsperando(it); pill = `<span class="st ${dd != null && dd > ESPERA_LONGA ? 'crit' : 'warn'}"><span class="dot"></span>Aguardando decisão</span>`; }
   else if (modo === 'execucao') pill = atrasada(it) ? `<span class="st crit"><span class="dot"></span>Atrasada</span>` : `<span class="st acc"><span class="dot"></span>Em execução</span>`;
   else if (modo === 'implantada') pill = `<span class="st good"><span class="dot"></span>Implantada</span>`;
   else pill = `<span class="st mute"><span class="dot"></span>Arquivada${it.statusAnterior && it.statusAnterior !== 'ativa' && STATUS[it.statusAnterior] ? ' · era ' + STATUS[it.statusAnterior].toLowerCase() : ''}</span>`;
@@ -1496,6 +1523,12 @@ function rowHTML(it, pos, modo){
 
   const facts = factsHTML(it, modo);
   let resu = '';
+  if (modo === 'aguardando') {
+    const d = decisaoDe(it), dd = diasEsperando(it);
+    const desde = !d.desde ? '' : dd === 0 ? ' · desde <b>hoje</b>'
+      : ` · desde <b>${fmtData(d.desde)}</b>${dd == null ? '' : dd > ESPERA_LONGA ? ` <span class="late">(há ${dd} dias)</span>` : `, há ${plural(dd, 'dia', 'dias')}`}`;
+    resu = `<div class="plano"><p class="pk">Decisão pendente</p><p><b>Quem decide:</b> ${d.quem ? esc(d.quem) : '<span class="late">não informado</span>'}${desde}</p><p><b>Falta decidir:</b> ${d.falta ? esc(d.falta) : 'não informado. Registre em Editar.'}</p></div>`;
+  }
   if (modo === 'execucao' || modo === 'implantada') {
     const m = it.medicao || {};
     const linhas = [];
@@ -1534,7 +1567,7 @@ function rowHTML(it, pos, modo){
 
 function factsHTML(it, modo){
   const f = [];
-  const nv = nivelValor(it), vivo = modo === 'ativa' || modo === 'execucao';
+  const nv = nivelValor(it), vivo = modo === 'ativa' || modo === 'aguardando' || modo === 'execucao';
   if (nv) {
     const org = CONFS[it.valor.nivelOrigem] || 'hipótese';
     f.push(`<span class="fact${nv === 'alto' ? ' money' : ''}" title="Nível de valor para a empresa, registrado por quem cadastrou. Origem: ${esc(org)}.">Valor <b>${VALORES[nv].l}</b><span class="selo">${esc(org)}</span></span>`);
@@ -1552,7 +1585,7 @@ function factsHTML(it, modo){
   if (c != null) f.push(`<span class="fact" title="${esc(np > 1 ? detalheProcs(it).join('; ') + '. A origem dos números é a mais fraca entre os processos.' : textoCarga(it))}">Carga <b>${fmt(c)} h/mês</b>${np > 1 ? ` em ${np} processos` : ''}${selo}</span>`);
   const ops = operDe(it);
   if (ops.length) {
-    const ex = modo === 'ativa' ? excessos(it) : [];
+    const ex = modo === 'ativa' || modo === 'aguardando' ? excessos(it) : [];
     const tit = `Tempo por semana que a solução pede depois de implantada: ${ops.map(x => `${x.funcao} ${fmt(toNum(x.horasSemana))} h`).join('; ')}`
       + (ex.length ? `. Se começar agora, passa do limite de ${fmt(limiteHoras())} h por semana: ${ex.map(e => `${e.nome} (${fmt(e.horas)} h)`).join(', ')}.` : '');
     f.push(`<span class="fact${ex.length ? ' lock' : ''}" title="${esc(tit)}">Pede <b>${fmt(horasOper(it))} h/semana</b> de ${ops.length === 1 ? esc(ops[0].funcao) : ops.length + ' funções'}${ex.length ? ' · passa do limite' : ''}</span>`);
@@ -1573,6 +1606,7 @@ function factsHTML(it, modo){
 /* ---------- Render geral ---------- */
 function render(){
   const roadmap = items.filter(i => statusDe(i) === 'ativa');
+  const aguard = items.filter(i => statusDe(i) === 'aguardando');
   const exec = items.filter(i => statusDe(i) === 'execucao');
   const impl = items.filter(i => statusDe(i) === 'implantada');
   const arquivadas = items.filter(i => statusDe(i) === 'arquivada').sort(ordem);
@@ -1617,6 +1651,8 @@ function render(){
     $('#b-comecar').textContent = plural(comecar, 'solução para começar já', 'soluções para começar já');
     $('#b-exec').textContent = plural(exec.length, 'em execução', 'em execução');
     $('#b-impl').textContent = plural(impl.length, 'implantada', 'implantadas');
+    $('#b-aguard').hidden = !aguard.length;
+    $('#b-aguard-t').textContent = plural(aguard.length, 'aguardando decisão', 'aguardando decisão');
     $('#b-atraso').hidden = !atrasadas;
     $('#b-atraso-t').textContent = plural(atrasadas, 'atrasada', 'atrasadas');
   } else {
@@ -1658,18 +1694,18 @@ function render(){
   const filtrar = arr => arr
     .filter(i => !filtroSetor || (i.setor || 'Sem área') === filtroSetor)
     .filter(i => !filtroDono || (filtroDono === SEM_DONO ? !donosDe(i).length : donosDe(i).includes(filtroDono)))
-    .filter(i => !q || [codigoDe(i), i.nome, i.descricao, i.resolve, i.setor, ...donosDe(i), i.responsavel].join(' ').toLowerCase().includes(q));
+    .filter(i => !q || [codigoDe(i), i.nome, i.descricao, i.resolve, i.setor, ...donosDe(i), i.responsavel, statusDe(i) === 'aguardando' ? decisaoDe(i).quem : ''].join(' ').toLowerCase().includes(q));
   const filtrando = !!(filtroSetor || filtroDono || q);
   const contagem = (vis, tot) => filtrando ? `${vis} de ${tot}` : plural(tot, 'solução', 'soluções');
 
-  const lista = $('#lista'), lExec = $('#lista-exec'), lImpl = $('#lista-impl');
+  const lista = $('#lista'), lAguard = $('#lista-aguard'), lExec = $('#lista-exec'), lImpl = $('#lista-impl');
   if (!loaded) {
     let msg;
     if (dbState === 'off') msg = `<div class="empty"><strong>O servidor local não respondeu.</strong>Confira se a janela do iniciar.cmd continua aberta e recarregue a página.</div>`;
     else if (dbState === 'error') msg = `<div class="empty"><strong>Não foi possível ler as soluções.</strong>Recarregue a página em alguns instantes.</div>`;
     else if (dbState === 'slow') msg = `<div class="empty"><strong>O banco ainda não respondeu.</strong>A lista aparece aqui assim que a conexão voltar.</div>`;
     else msg = `<div class="empty"><strong>Carregando as soluções…</strong>A lista aparece aqui assim que o banco da página responder.</div>`;
-    lista.innerHTML = msg; lExec.innerHTML = ''; lImpl.innerHTML = '';
+    lista.innerHTML = msg; lAguard.innerHTML = ''; lExec.innerHTML = ''; lImpl.innerHTML = '';
   } else {
     const semFiltro = `<div class="empty"><strong>Nenhuma solução com esses filtros.</strong>Troque a área, o setor ou o termo de busca.</div>`;
 
@@ -1691,6 +1727,13 @@ function render(){
         return `<div class="grp"><div class="grp-h"><h3>${esc(s)}</h3><span class="meta-inline">${plural(g.length, 'solução', 'soluções')} · facilidade média ${fmt(med)}</span></div><div class="sol-list">${g.map(it => rowHTML(it, 0, 'ativa')).join('')}</div></div>`;
       }).join('');
     }
+
+    const vAguard = filtrar(aguard).sort(porEspera);
+    $('#c-aguard').textContent = contagem(vAguard.length, aguard.length);
+    lAguard.innerHTML = !aguard.length
+      ? `<div class="empty"><strong>Nenhuma solução esperando decisão.</strong>Use “Aguardar decisão” numa solução do roadmap que só anda depois de alguém decidir.</div>`
+      : !vAguard.length ? semFiltro
+      : `<div class="sol-list">${vAguard.map(it => rowHTML(it, 0, 'aguardando')).join('')}</div>`;
 
     const vExec = filtrar(exec).sort(ordemExec);
     $('#c-exec').textContent = contagem(vExec.length, exec.length);
@@ -1724,6 +1767,13 @@ function onRowClick(e){
   const it = items.find(i => i.id === id); if (!it) return;
   const agora = new Date().toISOString();
   if (act === 'editar') return abrirEditor(id);
+  if (act === 'pedir-decisao') {
+    abrirEditor(id);
+    $('#f-status').value = 'aguardando';
+    $('#f-status').dispatchEvent(new Event('change', { bubbles:true }));
+    setTimeout(() => { $('#f-dec-quem').scrollIntoView({ block:'center' }); $('#f-dec-quem').focus(); }, 60);
+    return;
+  }
   if (act === 'iniciar') {
     const nExec = items.filter(i => statusDe(i) === 'execucao').length, lim = limiteExec();
     const avisos = [];
@@ -1915,7 +1965,7 @@ function atualizarOper(f){
   const inc = f.operacao.some(x => !x.funcao || !(x.horasSemana > 0));
   let t = linhas.length ? linhas.join('<br>') : 'Nenhum tempo informado. Preencha quando a solução vai pedir trabalho fixo de alguém depois de implantada.';
   if (inc) t += ' Há uma linha incompleta: falta a função ou as horas.';
-  if (linhas.length && !limH) t += ' Defina o limite por função na seção 02 para o app avisar quando alguém passar dele.';
+  if (linhas.length && !limH) t += ' Defina o limite por função na seção 03 para o app avisar quando alguém passar dele.';
   $('#calc-oper').innerHTML = t;
   $('#sr-oper').textContent = ops.length ? `${fmt(horasOper(f))} h por semana` : 'não informado';
 }
@@ -1947,7 +1997,7 @@ function atualizarV2(f){
   const ref = valorRef(f), sug = valorSugerido(f), lim = limitesValor();
   let nt;
   if (ref == null) nt = 'Sem ganho em reais calculado: escolha o nível pela sua leitura. Ele fica marcado como hipótese até alguém medir.';
-  else if (!lim) nt = `Referência em reais: <b>${brl(ref)}/mês</b>. Defina os limites de valor no perfil da empresa (seção 05) para a página sugerir o nível.`;
+  else if (!lim) nt = `Referência em reais: <b>${brl(ref)}/mês</b>. Defina os limites de valor no perfil da empresa (seção 06) para a página sugerir o nível.`;
   else nt = `Pela referência de <b>${brl(ref)}/mês</b> e pelos limites do perfil, o valor sugerido é <b>${VALORES[sug].l}</b>.${f.valor.nivel !== sug ? ' <button type="button" class="btn-s" id="btn-nivel-sug">Usar a sugestão</button>' : ''}`;
   $('#calc-nivel').innerHTML = nt;
   $('#v-nconf').disabled = !f.valor.nivel;
@@ -2005,7 +2055,11 @@ function preencher(it){
   const st = statusDe(it); $('#f-status').value = st === 'arquivada' ? 'ativa' : st;
   $('#f-ini').value = st === 'execucao' || st === 'implantada' ? ymdDe(it.inicioExecucao) : '';
   $('#f-impl').value = st === 'implantada' ? ymdDe(it.implantadaEm) : '';
-  $('#f-ini').max = $('#f-impl').max = hojeYMD();
+  const dec = decisaoDe(it);
+  $('#f-dec-quem').value = dec.quem; $('#f-dec-falta').value = dec.falta;
+  $('#f-dec-desde').value = st === 'aguardando' ? ymdDe(dec.desde) : '';
+  $('#dl-decisores').innerHTML = [...new Set(items.flatMap(i => [decisaoDe(i).quem, String(i.responsavel || '').trim()]).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR')).map(v => `<option value="${esc(v)}"></option>`).join('');
+  $('#f-ini').max = $('#f-impl').max = $('#f-dec-desde').max = hojeYMD();
   const ms =Array.isArray(it.metas) ? it.metas : [];
   document.querySelectorAll('input[name="meta"]').forEach(i => { i.checked = ms.includes(i.value); });
   CRIT.forEach(c => {
@@ -2023,6 +2077,7 @@ function atualizarLive(){
   const stF = $('#f-status').value;
   $('#grp-medido').hidden = stF !== 'implantada';
   $('#grp-datas').hidden = stF !== 'execucao' && stF !== 'implantada';
+  $('#grp-decisao').hidden = stF !== 'aguardando';
   $('#fld-impl').hidden = stF !== 'implantada';
   atualizarV2(f);
 }
@@ -2057,8 +2112,14 @@ async function salvar(e){
   if (f.operacao.some(x => !x.funcao || !(x.horasSemana > 0))) { $('#f-err').textContent = 'Em "Tempo de quem opera depois", cada linha precisa da função e das horas por semana.'; $('#sec-oper').open = true; return; }
   if (f.operacao.some(x => x.horasSemana > 60)) { $('#f-err').textContent = 'As horas por semana de uma função vão até 60.'; $('#sec-oper').open = true; return; }
   if (f.valor.nivel && !f.valor.nivelOrigem) f.valor.nivelOrigem = 'hipotese';
-  const stF = $('#f-status').value, dIni = stF === 'ativa' ? '' : $('#f-ini').value, dImpl = stF === 'implantada' ? $('#f-impl').value : '';
+  const stF = $('#f-status').value, dIni = stF === 'execucao' || stF === 'implantada' ? $('#f-ini').value : '', dImpl = stF === 'implantada' ? $('#f-impl').value : '';
   const hoje = hojeYMD();
+  const dec = { quem: $('#f-dec-quem').value.trim(), falta: $('#f-dec-falta').value.trim(), dia: $('#f-dec-desde').value };
+  if (stF === 'aguardando') {
+    if (!dec.quem) { $('#f-err').textContent = 'Diga quem decide.'; $('#f-dec-quem').focus(); return; }
+    if (!dec.falta) { $('#f-err').textContent = 'Diga o que falta decidir.'; $('#f-dec-falta').focus(); return; }
+    if (dec.dia > hoje) { $('#f-err').textContent = 'A espera não pode começar depois de hoje.'; $('#f-dec-desde').focus(); return; }
+  }
   if (dIni > hoje) { $('#f-err').textContent = 'O início da execução não pode ser depois de hoje.'; $('#f-ini').focus(); return; }
   if (dImpl > hoje) { $('#f-err').textContent = 'A data de implantação não pode ser depois de hoje.'; $('#f-impl').focus(); return; }
   if (dIni && dImpl && dImpl < dIni) { $('#f-err').textContent = 'A implantação não pode ser antes do início da execução.'; $('#f-impl').focus(); return; }
@@ -2082,6 +2143,10 @@ async function salvar(e){
     if (ini) body.inicioExecucao = ini; else delete body.inicioExecucao;
   }
   if (novoStatus === 'implantada') body.implantadaEm = isoDoDia(dImpl, prev && prev.implantadaEm, agora) || agora;
+  if (novoStatus === 'aguardando') {
+    const desdeAnt = prev && antigo === 'aguardando' ? decisaoDe(prev).desde : '';
+    body.decisao = { quem: dec.quem, falta: dec.falta, desde: isoDoDia(dec.dia, desdeAnt, agora) || desdeAnt || agora };
+  }
   const btn = $('#btn-save'); btn.disabled = true; $('#f-err').textContent = '';
   try {
     await db.collection('solucoes').doc(id).set(body);
@@ -2630,9 +2695,9 @@ async function aplicarPropostas(){
 /* ---------- Exportar CSV ---------- */
 async function exportarCSV(){
   if (!downloads) return;
-  const ordemStatus = { ativa:0, execucao:1, implantada:2, arquivada:3 };
+  const ordemStatus = { ativa:0, aguardando:1, execucao:2, implantada:3, arquivada:4 };
   const lista = [...items].sort((a, b) => (ordemStatus[statusDe(a)] - ordemStatus[statusDe(b)]) || ordem(a, b));
-  const cab = ['Situação','Área','Setor dono','Código','Solução','Facilidade','Valor','Origem do valor','Faixa','Base de (soluções na fila)','Depende de','Metas','Manual (4)','Infra (3)','Time técnico (2)','Cultura (1)','Justificativa','Responsável','Previsão','Início da execução','Implantada em','Meta (resultado esperado)','Resultado medido','Avaliação','O que faz','O que resolve','Ajustes manuais sobre a IA',
+  const cab = ['Situação','Área','Setor dono','Código','Solução','Facilidade','Valor','Origem do valor','Faixa','Base de (soluções na fila)','Depende de','Metas','Manual (4)','Infra (3)','Time técnico (2)','Cultura (1)','Justificativa','Responsável','Previsão','Início da execução','Implantada em','Quem decide','O que falta decidir','Aguardando desde','Meta (resultado esperado)','Resultado medido','Avaliação','O que faz','O que resolve','Ajustes manuais sobre a IA',
     'Natureza','Travas','Chk dado','Chk integrações','Chk qualidade','Chk regras','Quem executa','Documentação','Entrada','Carga (h/mês)','Processos','Origem dos números','Linha de base validada','Tempo depois de implantada (h por semana)',
     'Custo atual (R$/mês)','Ganho conservador (R$/mês)','Ganho provável (R$/mês)','Custo da solução (R$/mês)','Ganho de receita (R$/mês, não validado)','Base da receita',
     'Indicador','Linha de base do indicador','Prazo (dias)','Método','Cenário conservador','Cenário provável','Cenário otimista'];
@@ -2661,6 +2726,7 @@ async function exportarCSV(){
     baseDe(i).map(curto).join(' | '), depsDe(i).map(curto).join(' | '),
     metasDe(i).map(m => m.n).join(', '), ...CRIT.map(c => num(nota(i, c))), i.justificativa || '', i.responsavel || '',
     fmtDia(i.previsao), i.inicioExecucao ? fmtData(i.inicioExecucao) : '', i.implantadaEm ? fmtData(i.implantadaEm) : '',
+    ...(statusDe(i) === 'aguardando' ? (d => [d.quem, d.falta, d.desde ? fmtData(d.desde) : ''])(decisaoDe(i)) : ['', '', '']),
     i.resultadoEsperado || '', i.resultadoMedido || '', AVAL[i.resultadoAvaliacao] ? AVAL[i.resultadoAvaliacao].l : '',
     i.descricao || '', i.resolve || '', ajustes(i), ...extra(i)
   ].map(cel).join(';'));
@@ -2677,7 +2743,7 @@ async function exportarCSV(){
 /* ---------- Ligações ---------- */
 montarEditor();
 montarPerfil();
-['#lista', '#lista-exec', '#lista-impl', '#arch-lista'].forEach(s => $(s).addEventListener('click', onRowClick));
+['#lista', '#lista-aguard', '#lista-exec', '#lista-impl', '#arch-lista'].forEach(s => $(s).addEventListener('click', onRowClick));
 $('#btn-nova').addEventListener('click', () => abrirEditor(null));
 $('#btn-csv').addEventListener('click', exportarCSV);
 $('#btn-cancel').addEventListener('click', fecharEditor);
@@ -2693,6 +2759,7 @@ $('#frm').addEventListener('change', e => {
   if (e.target.id === 'f-status') {
     const s = e.target.value;
     if (s === 'execucao' && !$('#f-ini').value) $('#f-ini').value = hojeYMD();
+    if (s === 'aguardando' && !$('#f-dec-desde').value) $('#f-dec-desde').value = hojeYMD();
     if (s === 'implantada' && !$('#f-impl').value) $('#f-impl').value = hojeYMD();
   }
   if (e.target.id === 'v-niv' && e.target.value && !$('#v-nconf').value) {
