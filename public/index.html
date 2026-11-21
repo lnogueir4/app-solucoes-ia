@@ -202,6 +202,7 @@
   .score.acc { background:var(--accent-soft); color:var(--accent-ink); }
   .score.warn { background:var(--warn-soft); color:var(--warn); }
   .score.crit { background:var(--crit-soft); color:var(--crit); }
+  .score.mute { background:var(--surface-2); color:var(--ink-soft); }
   .score.out b { text-decoration:line-through; text-decoration-thickness:2px; }
   .pos { font-family:var(--font-mono); font-size:11px; color:var(--muted); text-align:center; margin-top:6px; }
   .sol-main { min-width:0; }
@@ -345,6 +346,15 @@
   .fact.lock { background:var(--warn-soft); color:var(--warn); border-color:color-mix(in srgb,var(--warn) 35%,transparent); }
   .fact.bad { background:var(--crit-soft); color:var(--crit); border-color:color-mix(in srgb,var(--crit) 30%,transparent); }
   .fact .selo { font-size:9.5px; text-transform:uppercase; letter-spacing:.06em; opacity:.8; margin-left:4px; }
+  .fact.base { background:var(--accent-soft); color:var(--accent-ink); border-color:color-mix(in srgb,var(--accent) 30%,transparent); }
+  .fact.base b { color:var(--accent-ink); }
+  .fact.so-facil { border-style:dashed; color:var(--muted); }
+  .cod { font-family:var(--font-mono); font-size:12px; font-weight:600; color:var(--accent-ink); background:var(--accent-soft); padding:1px 7px; border-radius:6px; margin-right:8px; cursor:help; vertical-align:1px; }
+  .dep-chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+  .dep-chips:empty { display:none; }
+  .dep-chip { display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:11.5px; padding:2px 4px 2px 9px; border-radius:999px; border:1px solid var(--line-strong); color:var(--ink-soft); }
+  .dep-chip button { border:0; background:transparent; color:var(--muted); cursor:pointer; font-size:14px; line-height:1; padding:0 4px; }
+  .dep-chip button:hover { color:var(--crit); }
   .plano { margin-top:12px; padding:10px 12px; border-radius:8px; background:var(--surface-2); font-size:13px; color:var(--ink-soft); }
   .plano .pk { font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0 0 4px; }
   .plano p { margin:4px 0 0; }
@@ -460,11 +470,11 @@
 
   <dl class="ficha" id="kpis">
     <div><dt title="Soluções no roadmap">Roadmap</dt><dd id="k-roadmap">–</dd></div>
-    <div><dt title="Nota de 9 a 10">Começar já</dt><dd id="k-comecar">–</dd></div>
+    <div><dt title="Valor alto e facilidade de 7 a 10, sem trava (sem valor informado: facilidade de 9 a 10)">Começar já</dt><dd id="k-comecar">–</dd></div>
     <div><dt title="Soluções em execução">Em execução</dt><dd id="k-exec">–</dd></div>
     <div><dt title="Em execução com previsão vencida">Atrasadas</dt><dd id="k-atraso">–</dd></div>
     <div><dt title="Soluções implantadas">Implantadas</dt><dd id="k-impl">–</dd></div>
-    <div><dt title="Nota média do roadmap">Nota média</dt><dd id="k-media">–</dd></div>
+    <div><dt title="Facilidade média do roadmap">Facilidade média</dt><dd id="k-media">–</dd></div>
     <div><dt title="Prontidão da empresa para IA (régua de 1 a 5)">Prontidão</dt><dd id="k-pront">–</dd></div>
   </dl>
   <p class="legend-link">Como as notas e as faixas são definidas: <a href="#legenda">veja a metodologia</a>. As dependências consideram o <a href="#perfil">perfil da empresa</a>.</p>
@@ -500,7 +510,7 @@
       </div>
     </div>
     <div class="sec-body" id="sb-roadmap">
-      <p class="sec-intro">Soluções ainda não iniciadas, em ordem de prioridade. Comece pelas de nota mais alta.</p>
+      <p class="sec-intro">Soluções ainda não iniciadas, em ordem de prioridade: primeiro o valor para a empresa, depois quantas soluções cada uma destrava e, por fim, a facilidade.</p>
       <div id="lista">
         <div class="empty"><strong>Carregando as soluções…</strong>A lista aparece aqui assim que o banco da página responder.</div>
       </div>
@@ -564,6 +574,12 @@
           </div>
           <div class="fld"><label for="p-obs">Observações</label><textarea id="p-obs" rows="2" maxlength="600" placeholder="Ex.: usamos um ERP próprio e um CRM na nuvem; o comercial atende por um app de mensagens comum"></textarea></div>
         </div>
+        <p class="pf-k">Limites do valor (R$ por mês)</p>
+        <div class="pf-row">
+          <div class="fld"><label for="p-valto">Valor alto a partir de</label><input type="text" inputmode="decimal" id="p-valto" maxlength="12" placeholder="Ex.: 5000"></div>
+          <div class="fld"><label for="p-vmedio">Valor médio a partir de</label><input type="text" inputmode="decimal" id="p-vmedio" maxlength="12" placeholder="Ex.: 1000"></div>
+        </div>
+        <p class="ed-hint">Servem só para sugerir o nível de valor de uma solução que já tem o ganho em reais calculado (ou a receita informada). Abaixo do valor médio, a sugestão é valor baixo. O nível final é sempre escolhido por quem cadastra.</p>
         <div class="pf-actions">
           <button type="button" class="btn" id="btn-perfil">Salvar perfil</button>
           <button type="button" class="btn ghost" id="btn-recalc" hidden>Recalcular notas com o perfil</button>
@@ -577,7 +593,7 @@
 
   <!-- 06 Metodologia -->
   <section class="sec" id="legenda">
-    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-legenda"><span class="chev" aria-hidden="true"></span><span class="sec-num">06</span><span>Como a nota é calculada</span></button></h2></div>
+    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-legenda"><span class="chev" aria-hidden="true"></span><span class="sec-num">06</span><span>Como a fila é definida</span></button></h2></div>
     <div class="sec-body" id="sb-legenda">
       <div class="legend">
         <div class="lg">
@@ -590,8 +606,8 @@
           <p class="hint" style="margin:12px 0 0">Aumentar receita, diminuir custo e aumentar margem vêm primeiro. Diminuir risco, aumentar produtividade e aumentar valuation/equity desempatam.</p>
         </div>
         <div class="lg">
-          <h3>Passo 2 · "Ok, mas como?"</h3>
-          <p class="hint">Pontos ganhos quando o projeto <strong>não depende</strong> de cada item. Dependência parcial vale metade. O que a empresa já tem (seção 05) reduz a dependência. A revisão humana exigida por segurança e o trabalho feito com o resultado não contam como manutenção manual: esse tempo entra no ganho.</p>
+          <h3>Passo 2 · Facilidade ("Ok, mas como?")</h3>
+          <p class="hint">A soma vai de 0 a 10 e mede a <strong>facilidade</strong>, não o retorno. Pontos ganhos quando o projeto <strong>não depende</strong> de cada item. Dependência parcial vale metade. O que a empresa já tem (seção 05) reduz a dependência. A revisão humana exigida por segurança e o trabalho feito com o resultado não contam como manutenção manual: esse tempo entra no ganho.</p>
           <table class="wt">
             <thead><tr><th>Depende de…</th><th>Não</th><th>Em parte</th><th>Sim</th></tr></thead>
             <tbody>
@@ -603,17 +619,35 @@
           </table>
         </div>
         <div class="lg">
-          <h3>Faixas do roadmap</h3>
-          <p class="hint">Ordem: faixa, nota total, número de metas primárias e, por fim, ganho conservador em reais.</p>
+          <h3>Passo 3 · Valor × facilidade</h3>
+          <p class="hint">O valor (alto, médio ou baixo) é a leitura de quanto a solução devolve à empresa, com o selo de origem. Com o ganho em reais calculado e os limites do perfil (seção 05), a página sugere o nível.</p>
+          <table class="wt">
+            <thead><tr><th>Valor</th><th>Fácil (7 a 10)</th><th>Difícil (abaixo de 7)</th></tr></thead>
+            <tbody>
+              <tr><td>Alto</td><td class="g">Começar já*</td><td class="w">Planejar como projeto</td></tr>
+              <tr><td>Médio</td><td class="g">Próxima onda</td><td class="w">Avaliar com cuidado</td></tr>
+              <tr><td>Baixo</td><td class="w">Se sobrar tempo</td><td class="c">Abandonar</td></tr>
+            </tbody>
+          </table>
+          <p class="hint" style="margin:12px 0 0">* Com trava, vira "Destravar antes". Sem nenhuma meta, a solução vai para "Abandonar".</p>
+          <p class="hint" style="margin:8px 0 0"><b>Ordem da fila:</b> nível de valor, quantas soluções na fila dependem dela ("base de N"), faixa, facilidade, metas primárias e ganho conservador em reais.</p>
+        </div>
+        <div class="lg">
+          <h3>Sem valor informado</h3>
+          <p class="hint">A solução aparece com o aviso "Ordem só por facilidade", conta como valor médio na ordem e recebe a faixa pela facilidade:</p>
           <ul class="tiers">
             <li><span class="st good"><span class="dot"></span>Começar já</span><span class="rng">9 a 10, sem trava</span></li>
             <li><span class="st warn"><span class="dot"></span>Destravar antes</span><span class="rng">9 a 10, com trava</span></li>
             <li><span class="st acc"><span class="dot"></span>Próxima onda</span><span class="rng">7 a 8,5</span></li>
             <li><span class="st warn"><span class="dot"></span>Avaliar com cuidado</span><span class="rng">5 a 6,5</span></li>
             <li><span class="st crit"><span class="dot"></span>Projeto estrutural</span><span class="rng">abaixo de 5</span></li>
-            <li><span class="st crit"><span class="dot"></span>Abandonar</span><span class="rng">nenhuma meta</span></li>
           </ul>
           <p class="hint" style="margin:12px 0 0">Nas linhas: barra verde = não depende, amarela = depende em parte, vazia = depende.</p>
+        </div>
+        <div class="lg">
+          <h3>Código e dependências</h3>
+          <p class="hint"><b>Código</b> é um apelido curto e opcional que você dá à solução, como a sigla da área e um número. Ele aparece antes do nome, funciona na busca e identifica a solução no campo "Depende de". Não muda a nota nem a ordem, e não pode se repetir.</p>
+          <p class="hint" style="margin:8px 0 0"><b>Depende de</b> lista as soluções que precisam estar implantadas antes. Enquanto a base não estiver implantada, a solução fica com a trava "Base não implantada". A solução de que outras dependem mostra o selo "Base de N soluções" e sobe na fila entre as de mesmo valor.</p>
         </div>
         <div class="lg">
           <h3>Ciclo de cada solução</h3>
@@ -635,6 +669,7 @@
             <li><span class="st warn"><span class="dot"></span>Só uma pessoa sabe</span><span class="rng">documentar antes</span></li>
             <li><span class="st crit"><span class="dot"></span>Checagem com falha</span><span class="rng">dado, integração, qualidade ou regra</span></li>
             <li><span class="st warn"><span class="dot"></span>Regra sem resposta</span><span class="rng">exigência legal a confirmar</span></li>
+            <li><span class="st warn"><span class="dot"></span>Base não implantada</span><span class="rng">implantar antes a solução de que ela depende</span></li>
           </ul>
           <p class="hint" style="margin:12px 0 0">Comece sempre com revisão humana em pagamentos, exclusão de dados, acessos, decisões fiscais, jurídicas ou de RH e mensagens a clientes.</p>
         </div>
@@ -699,6 +734,10 @@
         </div>
       </div>
       <datalist id="dl-setores"></datalist>
+      <div class="row2">
+        <div class="fld"><label for="f-cod">Código <span class="hint-k">· opcional</span></label><input type="text" id="f-cod" maxlength="12" placeholder="Ex.: COM-01" autocomplete="off"></div>
+        <p class="ed-hint" style="align-self:end">O código é um apelido curto que você dá à solução, como a sigla da área e um número. Ele aparece antes do nome, funciona na busca e identifica a solução no campo "Depende de". Não muda a nota nem a ordem.</p>
+      </div>
       <div class="fld"><label for="f-desc">O que faz</label><textarea id="f-desc" rows="2" maxlength="500"></textarea></div>
       <div class="fld"><label for="f-res">O que resolve</label><textarea id="f-res" rows="2" maxlength="500"></textarea></div>
       <div class="fld" data-tip="nat:natureza"><label for="f-nat">Natureza da solução <span class="hint-k">· passe o mouse para ver o porquê da IA</span></label>
@@ -733,9 +772,26 @@
       </div>
 
       <div class="live">
-        <span class="fld-k">Nota</span><b id="live-t">0</b><span class="of">de 10</span><span class="st" id="live-f"></span>
+        <span class="fld-k">Facilidade</span><b id="live-t">0</b><span class="of">de 10</span><span class="st" id="live-f"></span>
       </div>
       <p class="warnline" id="live-w" hidden>Nenhuma meta marcada: pela regra, o projeto deve ser abandonado.</p>
+
+      <div class="fld">
+        <span class="fld-k">Passo 3 · Valor para a empresa</span>
+        <div class="row2">
+          <div class="fld"><label for="v-niv">Valor</label>
+            <select id="v-niv"><option value="">Não informado (ordem só por facilidade)</option><option value="alto">Alto</option><option value="medio">Médio</option><option value="baixo">Baixo</option></select></div>
+          <div class="fld"><label for="v-nconf">Origem do valor</label>
+            <select id="v-nconf"><option value="">Não informada</option><option value="medido">Medido</option><option value="informado">Informado por quem executa</option><option value="estimado">Estimado pelo gestor</option><option value="hipotese">Hipótese</option></select></div>
+        </div>
+        <p class="calc" id="calc-nivel"></p>
+      </div>
+
+      <div class="fld"><label for="f-dep">Depende de <span class="hint-k">· soluções que precisam estar implantadas antes desta</span></label>
+        <input type="text" id="f-dep" list="dl-sol" placeholder="Digite o código ou o nome e escolha na lista" autocomplete="off">
+        <datalist id="dl-sol"></datalist>
+        <div class="dep-chips" id="dep-chips"></div>
+      </div>
       <div id="diverg"></div>
       <details class="ia-exp" id="ia-exp" hidden><summary>Explicações da IA para cada item</summary><ul id="ia-exp-list"></ul></details>
 
@@ -1034,11 +1090,16 @@ const CRIT = [
   { k:'cultura', n:'Cultura', d:'Mudança de cultura e comportamento', peso:1 }
 ];
 const NIVEIS = [ { f:1, l:'Não depende', c:'f1' }, { f:0.5, l:'Em parte', c:'f5' }, { f:0, l:'Depende', c:'f0' } ];
+/* Faixa = valor × facilidade. Sem valor informado, a faixa sai só da facilidade (regra original).
+   r ordena dentro do mesmo nível de valor; o nível de valor vem antes (rankValor). */
 const FAIXAS = {
   comecar:{ l:'Começar já', c:'good', r:0 }, destravar:{ l:'Destravar antes', c:'warn', r:1 }, proxima:{ l:'Próxima onda', c:'acc', r:2 },
-  avaliar:{ l:'Avaliar com cuidado', c:'warn', r:3 }, estrutural:{ l:'Projeto estrutural', c:'crit', r:4 },
-  abandonar:{ l:'Abandonar', c:'crit', r:5 }
+  sobrar:{ l:'Se sobrar tempo', c:'mute', r:2 }, avaliar:{ l:'Avaliar com cuidado', c:'warn', r:3 }, projeto:{ l:'Planejar como projeto', c:'acc', r:3 },
+  estrutural:{ l:'Projeto estrutural', c:'crit', r:4 }, abandonar:{ l:'Abandonar', c:'crit', r:9 }
 };
+const VALORES = { alto:{ l:'alto', r:0 }, medio:{ l:'médio', r:1 }, baixo:{ l:'baixo', r:2 } };
+const FACIL = 7; /* facilidade a partir da qual a solução conta como fácil no quadro valor × facilidade */
+const TIP_COD = 'Código: apelido curto que você dá à solução (ex.: sigla da área e número). Serve para citá-la em documentos, na busca e no campo “Depende de”. Não muda a nota nem a ordem.';
 const STATUS = { ativa:'No roadmap', execucao:'Em execução', implantada:'Implantada', arquivada:'Arquivada' };
 const AVAL = { atingido:{ l:'Resultado atingido', c:'good' }, parcial:{ l:'Atingido em parte', c:'warn' }, nao:{ l:'Não atingido', c:'crit' } };
 const PERFIL_ITENS = [
@@ -1139,15 +1200,69 @@ function travas(it){
   else if (p.documentado === 'so_uma_pessoa') t.push({ l:'Só uma pessoa sabe fazer', d:'Documente e padronize o processo antes de automatizar.', c:'lock' });
   CHECKS.forEach(c => { if (ch[c.k] === 'falha') t.push({ l:`${c.n} com falha`, d:`Checagem de ${c.n.toLowerCase()} com falha: ${c.d}`, c:'bad' }); });
   if (ch.regras === 'desconhecido') t.push({ l:'Regra legal sem resposta', d:'Confirme se há exigência legal, fiscal ou regulatória antes de começar.', c:'lock' });
+  depsDe(it).forEach(d => { if (statusDe(d) !== 'implantada') t.push({ l:`Base não implantada: ${curto(d)}`, d:`Esta solução depende de ${rotulo(d)}, que ainda não está implantada. Implante a base antes.`, c:'lock' }); });
   return t;
 }
+
+/* ---------- Código e dependências ---------- */
+function codigoDe(it){ return String(it && it.codigo || '').trim(); }
+function curto(it){ return codigoDe(it) || it.nome || 'Sem nome'; }
+function rotulo(it){ const c = codigoDe(it); return c ? `${c} · ${it.nome || 'Sem nome'}` : (it.nome || 'Sem nome'); }
+function depsDe(it){
+  const ids = Array.isArray(it && it.dependeDe) ? it.dependeDe : [];
+  return [...new Set(ids)].filter(id => id !== (it && it.id)).map(id => items.find(i => i.id === id)).filter(Boolean);
+}
+/* Quem espera por cada solução: só conta quem está no roadmap ou em execução */
+let baseCache = { ref:null, mapa:null };
+function mapaBase(){
+  if (baseCache.ref === items) return baseCache.mapa;
+  const mapa = new Map();
+  items.forEach(i => {
+    if (!['ativa','execucao'].includes(statusDe(i))) return;
+    [...new Set(Array.isArray(i.dependeDe) ? i.dependeDe : [])].forEach(id => {
+      if (id === i.id) return;
+      if (!mapa.has(id)) mapa.set(id, []);
+      mapa.get(id).push(i);
+    });
+  });
+  baseCache = { ref:items, mapa };
+  return mapa;
+}
+function baseDe(it){ return (it && it.id && mapaBase().get(it.id)) || []; }
+
+/* ---------- Valor × facilidade ---------- */
+function nivelValor(it){ const n = it && it.valor && it.valor.nivel; return VALORES[n] ? n : ''; }
+function rankValor(it){ if (!metasDe(it).length) return 9; const n = nivelValor(it); return n ? VALORES[n].r : 1; }
 function faixa(it){
   if (!metasDe(it).length) return FAIXAS.abandonar;
-  const t = total(it);
-  if (t >= 9) return travas(it).length ? FAIXAS.destravar : FAIXAS.comecar;
-  return t >= 7 ? FAIXAS.proxima : t >= 5 ? FAIXAS.avaliar : FAIXAS.estrutural;
+  const t = total(it), n = nivelValor(it);
+  if (!n) {
+    if (t >= 9) return travas(it).length ? FAIXAS.destravar : FAIXAS.comecar;
+    return t >= 7 ? FAIXAS.proxima : t >= 5 ? FAIXAS.avaliar : FAIXAS.estrutural;
+  }
+  const facil = t >= FACIL;
+  if (n === 'alto') return facil ? (travas(it).length ? FAIXAS.destravar : FAIXAS.comecar) : FAIXAS.projeto;
+  if (n === 'medio') return facil ? FAIXAS.proxima : FAIXAS.avaliar;
+  return facil ? FAIXAS.sobrar : FAIXAS.abandonar;
+}
+/* Referência em R$ para sugerir o nível: o maior entre o ganho conservador e a receita informada (nunca somados) */
+function valorRef(it){
+  const g = ganho(it, 'Conservador'), r = toNum(it && it.valor && it.valor.receita);
+  const xs = [g, r > 0 ? r : null].filter(x => x != null);
+  return xs.length ? Math.max(...xs) : null;
+}
+function limitesValor(){
+  const a = toNum(perfil && perfil.valorAlto), m = toNum(perfil && perfil.valorMedio);
+  return a > 0 && m > 0 && a > m ? { a, m } : null;
+}
+function valorSugerido(it){
+  const ref = valorRef(it), lim = limitesValor();
+  if (ref == null || !lim) return '';
+  return ref >= lim.a ? 'alto' : ref >= lim.m ? 'medio' : 'baixo';
 }
 function ordem(a, b){
+  const v = rankValor(a) - rankValor(b); if (v) return v;
+  const nb = baseDe(b).length - baseDe(a).length; if (nb) return nb;
   const r = faixa(a).r - faixa(b).r; if (r) return r;
   const d = total(b) - total(a); if (d) return d;
   const p = primarias(b) - primarias(a); if (p) return p;
@@ -1264,6 +1379,10 @@ function rowHTML(it, pos, modo){
   if (modo === 'implantada' && it.implantadaEm) info.push(`Implantada em <b>${fmtData(it.implantadaEm)}</b>`);
   if (it.responsavel) info.push(`Responsável: <b>${esc(it.responsavel)}</b>`);
   if (it.previsao && modo !== 'implantada') info.push(atrasada(it) ? `<span class="late">Previsão: ${fmtDia(it.previsao)} (vencida)</span>` : `Previsão: <b>${fmtDia(it.previsao)}</b>`);
+  const liga = [];
+  const deps = depsDe(it), base = baseDe(it);
+  if (deps.length) liga.push(`Depende de ${deps.map(d => `<b title="${esc(rotulo(d))} · ${esc(STATUS[statusDe(d)].toLowerCase())}">${esc(curto(d))}</b>`).join(', ')}`);
+  if (base.length) liga.push(`Base de ${base.map(d => `<b title="${esc(rotulo(d))}">${esc(curto(d))}</b>`).join(', ')}`);
 
   const facts = factsHTML(it, modo);
   let resu = '';
@@ -1286,10 +1405,11 @@ function rowHTML(it, pos, modo){
   }
 
   return `<article class="sol">
-    <div><div class="score ${fx.c}${out ? ' out' : ''}"><b>${fmt(t)}</b><span>de 10</span></div>${pos ? `<div class="pos">#${pos}</div>` : ''}</div>
+    <div><div class="score ${fx.c}${out ? ' out' : ''}" title="Facilidade de 0 a 10: quanto menos a solução depende de trabalho manual, infra, gente técnica e mudança de cultura, maior a nota"><b>${fmt(t)}</b><span>de 10</span></div>${pos ? `<div class="pos">#${pos}</div>` : ''}</div>
     <div class="sol-main">
-      <div class="sol-top"><h4>${esc(it.nome || 'Sem nome')}</h4>${pill}${setorPill}</div>
+      <div class="sol-top"><h4>${codigoDe(it) ? `<span class="cod" title="${esc(TIP_COD)}">${esc(codigoDe(it))}</span>` : ''}${esc(it.nome || 'Sem nome')}</h4>${pill}${setorPill}</div>
       ${info.length ? `<p class="when">${info.join(' · ')}</p>` : ''}
+      ${liga.length ? `<p class="when">${liga.join(' · ')}</p>` : ''}
       ${it.descricao ? `<p class="sol-desc">${esc(it.descricao)}</p>` : ''}
       ${it.resolve ? `<p class="sol-res"><span>Resolve</span>${esc(it.resolve)}</p>` : ''}
       <div class="chips">${metas || '<span class="mt">Nenhuma meta</span>'}</div>
@@ -1297,13 +1417,22 @@ function rowHTML(it, pos, modo){
       ${it.justificativa ? `<p class="sol-why">${esc(it.justificativa)}</p>` : ''}
       ${resu}
     </div>
-    <div class="notas-col">${crit}<div class="tot"><span>Total</span><span>${fmt(t)} / 10</span></div></div>
+    <div class="notas-col">${crit}<div class="tot"><span>Facilidade</span><span>${fmt(t)} / 10</span></div></div>
     ${acts}
   </article>`;
 }
 
 function factsHTML(it, modo){
   const f = [];
+  const nv = nivelValor(it), vivo = modo === 'ativa' || modo === 'execucao';
+  if (nv) {
+    const org = CONFS[it.valor.nivelOrigem] || 'hipótese';
+    f.push(`<span class="fact${nv === 'alto' ? ' money' : ''}" title="Nível de valor para a empresa, registrado por quem cadastrou. Origem: ${esc(org)}.">Valor <b>${VALORES[nv].l}</b><span class="selo">${esc(org)}</span></span>`);
+  } else if (modo === 'ativa' && metasDe(it).length) {
+    f.push(`<span class="fact so-facil" title="Sem nível de valor informado, a posição desta solução na fila usa só a facilidade. Informe o valor em Editar.">Ordem só por facilidade</span>`);
+  }
+  const nb = baseDe(it).length;
+  if (vivo && nb) f.push(`<span class="fact base" title="Soluções na fila que só funcionam depois desta: ${esc(baseDe(it).map(rotulo).join('; '))}">Base de <b>${plural(nb, 'solução', 'soluções')}</b></span>`);
   if (NATUREZAS[it.natureza]) f.push(`<span class="fact" title="Natureza da solução">${NATUREZAS[it.natureza]}</span>`);
   const p = it.processo || {};
   if (DOCS[p.documentado] && p.documentado !== 'so_uma_pessoa') f.push(`<span class="fact">${DOCS[p.documentado]}</span>`);
@@ -1352,9 +1481,10 @@ function render(){
     $('#k-exec').innerHTML = `${exec.length} <small>de ${lim}</small>`;
     $('#k-exec').classList.toggle('alert', exec.length > lim);
     const fila = $('#fila');
+    const proxV = prox && nivelValor(prox) ? `valor ${VALORES[nivelValor(prox)].l}, ` : '';
     if (exec.length > lim) fila.innerHTML = `<span class="over">${exec.length} soluções em execução, acima do limite de ${lim}.</span> Conclua ou devolva ao roadmap antes de iniciar outra.`;
-    else if (exec.length === lim) fila.innerHTML = `Limite atingido (${exec.length} de ${lim}).${prox ? ` Quando uma entrar em uso, a próxima da fila é <b>${esc(prox.nome)}</b> (${fmt(total(prox))}).` : ''}`;
-    else fila.innerHTML = prox ? `Há espaço para iniciar ${plural(lim - exec.length, 'solução', 'soluções')}. Próxima da fila: <b>${esc(prox.nome)}</b> (${esc(prox.setor || 'sem área')}, nota ${fmt(total(prox))}).` : `Há espaço para iniciar ${plural(lim - exec.length, 'solução', 'soluções')}, mas nenhuma do roadmap está em "Começar já" sem trava.`;
+    else if (exec.length === lim) fila.innerHTML = `Limite atingido (${exec.length} de ${lim}).${prox ? ` Quando uma entrar em uso, a próxima da fila é <b>${esc(rotulo(prox))}</b> (${proxV}facilidade ${fmt(total(prox))}).` : ''}`;
+    else fila.innerHTML = prox ? `Há espaço para iniciar ${plural(lim - exec.length, 'solução', 'soluções')}. Próxima da fila: <b>${esc(rotulo(prox))}</b> (${esc(prox.setor || 'sem área')}, ${proxV}facilidade ${fmt(total(prox))}).` : `Há espaço para iniciar ${plural(lim - exec.length, 'solução', 'soluções')}, mas nenhuma do roadmap está em "Começar já" sem trava.`;
     $('#k-atraso').textContent = atrasadas;
     $('#k-atraso').classList.toggle('alert', atrasadas > 0);
     $('#k-impl').textContent = impl.length;
@@ -1390,7 +1520,7 @@ function render(){
   const q = busca.trim().toLowerCase();
   const filtrar = arr => arr
     .filter(i => !filtroSetor || (i.setor || 'Sem área') === filtroSetor)
-    .filter(i => !q || [i.nome, i.descricao, i.resolve, i.setor, i.responsavel].join(' ').toLowerCase().includes(q));
+    .filter(i => !q || [codigoDe(i), i.nome, i.descricao, i.resolve, i.setor, i.responsavel].join(' ').toLowerCase().includes(q));
   const filtrando = !!(filtroSetor || q);
   const contagem = (vis, tot) => filtrando ? `${vis} de ${tot}` : plural(tot, 'solução', 'soluções');
 
@@ -1420,7 +1550,7 @@ function render(){
       lista.innerHTML = keys.map(s => {
         const g = grupos.get(s);
         const med = g.reduce((a,i) => a + total(i), 0) / g.length;
-        return `<div class="grp"><div class="grp-h"><h3>${esc(s)}</h3><span class="meta-inline">${plural(g.length, 'solução', 'soluções')} · média ${fmt(med)}</span></div><div class="sol-list">${g.map(it => rowHTML(it, 0, 'ativa')).join('')}</div></div>`;
+        return `<div class="grp"><div class="grp-h"><h3>${esc(s)}</h3><span class="meta-inline">${plural(g.length, 'solução', 'soluções')} · facilidade média ${fmt(med)}</span></div><div class="sol-list">${g.map(it => rowHTML(it, 0, 'ativa')).join('')}</div></div>`;
       }).join('');
     }
 
@@ -1516,6 +1646,7 @@ function lerForm(){
   const un = ['dia','semana','mes'].includes($('#p-un').value) ? $('#p-un').value : 'mes';
   return {
     nome: $('#f-nome').value.trim(), setor: $('#f-setor').value.trim(),
+    codigo: $('#f-cod').value.trim(), dependeDe: [...depSel],
     descricao: $('#f-desc').value.trim(), resolve: $('#f-res').value.trim(),
     natureza: NATUREZAS[$('#f-nat').value] ? $('#f-nat').value : '',
     metas: [...document.querySelectorAll('input[name="meta"]:checked')].map(i => i.value),
@@ -1533,7 +1664,9 @@ function lerForm(){
     valor: {
       custoHora: vNum('#v-ch'), supervisaoHoras: vNum('#v-sup'), custoHoraSupervisor: vNum('#v-chs'),
       pctConservador: vNum('#v-pc'), pctProvavel: vNum('#v-pp'), custoSolucao: vNum('#v-cs'),
-      receita: vNum('#v-rec'), baseReceita: BASES_REC[$('#v-brec').value] ? $('#v-brec').value : ''
+      receita: vNum('#v-rec'), baseReceita: BASES_REC[$('#v-brec').value] ? $('#v-brec').value : '',
+      nivel: VALORES[$('#v-niv').value] ? $('#v-niv').value : '',
+      nivelOrigem: VALORES[$('#v-niv').value] && CONFS[$('#v-nconf').value] ? $('#v-nconf').value : ''
     },
     medicao: {
       indicador: $('#m-ind').value.trim(), metodo: $('#m-met').value.trim(), base: $('#m-base').value.trim(),
@@ -1558,6 +1691,7 @@ function preencherV2(it){
   $('#v-ch').value = numTxt(v.custoHora); $('#v-sup').value = numTxt(v.supervisaoHoras); $('#v-chs').value = numTxt(v.custoHoraSupervisor);
   $('#v-pc').value = numTxt(v.pctConservador); $('#v-pp').value = numTxt(v.pctProvavel); $('#v-cs').value = numTxt(v.custoSolucao);
   $('#v-rec').value = numTxt(v.receita); $('#v-brec').value = BASES_REC[v.baseReceita] ? v.baseReceita : '';
+  $('#v-niv').value = VALORES[v.nivel] ? v.nivel : ''; $('#v-nconf').value = VALORES[v.nivel] && CONFS[v.nivelOrigem] ? v.nivelOrigem : '';
   $('#m-ind').value = m.indicador || ''; $('#m-met').value = m.metodo || ''; $('#m-base').value = m.base || '';
   $('#m-prazo').value = numTxt(m.prazoDias); $('#m-con').value = m.conservador || ''; $('#m-pro').value = m.provavel || ''; $('#m-oti').value = m.otimista || '';
   $('#sec-proc').open = !!(p.frequencia || p.documentado || p.executor);
@@ -1580,6 +1714,13 @@ function atualizarV2(f){
     if (gc != null && gc <= 0) vt += ' O cenário conservador não se paga: o custo da solução supera a economia.';
   }
   $('#calc-valor').innerHTML = vt;
+  const ref = valorRef(f), sug = valorSugerido(f), lim = limitesValor();
+  let nt;
+  if (ref == null) nt = 'Sem ganho em reais calculado: escolha o nível pela sua leitura. Ele fica marcado como hipótese até alguém medir.';
+  else if (!lim) nt = `Referência em reais: <b>${brl(ref)}/mês</b>. Defina os limites de valor no perfil da empresa (seção 05) para a página sugerir o nível.`;
+  else nt = `Pela referência de <b>${brl(ref)}/mês</b> e pelos limites do perfil, o valor sugerido é <b>${VALORES[sug].l}</b>.${f.valor.nivel !== sug ? ' <button type="button" class="btn-s" id="btn-nivel-sug">Usar a sugestão</button>' : ''}`;
+  $('#calc-nivel').innerHTML = nt;
+  $('#v-nconf').disabled = !f.valor.nivel;
   const tv = travas(f);
   $('#travas-live').innerHTML = tv.map(t => `<span class="fact ${t.c}" title="${esc(t.d)}">${esc(t.l)}</span>`).join('');
   $('#sr-proc').textContent = c != null ? `${fmt(c)} h/mês${CONFS[f.processo.confianca] ? ' · ' + CONFS[f.processo.confianca] : ''}` : 'não preenchido';
@@ -1588,8 +1729,34 @@ function atualizarV2(f){
   $('#sr-valor').textContent = gc != null ? `conservador ${brl(gc)}/mês` : ca != null ? `custo atual ${brl(ca)}/mês` : 'não preenchido';
   $('#sr-med').textContent = f.medicao.indicador ? f.medicao.indicador.slice(0, 50) : 'sem indicador';
 }
+/* Campo "Depende de": lista de ids, escolhidos por código ou nome numa lista de sugestões */
+let depSel = [];
+function opcaoSol(i){ return rotulo(i) + (i.setor ? ` (${i.setor})` : ''); }
+function candidatosDep(){ return items.filter(i => i.id !== editId && statusDe(i) !== 'arquivada' && !depSel.includes(i.id)); }
+function renderDeps(){
+  $('#dl-sol').innerHTML = candidatosDep().sort((a, b) => setorOrd(a.setor) - setorOrd(b.setor) || rotulo(a).localeCompare(rotulo(b), 'pt-BR')).map(i => `<option value="${esc(opcaoSol(i))}"></option>`).join('');
+  $('#dep-chips').innerHTML = depSel.map(id => {
+    const i = items.find(x => x.id === id);
+    const txt = i ? rotulo(i) : 'Solução excluída';
+    const st = i ? STATUS[statusDe(i)].toLowerCase() : '';
+    return `<span class="dep-chip" title="${esc(st)}">${esc(txt)}${st ? ` · ${esc(st)}` : ''}<button type="button" data-dep-rm="${esc(id)}" aria-label="Tirar ${esc(txt)}">×</button></span>`;
+  }).join('');
+}
+function addDep(){
+  const el = $('#f-dep'), v = el.value.trim(); if (!v) return;
+  const lv = v.toLowerCase();
+  const c = candidatosDep();
+  const it = c.find(i => opcaoSol(i) === v) || c.find(i => codigoDe(i).toLowerCase() === lv) || c.find(i => String(i.nome || '').toLowerCase() === lv);
+  if (!it) return;
+  depSel.push(it.id); el.value = '';
+  renderDeps(); atualizarLive();
+}
 function preencher(it){
   $('#f-nome').value = it.nome || ''; $('#f-setor').value = it.setor || '';
+  $('#f-cod').value = codigoDe(it);
+  depSel = Array.isArray(it.dependeDe) ? [...new Set(it.dependeDe)].filter(id => id !== editId) : [];
+  $('#f-dep').value = '';
+  renderDeps();
   $('#f-desc').value = it.descricao || ''; $('#f-res').value = it.resolve || '';
   $('#f-just').value = it.justificativa || '';
   $('#f-resp').value = it.responsavel || ''; $('#f-prev').value = /^\d{4}-\d{2}-\d{2}$/.test(it.previsao || '') ? it.previsao : '';
@@ -1639,6 +1806,9 @@ async function salvar(e){
   const f = lerForm();
   if (!f.nome) { $('#f-err').textContent = 'Dê um nome à solução.'; $('#f-nome').focus(); return; }
   if (!f.setor) { $('#f-err').textContent = 'Escolha ou digite a área.'; $('#f-setor').focus(); return; }
+  const dupCod = f.codigo && items.find(i => i.id !== editId && codigoDe(i).toLowerCase() === f.codigo.toLowerCase());
+  if (dupCod) { $('#f-err').textContent = `O código ${f.codigo} já é usado por "${dupCod.nome || 'outra solução'}". Escolha outro ou deixe em branco.`; $('#f-cod').focus(); return; }
+  if (f.valor.nivel && !f.valor.nivelOrigem) f.valor.nivelOrigem = 'hipotese';
   const prev = editId ? items.find(i => i.id === editId) : null;
   const id = editId || (slug(f.nome) + '-' + Math.random().toString(36).slice(2, 6));
   const agora = new Date().toISOString();
@@ -2019,6 +2189,9 @@ function lerPerfil(){
   REGUA.forEach(d => { const n = nivelRegua($('#r-' + d.k).value); if (n) p.regua[d.k] = n; });
   p.porte = PORTES[$('#p-porte').value] ? $('#p-porte').value : '';
   p.obs = $('#p-obs').value.trim();
+  const va = toNum($('#p-valto').value), vm = toNum($('#p-vmedio').value);
+  if (va > 0) p.valorAlto = va;
+  if (vm > 0) p.valorMedio = vm;
   return p;
 }
 function preencherPerfil(){
@@ -2028,6 +2201,7 @@ function preencherPerfil(){
   REGUA.forEach(d => { const n = nivelRegua(r[d.k]); $('#r-' + d.k).value = n ? String(n) : ''; });
   $('#p-porte').value = PORTES[p.porte] ? p.porte : '';
   $('#p-obs').value = p.obs || '';
+  $('#p-valto').value = numTxt(p.valorAlto); $('#p-vmedio').value = numTxt(p.valorMedio);
 }
 function renderProntidao(){
   const r = lerPerfil().regua;
@@ -2193,7 +2367,7 @@ async function exportarCSV(){
   if (!downloads) return;
   const ordemStatus = { ativa:0, execucao:1, implantada:2, arquivada:3 };
   const lista = [...items].sort((a, b) => (ordemStatus[statusDe(a)] - ordemStatus[statusDe(b)]) || ordem(a, b));
-  const cab = ['Situação','Área','Solução','Nota','Faixa','Metas','Manual (4)','Infra (3)','Time técnico (2)','Cultura (1)','Justificativa','Responsável','Previsão','Início da execução','Implantada em','Meta (resultado esperado)','Resultado medido','Avaliação','O que faz','O que resolve','Ajustes manuais sobre a IA',
+  const cab = ['Situação','Área','Código','Solução','Facilidade','Valor','Origem do valor','Faixa','Base de (soluções na fila)','Depende de','Metas','Manual (4)','Infra (3)','Time técnico (2)','Cultura (1)','Justificativa','Responsável','Previsão','Início da execução','Implantada em','Meta (resultado esperado)','Resultado medido','Avaliação','O que faz','O que resolve','Ajustes manuais sobre a IA',
     'Natureza','Travas','Chk dado','Chk integrações','Chk qualidade','Chk regras','Quem executa','Documentação','Entrada','Carga (h/mês)','Origem dos números','Linha de base validada',
     'Custo atual (R$/mês)','Ganho conservador (R$/mês)','Ganho provável (R$/mês)','Custo da solução (R$/mês)','Ganho de receita (R$/mês, não validado)','Base da receita',
     'Indicador','Linha de base do indicador','Prazo (dias)','Método','Cenário conservador','Cenário provável','Cenário otimista'];
@@ -2216,7 +2390,9 @@ async function exportarCSV(){
   const cel = v => { const s = String(v == null ? '' : v); return /[";\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
   const num = n => String(n).replace('.', ',');
   const linhas = lista.map(i => [
-    atrasada(i) ? 'Em execução (atrasada)' : STATUS[statusDe(i)], i.setor || '', i.nome || '', num(total(i)), faixa(i).l,
+    atrasada(i) ? 'Em execução (atrasada)' : STATUS[statusDe(i)], i.setor || '', codigoDe(i), i.nome || '', num(total(i)),
+    nivelValor(i) ? VALORES[nivelValor(i)].l : '', nivelValor(i) ? (CONFS[i.valor.nivelOrigem] || 'hipótese') : '', faixa(i).l,
+    baseDe(i).map(curto).join(' | '), depsDe(i).map(curto).join(' | '),
     metasDe(i).map(m => m.n).join(', '), ...CRIT.map(c => num(nota(i, c))), i.justificativa || '', i.responsavel || '',
     fmtDia(i.previsao), i.inicioExecucao ? fmtData(i.inicioExecucao) : '', i.implantadaEm ? fmtData(i.implantadaEm) : '',
     i.resultadoEsperado || '', i.resultadoMedido || '', AVAL[i.resultadoAvaliacao] ? AVAL[i.resultadoAvaliacao].l : '',
@@ -2243,6 +2419,11 @@ $('#dlg').addEventListener('close', () => { if (iaCtl) { iaCtl.abort(); iaCtl = 
 $('#frm').addEventListener('submit', salvar);
 $('#frm').addEventListener('change', e => {
   if (e.target.id === 'p-valid' && e.target.checked) $('#p-conf').value = 'medido';
+  if (e.target.id === 'f-dep') return addDep();
+  if (e.target.id === 'v-niv' && e.target.value && !$('#v-nconf').value) {
+    const f0 = lerForm();
+    $('#v-nconf').value = valorRef(f0) != null ? (CONFS[f0.processo.confianca] ? f0.processo.confianca : 'estimado') : 'hipotese';
+  }
   atualizarLive();
   if (e.target.matches('input[name="meta"], #deps .rad input')) renderDiverg();
 });
@@ -2255,6 +2436,20 @@ $('#btn-base').addEventListener('click', () => {
   atualizarLive();
 });
 $('#f-limite').addEventListener('change', salvarLimite);
+$('#f-dep').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addDep(); } });
+$('#dep-chips').addEventListener('click', e => {
+  const b = e.target.closest('button[data-dep-rm]'); if (!b) return;
+  depSel = depSel.filter(id => id !== b.dataset.depRm);
+  renderDeps(); atualizarLive();
+});
+$('#calc-nivel').addEventListener('click', e => {
+  if (!e.target.closest('#btn-nivel-sug')) return;
+  const f0 = lerForm(), sug = valorSugerido(f0); if (!sug) return;
+  $('#v-niv').value = sug;
+  $('#v-nconf').disabled = false;
+  $('#v-nconf').value = CONFS[f0.processo.confianca] ? f0.processo.confianca : 'estimado';
+  atualizarLive();
+});
 $('#diverg').addEventListener('input', e => { const k = e.target.dataset && e.target.dataset.key; if (k && e.target.tagName === 'TEXTAREA') motivosU[k] = e.target.value; });
 $('#diverg').addEventListener('click', e => {
   if (e.target.closest('#btn-reav')) return reavaliarIA();
@@ -2271,7 +2466,7 @@ $('#btn-perfil').addEventListener('click', salvarPerfil);
 $('#btn-recalc').addEventListener('click', recalcular);
 $('#btn-recalc-stop').addEventListener('click', () => { if (recCtl) recCtl.abort(); });
 ['input','change'].forEach(ev => $('#perfil .perfil').addEventListener(ev, e => {
-  if (e.target.closest('#pf-list, #p-porte, #p-obs, #regua')) { perfilSujo = true; setPf('Alterações no perfil ainda não salvas.', false); }
+  if (e.target.closest('#pf-list, #p-porte, #p-obs, #regua, #p-valto, #p-vmedio')) { perfilSujo = true; setPf('Alterações no perfil ainda não salvas.', false); }
   if (e.target.closest('#regua')) renderProntidao();
 }));
 $('#v-setor').addEventListener('click', () => { view = 'setor'; try { localStorage.setItem('ranking-ia-view', view); } catch (e) {} render(); });
