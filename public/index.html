@@ -281,6 +281,7 @@
   .row2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
   @media (max-width:640px){ .row3, .row2 { grid-template-columns:1fr; } }
   .fld { display:flex; flex-direction:column; gap:5px; min-width:0; }
+  .fld[hidden] { display:none; }
   .fld > label, .fld-k { font-family:var(--font-mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:600; }
   .fld input[type="text"], .fld input[type="date"], .fld textarea, .fld select { font:14.5px var(--font-body); padding:9px 11px; border:1px solid var(--line-strong); border-radius:8px; background:var(--bg); color:var(--ink); width:100%; }
   .fld textarea { resize:vertical; min-height:62px; line-height:1.5; }
@@ -863,6 +864,13 @@
         <div class="fld"><label for="f-resp">Responsável</label><input type="text" id="f-resp" maxlength="80" placeholder="Nome de quem conduz"></div>
         <div class="fld"><label for="f-prev">Previsão de entrega</label><input type="date" id="f-prev"></div>
       </div>
+      <div id="grp-datas" hidden>
+        <div class="row2">
+          <div class="fld" id="fld-ini"><label for="f-ini">Início da execução</label><input type="date" id="f-ini"></div>
+          <div class="fld" id="fld-impl"><label for="f-impl">Implantada em</label><input type="date" id="f-impl"></div>
+        </div>
+        <p class="ed-hint">A data vem preenchida com o dia em que a situação mudou. Troque pela data real quando a solução já rodava antes do cadastro. A data não pode ser depois de hoje.</p>
+      </div>
       <details class="ed-sec" id="sec-med">
         <summary><span class="sk">Plano de medição</span><span class="sr" id="sr-med"></span></summary>
         <div class="in">
@@ -1185,6 +1193,15 @@ const fmt = n => Number(n).toLocaleString('pt-BR', { maximumFractionDigits:1 });
 const fmtData = iso => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString('pt-BR'); };
 const fmtDia = ymd => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(ymd || '')); return m ? `${m[3]}/${m[2]}/${m[1]}` : ''; };
 function hojeYMD(){ const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); }
+const ymdDe = iso => { const d = new Date(iso || ''); return isNaN(d) ? '' : new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
+// Dia escolhido no formulário -> ISO. Mantém o horário gravado se o dia não mudou; dia passado vira meio-dia local.
+function isoDoDia(ymd, isoAntigo, agora){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ymd || '');
+  if (!m) return '';
+  if (isoAntigo && ymdDe(isoAntigo) === ymd) return isoAntigo;
+  if (ymd === hojeYMD()) return agora;
+  return new Date(+m[1], +m[2] - 1, +m[3], 12).toISOString();
+}
 function snap(v, peso){ const x = Number(v); if (!isFinite(x)) return 0; return [0, peso/2, peso].reduce((a,b) => Math.abs(b-x) < Math.abs(a-x) ? b : a); }
 function nota(it, c){ return snap(it && it.notas ? it.notas[c.k] : 0, c.peso); }
 function total(it){ return CRIT.reduce((s,c) => s + nota(it,c), 0); }
@@ -1600,7 +1617,7 @@ function onRowClick(e){
     }
     return mover(id, { status:'execucao', inicioExecucao: agora }, 'Solução em execução. Defina responsável, previsão e plano de medição em Editar.');
   }
-  if (act === 'implantar') return mover(id, { status:'implantada', implantadaEm: agora }, 'Solução marcada como implantada. Registre o resultado em Editar.');
+  if (act === 'implantar') return mover(id, { status:'implantada', implantadaEm: agora }, 'Solução marcada como implantada com a data de hoje. Em Editar, troque pela data real se ela for outra e registre o resultado.');
   if (act === 'voltar-roadmap') return mover(id, { status:'ativa' }, 'Solução voltou ao roadmap');
   if (act === 'voltar-execucao') return mover(id, { status:'execucao' }, 'Solução voltou para execução');
   if (act === 'arquivar') return mover(id, { status:'arquivada', statusAnterior: statusDe(it) }, 'Solução arquivada');
@@ -1763,7 +1780,10 @@ function preencher(it){
   $('#f-esp').value = it.resultadoEsperado || ''; $('#f-med').value = it.resultadoMedido || '';
   $('#f-aval').value = AVAL[it.resultadoAvaliacao] ? it.resultadoAvaliacao : '';
   const st = statusDe(it); $('#f-status').value = st === 'arquivada' ? 'ativa' : st;
-  const ms = Array.isArray(it.metas) ? it.metas : [];
+  $('#f-ini').value = st === 'execucao' || st === 'implantada' ? ymdDe(it.inicioExecucao) : '';
+  $('#f-impl').value = st === 'implantada' ? ymdDe(it.implantadaEm) : '';
+  $('#f-ini').max = $('#f-impl').max = hojeYMD();
+  const ms =Array.isArray(it.metas) ? it.metas : [];
   document.querySelectorAll('input[name="meta"]').forEach(i => { i.checked = ms.includes(i.value); });
   CRIT.forEach(c => {
     const v = snap(it.notas ? it.notas[c.k] : 0, c.peso);
@@ -1777,7 +1797,10 @@ function atualizarLive(){
   $('#live-t').textContent = fmt(total(f));
   const lf = $('#live-f'); lf.className = 'st ' + fx.c; lf.innerHTML = `<span class="dot"></span>${fx.l}`;
   $('#live-w').hidden = f.metas.length > 0;
-  $('#grp-medido').hidden = $('#f-status').value !== 'implantada';
+  const stF = $('#f-status').value;
+  $('#grp-medido').hidden = stF !== 'implantada';
+  $('#grp-datas').hidden = stF !== 'execucao' && stF !== 'implantada';
+  $('#fld-impl').hidden = stF !== 'implantada';
   atualizarV2(f);
 }
 function abrirEditor(id){
@@ -1809,6 +1832,11 @@ async function salvar(e){
   const dupCod = f.codigo && items.find(i => i.id !== editId && codigoDe(i).toLowerCase() === f.codigo.toLowerCase());
   if (dupCod) { $('#f-err').textContent = `O código ${f.codigo} já é usado por "${dupCod.nome || 'outra solução'}". Escolha outro ou deixe em branco.`; $('#f-cod').focus(); return; }
   if (f.valor.nivel && !f.valor.nivelOrigem) f.valor.nivelOrigem = 'hipotese';
+  const stF = $('#f-status').value, dIni = stF === 'ativa' ? '' : $('#f-ini').value, dImpl = stF === 'implantada' ? $('#f-impl').value : '';
+  const hoje = hojeYMD();
+  if (dIni > hoje) { $('#f-err').textContent = 'O início da execução não pode ser depois de hoje.'; $('#f-ini').focus(); return; }
+  if (dImpl > hoje) { $('#f-err').textContent = 'A data de implantação não pode ser depois de hoje.'; $('#f-impl').focus(); return; }
+  if (dIni && dImpl && dImpl < dIni) { $('#f-err').textContent = 'A implantação não pode ser antes do início da execução.'; $('#f-impl').focus(); return; }
   const prev = editId ? items.find(i => i.id === editId) : null;
   const id = editId || (slug(f.nome) + '-' + Math.random().toString(36).slice(2, 6));
   const agora = new Date().toISOString();
@@ -1824,8 +1852,11 @@ async function salvar(e){
   const divKeys = new Set(divergencias(f, iaAtual).map(d => d.key));
   body.motivosUsuario = Object.fromEntries(Object.entries(motivosU).filter(([k, v]) => divKeys.has(k) && String(v || '').trim()).map(([k, v]) => [k, String(v).trim().slice(0, 400)]));
   if (iaAtual) body.ia = iaAtual; else delete body.ia;
-  if (novoStatus === 'execucao' && (antigo !== 'execucao' || !body.inicioExecucao)) body.inicioExecucao = antigo === 'implantada' && body.inicioExecucao ? body.inicioExecucao : agora;
-  if (novoStatus === 'implantada' && (antigo !== 'implantada' || !body.implantadaEm)) body.implantadaEm = agora;
+  if (novoStatus === 'execucao' || novoStatus === 'implantada') {
+    const ini = isoDoDia(dIni, prev && prev.inicioExecucao, agora) || (novoStatus === 'execucao' ? agora : '');
+    if (ini) body.inicioExecucao = ini; else delete body.inicioExecucao;
+  }
+  if (novoStatus === 'implantada') body.implantadaEm = isoDoDia(dImpl, prev && prev.implantadaEm, agora) || agora;
   const btn = $('#btn-save'); btn.disabled = true; $('#f-err').textContent = '';
   try {
     await db.collection('solucoes').doc(id).set(body);
@@ -2420,6 +2451,11 @@ $('#frm').addEventListener('submit', salvar);
 $('#frm').addEventListener('change', e => {
   if (e.target.id === 'p-valid' && e.target.checked) $('#p-conf').value = 'medido';
   if (e.target.id === 'f-dep') return addDep();
+  if (e.target.id === 'f-status') {
+    const s = e.target.value;
+    if (s === 'execucao' && !$('#f-ini').value) $('#f-ini').value = hojeYMD();
+    if (s === 'implantada' && !$('#f-impl').value) $('#f-impl').value = hojeYMD();
+  }
   if (e.target.id === 'v-niv' && e.target.value && !$('#v-nconf').value) {
     const f0 = lerForm();
     $('#v-nconf').value = valorRef(f0) != null ? (CONFS[f0.processo.confianca] ? f0.processo.confianca : 'estimado') : 'hipotese';
