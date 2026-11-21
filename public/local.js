@@ -21,7 +21,8 @@
   /* ---------- Configurações (documento config/app) ---------- */
   const PADRAO = {
     provedor: 'anthropic', modelo: 'claude-opus-5-5', esforco: 'medium', baseUrl: 'http://localhost:11434/v1',
-    empresa: 'Minha empresa', areas: ['Atendimento', 'Vendas', 'Marketing', 'Financeiro', 'Pessoas', 'Operação', 'Dados']
+    empresa: 'Minha empresa', areas: ['Atendimento', 'Vendas', 'Marketing', 'Financeiro', 'Pessoas', 'Operação', 'Dados'],
+    setoresDono: {}
   };
   const PROVS = {
     anthropic: { nome: 'Anthropic (Claude)', curto: 'Anthropic', modelos: ['claude-opus-5-5', 'claude-sonnet-5-5', 'claude-haiku-5-5', 'claude-fable-5-2'],
@@ -41,6 +42,7 @@
     const c = Object.assign({}, PADRAO, (estado && estado.config && estado.config.app) || {});
     if (!PROVS[c.provedor]) c.provedor = PADRAO.provedor;
     if (!Array.isArray(c.areas) || !c.areas.length) c.areas = PADRAO.areas.slice();
+    if (!c.setoresDono || typeof c.setoresDono !== 'object' || Array.isArray(c.setoresDono)) c.setoresDono = {};
     return c;
   }
   function iaNome() {
@@ -220,6 +222,7 @@
     el('c-base').value = c.baseUrl || PADRAO.baseUrl;
     el('c-empresa').value = c.empresa || '';
     el('c-areas').value = c.areas.join('\n');
+    el('c-donos').value = Object.entries(c.setoresDono).filter(([, l]) => Array.isArray(l) && l.length).map(([a, l]) => `${a}: ${l.join(', ')}`).join('\n');
     el('c-chave').value = '';
     el('c-logo-st').textContent = '';
     el('c-sol-st').textContent = '';
@@ -235,9 +238,21 @@
     const vistos = new Set();
     const areas = el('c-areas').value.split(/\r?\n/).map(s => s.trim().slice(0, 40)).filter(s => s && !vistos.has(s.toLowerCase()) && vistos.add(s.toLowerCase())).slice(0, 40);
     if (!areas.length) { el('c-err').textContent = 'Informe ao menos uma área.'; el('c-areas').focus(); return; }
+    // Setores dono: uma linha por área, no formato "Área: Setor A, Setor B".
+    const setoresDono = {};
+    const linhas = el('c-donos').value.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+    for (let n = 0; n < linhas.length; n++) {
+      const m = /^([^:]+):(.*)$/.exec(linhas[n]);
+      const area = m ? m[1].trim().slice(0, 40) : '';
+      const lista = m ? m[2].split(/[,;]/).map(s => s.trim().slice(0, 40)).filter(Boolean) : [];
+      if (!area || !lista.length) { el('c-err').textContent = `Setores dono, linha ${n + 1}: use "Área: Setor A, Setor B".`; el('c-donos').focus(); return; }
+      const atual = setoresDono[area] || [];
+      lista.forEach(s => { if (atual.length < 20 && !atual.some(x => x.toLowerCase() === s.toLowerCase())) atual.push(s); });
+      setoresDono[area] = atual;
+    }
     const novo = Object.assign({}, (estado && estado.config && estado.config.app) || {}, {
       provedor: el('c-prov').value, modelo, esforco: el('c-esforco').value, baseUrl: el('c-base').value.trim() || PADRAO.baseUrl,
-      empresa: el('c-empresa').value.trim() || PADRAO.empresa, areas, atualizadoEm: new Date().toISOString()
+      empresa: el('c-empresa').value.trim() || PADRAO.empresa, areas, setoresDono, atualizadoEm: new Date().toISOString()
     });
     el('c-salvar').disabled = true;
     try { await db.doc('config/app').set(novo); el('dlg-cfg').close(); if (typeof toast === 'function') toast('Configurações salvas'); }

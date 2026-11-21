@@ -177,6 +177,7 @@
   .seg button + button { border-left:1px solid var(--line-strong); }
   .seg button[aria-pressed="true"] { background:var(--accent-soft); color:var(--accent-ink); }
   .search { font:14px var(--font-body); padding:8px 12px; border:1px solid var(--line-strong); border-radius:9px; background:var(--bg); color:var(--ink); width:min(240px, 100%); }
+  select.search { width:auto; max-width:min(220px, 100%); }
   .btn { font:600 13px var(--font-body); padding:9px 16px; border-radius:9px; border:1px solid var(--accent); background:var(--accent); color:var(--on-accent); cursor:pointer; display:inline-flex; align-items:center; gap:8px; }
   .btn:hover { filter:brightness(1.07); }
   .btn:disabled { opacity:.55; cursor:default; filter:none; }
@@ -484,6 +485,7 @@
     <div class="l">
       <span class="lbl">Filtrar</span>
       <select id="filtro-setor" class="search" aria-label="Filtrar por área"><option value="">Todas as áreas</option></select>
+      <select id="filtro-dono" class="search" aria-label="Filtrar por setor dono" hidden><option value="">Todos os setores</option></select>
       <input type="search" id="busca" class="search" placeholder="Buscar solução" aria-label="Buscar solução">
     </div>
     <div class="r">
@@ -739,6 +741,10 @@
         <div class="fld"><label for="f-cod">Código <span class="hint-k">· opcional</span></label><input type="text" id="f-cod" maxlength="12" placeholder="Ex.: COM-01" autocomplete="off"></div>
         <p class="ed-hint" style="align-self:end">O código é um apelido curto que você dá à solução, como a sigla da área e um número. Ele aparece antes do nome, funciona na busca e identifica a solução no campo "Depende de". Não muda a nota nem a ordem.</p>
       </div>
+      <div class="fld" id="fld-dono" hidden>
+        <span class="fld-k">Setor dono <span class="hint-k">· um ou mais; a lista de cada área fica em Configurações</span></span>
+        <div class="tg" id="tg-dono"></div>
+      </div>
       <div class="fld"><label for="f-desc">O que faz</label><textarea id="f-desc" rows="2" maxlength="500"></textarea></div>
       <div class="fld"><label for="f-res">O que resolve</label><textarea id="f-res" rows="2" maxlength="500"></textarea></div>
       <div class="fld" data-tip="nat:natureza"><label for="f-nat">Natureza da solução <span class="hint-k">· passe o mouse para ver o porquê da IA</span></label>
@@ -972,6 +978,8 @@
       <p class="ed-sep">Áreas</p>
       <div class="fld"><label for="c-areas">Áreas sugeridas no cadastro, uma por linha, na ordem de exibição</label><textarea id="c-areas" rows="8"></textarea></div>
       <p class="cfg-hint">Para incluir uma área, acrescente uma linha. No cadastro de uma solução você também pode digitar uma área nova direto no campo "Área". Tirar uma área desta lista não muda as soluções que já usam essa área.</p>
+      <div class="fld"><label for="c-donos">Setores dono, por área · uma área por linha, no formato "Área: Setor A, Setor B"</label><textarea id="c-donos" rows="4" placeholder="Operação: Manutenção, Logística, Compras"></textarea></div>
+      <p class="cfg-hint">Use quando uma área tem mais de um gestor. A área com setores ganha o campo "Setor dono" no cadastro e o filtro por setor na fila. A área sem linha aqui continua sem setor. Tirar um setor desta lista não apaga o setor das soluções que já o usam.</p>
 
       <p class="ed-sep">Soluções</p>
       <p class="cfg-hint" id="c-sol-info"></p>
@@ -1083,6 +1091,10 @@
 /* ---------- Modelo ---------- */
 const IA_OPTS = {}; /* provedor, modelo e esforço vêm das Configurações (local.js) */
 let SETORES = ['Atendimento','Vendas','Marketing','Financeiro','Pessoas','Operação','Dados'];
+let SETORES_DONO = {}; /* { área: [setor, ...] }, vem das Configurações */
+const SEM_DONO = '__sem-dono';
+const donosDe = it => Array.isArray(it.donos) ? it.donos.filter(s => typeof s === 'string' && s) : [];
+const donosDaArea = a => Array.isArray(SETORES_DONO[a]) ? SETORES_DONO[a] : [];
 const METAS = [
   { k:'receita', n:'Receita', d:'Aumentar receita', p:true },
   { k:'custo', n:'Custo', d:'Diminuir custo', p:true },
@@ -1342,6 +1354,7 @@ let perfilSujo = false;
 let view = 'setor';
 let busca = '';
 let filtroSetor = '';
+let filtroDono = '';
 let db = null;
 let sample = null;
 let downloads = null;
@@ -1360,6 +1373,7 @@ function limiteExec(){ const n = Number(perfil && perfil.limiteExec); return n >
 
 try { const v = localStorage.getItem('ranking-ia-view'); if (v === 'geral' || v === 'setor') view = v; } catch (e) {}
 try { filtroSetor = localStorage.getItem('ranking-ia-setor') || ''; } catch (e) {}
+try { filtroDono = localStorage.getItem('ranking-ia-dono') || ''; } catch (e) {}
 
 /* ---------- Render das linhas ---------- */
 const ACOES = {
@@ -1392,6 +1406,7 @@ function rowHTML(it, pos, modo){
   const setorPill = (modo !== 'ativa' || view === 'geral') ? `<span class="mt">${esc(it.setor || 'Sem área')}</span>` : '';
 
   const info = [];
+  if (donosDe(it).length) info.push(`Setor dono: <b>${esc(donosDe(it).join(', '))}</b>`);
   if (modo === 'execucao' && it.inicioExecucao) info.push(`Em execução desde <b>${fmtData(it.inicioExecucao)}</b>`);
   if (modo === 'implantada' && it.implantadaEm) info.push(`Implantada em <b>${fmtData(it.implantadaEm)}</b>`);
   if (it.responsavel) info.push(`Responsável: <b>${esc(it.responsavel)}</b>`);
@@ -1531,14 +1546,27 @@ function render(){
   }).join('');
   fs.value = filtroSetor;
 
+  // Setor dono: só aparece quando a área escolhida tem setores (na configuração ou nas soluções).
+  const vivasArea = filtroSetor ? vivas.filter(i => (i.setor || 'Sem área') === filtroSetor) : [];
+  const donosOpc = filtroSetor ? [...new Set([...donosDaArea(filtroSetor), ...vivasArea.flatMap(donosDe)])] : [];
+  const semDonoN = vivasArea.filter(i => !donosDe(i).length).length;
+  if (loaded && filtroDono && (!donosOpc.length || (filtroDono === SEM_DONO ? !semDonoN : !donosOpc.includes(filtroDono)))) filtroDono = '';
+  const fd = $('#filtro-dono');
+  fd.hidden = !donosOpc.length;
+  fd.innerHTML = `<option value="">Todos os setores</option>`
+    + donosOpc.map(s => `<option value="${esc(s)}">${esc(s)} (${vivasArea.filter(i => donosDe(i).includes(s)).length})</option>`).join('')
+    + (semDonoN ? `<option value="${SEM_DONO}">Sem setor dono (${semDonoN})</option>` : '');
+  fd.value = filtroDono;
+
   $('#v-setor').setAttribute('aria-pressed', view === 'setor');
   $('#v-geral').setAttribute('aria-pressed', view === 'geral');
 
   const q = busca.trim().toLowerCase();
   const filtrar = arr => arr
     .filter(i => !filtroSetor || (i.setor || 'Sem área') === filtroSetor)
-    .filter(i => !q || [codigoDe(i), i.nome, i.descricao, i.resolve, i.setor, i.responsavel].join(' ').toLowerCase().includes(q));
-  const filtrando = !!(filtroSetor || q);
+    .filter(i => !filtroDono || (filtroDono === SEM_DONO ? !donosDe(i).length : donosDe(i).includes(filtroDono)))
+    .filter(i => !q || [codigoDe(i), i.nome, i.descricao, i.resolve, i.setor, ...donosDe(i), i.responsavel].join(' ').toLowerCase().includes(q));
+  const filtrando = !!(filtroSetor || filtroDono || q);
   const contagem = (vis, tot) => filtrando ? `${vis} de ${tot}` : plural(tot, 'solução', 'soluções');
 
   const lista = $('#lista'), lExec = $('#lista-exec'), lImpl = $('#lista-impl');
@@ -1550,7 +1578,7 @@ function render(){
     else msg = `<div class="empty"><strong>Carregando as soluções…</strong>A lista aparece aqui assim que o banco da página responder.</div>`;
     lista.innerHTML = msg; lExec.innerHTML = ''; lImpl.innerHTML = '';
   } else {
-    const semFiltro = `<div class="empty"><strong>Nenhuma solução com esses filtros.</strong>Troque a área ou o termo de busca.</div>`;
+    const semFiltro = `<div class="empty"><strong>Nenhuma solução com esses filtros.</strong>Troque a área, o setor ou o termo de busca.</div>`;
 
     const vis = filtrar(roadmap).sort(ordem);
     $('#c-roadmap').textContent = contagem(vis.length, roadmap.length);
@@ -1664,6 +1692,7 @@ function lerForm(){
   return {
     nome: $('#f-nome').value.trim(), setor: $('#f-setor').value.trim(),
     codigo: $('#f-cod').value.trim(), dependeDe: [...depSel],
+    donos: donosMarcados(),
     descricao: $('#f-desc').value.trim(), resolve: $('#f-res').value.trim(),
     natureza: NATUREZAS[$('#f-nat').value] ? $('#f-nat').value : '',
     metas: [...document.querySelectorAll('input[name="meta"]:checked')].map(i => i.value),
@@ -1768,8 +1797,16 @@ function addDep(){
   depSel.push(it.id); el.value = '';
   renderDeps(); atualizarLive();
 }
+const donosMarcados = () => [...document.querySelectorAll('input[name="dono"]:checked')].map(i => i.value);
+// Mostra os setores da área do formulário; um setor já gravado que saiu da configuração continua na lista.
+function renderDonos(sel){
+  const opc = [...new Set([...donosDaArea($('#f-setor').value.trim()), ...sel])];
+  $('#fld-dono').hidden = !opc.length;
+  $('#tg-dono').innerHTML = opc.map(s => `<label><input type="checkbox" name="dono" value="${esc(s)}"${sel.includes(s) ? ' checked' : ''}><span>${esc(s)}</span></label>`).join('');
+}
 function preencher(it){
   $('#f-nome').value = it.nome || ''; $('#f-setor').value = it.setor || '';
+  renderDonos(donosDe(it));
   $('#f-cod').value = codigoDe(it);
   depSel = Array.isArray(it.dependeDe) ? [...new Set(it.dependeDe)].filter(id => id !== editId) : [];
   $('#f-dep').value = '';
@@ -1808,7 +1845,7 @@ function abrirEditor(id){
   const it = id ? items.find(i => i.id === id) : null;
   $('#dlg-k').textContent = it ? 'Editar solução' : 'Nova solução';
   $('#dlg-t').textContent = it ? (it.nome || 'Solução') : 'Cadastrar solução';
-  preencher(it || { setor: filtroSetor || '', status:'ativa', notas: { manual:0, infra:0, dados:0, cultura:0 }, metas: [] });
+  preencher(it || { setor: filtroSetor || '', donos: filtroDono && filtroDono !== SEM_DONO ? [filtroDono] : [], status:'ativa', notas: { manual:0, infra:0, dados:0, cultura:0 }, metas: [] });
   iaAtual = it && it.ia && it.ia.dependencias ? JSON.parse(JSON.stringify(it.ia)) : null;
   motivosU = Object.assign({}, it && it.motivosUsuario);
   renderDiverg();
@@ -2398,7 +2435,7 @@ async function exportarCSV(){
   if (!downloads) return;
   const ordemStatus = { ativa:0, execucao:1, implantada:2, arquivada:3 };
   const lista = [...items].sort((a, b) => (ordemStatus[statusDe(a)] - ordemStatus[statusDe(b)]) || ordem(a, b));
-  const cab = ['Situação','Área','Código','Solução','Facilidade','Valor','Origem do valor','Faixa','Base de (soluções na fila)','Depende de','Metas','Manual (4)','Infra (3)','Time técnico (2)','Cultura (1)','Justificativa','Responsável','Previsão','Início da execução','Implantada em','Meta (resultado esperado)','Resultado medido','Avaliação','O que faz','O que resolve','Ajustes manuais sobre a IA',
+  const cab = ['Situação','Área','Setor dono','Código','Solução','Facilidade','Valor','Origem do valor','Faixa','Base de (soluções na fila)','Depende de','Metas','Manual (4)','Infra (3)','Time técnico (2)','Cultura (1)','Justificativa','Responsável','Previsão','Início da execução','Implantada em','Meta (resultado esperado)','Resultado medido','Avaliação','O que faz','O que resolve','Ajustes manuais sobre a IA',
     'Natureza','Travas','Chk dado','Chk integrações','Chk qualidade','Chk regras','Quem executa','Documentação','Entrada','Carga (h/mês)','Origem dos números','Linha de base validada',
     'Custo atual (R$/mês)','Ganho conservador (R$/mês)','Ganho provável (R$/mês)','Custo da solução (R$/mês)','Ganho de receita (R$/mês, não validado)','Base da receita',
     'Indicador','Linha de base do indicador','Prazo (dias)','Método','Cenário conservador','Cenário provável','Cenário otimista'];
@@ -2421,7 +2458,7 @@ async function exportarCSV(){
   const cel = v => { const s = String(v == null ? '' : v); return /[";\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
   const num = n => String(n).replace('.', ',');
   const linhas = lista.map(i => [
-    atrasada(i) ? 'Em execução (atrasada)' : STATUS[statusDe(i)], i.setor || '', codigoDe(i), i.nome || '', num(total(i)),
+    atrasada(i) ? 'Em execução (atrasada)' : STATUS[statusDe(i)], i.setor || '', donosDe(i).join(', '), codigoDe(i), i.nome || '', num(total(i)),
     nivelValor(i) ? VALORES[nivelValor(i)].l : '', nivelValor(i) ? (CONFS[i.valor.nivelOrigem] || 'hipótese') : '', faixa(i).l,
     baseDe(i).map(curto).join(' | '), depsDe(i).map(curto).join(' | '),
     metasDe(i).map(m => m.n).join(', '), ...CRIT.map(c => num(nota(i, c))), i.justificativa || '', i.responsavel || '',
@@ -2451,6 +2488,7 @@ $('#frm').addEventListener('submit', salvar);
 $('#frm').addEventListener('change', e => {
   if (e.target.id === 'p-valid' && e.target.checked) $('#p-conf').value = 'medido';
   if (e.target.id === 'f-dep') return addDep();
+  if (e.target.id === 'f-setor') { const l = donosDaArea(e.target.value.trim()); renderDonos(donosMarcados().filter(s => l.includes(s))); }
   if (e.target.id === 'f-status') {
     const s = e.target.value;
     if (s === 'execucao' && !$('#f-ini').value) $('#f-ini').value = hojeYMD();
@@ -2507,7 +2545,12 @@ $('#btn-recalc-stop').addEventListener('click', () => { if (recCtl) recCtl.abort
 }));
 $('#v-setor').addEventListener('click', () => { view = 'setor'; try { localStorage.setItem('ranking-ia-view', view); } catch (e) {} render(); });
 $('#v-geral').addEventListener('click', () => { view = 'geral'; try { localStorage.setItem('ranking-ia-view', view); } catch (e) {} render(); });
-$('#filtro-setor').addEventListener('change', e => { filtroSetor = e.target.value; try { localStorage.setItem('ranking-ia-setor', filtroSetor); } catch (err) {} render(); });
+$('#filtro-setor').addEventListener('change', e => {
+  filtroSetor = e.target.value; filtroDono = '';
+  try { localStorage.setItem('ranking-ia-setor', filtroSetor); localStorage.setItem('ranking-ia-dono', ''); } catch (err) {}
+  render();
+});
+$('#filtro-dono').addEventListener('change', e => { filtroDono = e.target.value; try { localStorage.setItem('ranking-ia-dono', filtroDono); } catch (err) {} render(); });
 let buscaT = null;
 $('#busca').addEventListener('input', e => { clearTimeout(buscaT); buscaT = setTimeout(() => { busca = e.target.value; render(); }, 120); });
 render();
@@ -2515,6 +2558,7 @@ render();
 /* ---------- Versão local: configurações ---------- */
 LOCAL.onCfg(c => {
   SETORES = c.areas.slice();
+  SETORES_DONO = c.setoresDono && typeof c.setoresDono === 'object' ? c.setoresDono : {};
   document.querySelectorAll('.js-empresa').forEach(e => { e.textContent = c.empresa; });
   $('#ft-ia').textContent = LOCAL.iaNome();
   render();
