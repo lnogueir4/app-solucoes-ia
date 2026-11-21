@@ -375,6 +375,15 @@
   @media (max-width:640px){ .row4 { grid-template-columns:1fr 1fr; } }
   .calc { font-size:13px; color:var(--ink-soft); margin:0; padding:8px 12px; background:var(--surface-2); border-radius:8px; }
   .calc b { color:var(--ink); }
+  .procs-ed { display:flex; flex-direction:column; gap:10px; }
+  .proc { border:1px solid var(--line); border-radius:8px; padding:10px 12px; display:flex; flex-direction:column; gap:10px; }
+  .proc-top { display:flex; gap:10px; align-items:flex-end; }
+  .proc-top .fld { flex:1; min-width:0; }
+  .proc .calc { padding:6px 10px; font-size:12.5px; }
+  .proc .calc[hidden] { display:none; }
+  .procs-lista { margin:8px 0 0; padding:0; list-style:none; font-family:var(--font-mono); font-size:11.5px; color:var(--muted); }
+  .procs-lista li { margin:2px 0; }
+  .procs-lista b { color:var(--ink-soft); font-weight:600; }
   .ck { display:flex; gap:8px; align-items:flex-start; font-size:13.5px; cursor:pointer; }
   .ck input { margin-top:4px; width:16px; height:16px; flex:none; }
   .rad input:checked + span.fq { background:var(--surface-2); color:var(--ink); }
@@ -457,7 +466,7 @@
 
   <p class="eyebrow">Relatório Executivo · Priorização de projetos de IA · Versão local</p>
   <h1>Soluções de IA</h1>
-  <p class="lede">O catálogo das soluções de IA por área, do roadmap até a implantação. Cada solução recebe uma nota de 0 a 10 pelo que muda no negócio e pelo quanto depende de trabalho manual, infraestrutura, gente técnica e cultura. Ela também registra o processo que ataca, com linha de base e valor em reais, e passa por checagens que travam o que ainda não está pronto. A execução é feita em série, com plano de medição.</p>
+  <p class="lede">O catálogo das soluções de IA por área, do roadmap até a implantação. Cada solução recebe uma nota de 0 a 10 pelo que muda no negócio e pelo quanto depende de trabalho manual, infraestrutura, gente técnica e cultura. Ela também registra os processos que ataca, com linha de base e valor em reais, e passa por checagens que travam o que ainda não está pronto. A execução é feita em série, com plano de medição.</p>
 
   <div class="status-row">
     <span class="badge good"><span class="dot"></span><span id="b-comecar">Carregando…</span></span>
@@ -680,7 +689,7 @@
           <h3>Valor em reais</h3>
           <p class="hint">Mostrado como faixa, sempre com o cenário conservador primeiro.</p>
           <ul class="tiers">
-            <li><span class="rng">Carga</span><span>ocorrências por mês × minutos ÷ 60 (semana × 4,3; dia × dias de operação)</span></li>
+            <li><span class="rng">Carga</span><span>ocorrências por mês × minutos ÷ 60 (semana × 4,3; dia × dias de operação), somada entre os processos da solução</span></li>
             <li><span class="rng">Custo atual</span><span>carga × custo-hora + supervisão × custo-hora de quem supervisiona. É o teto do ganho.</span></li>
             <li><span class="rng">Ganho</span><span>custo atual × % do tempo eliminado − custo mensal da solução</span></li>
             <li><span class="rng">Receita</span><span>informada à parte, não validada, nunca somada ao custo</span></li>
@@ -809,28 +818,17 @@
       <details class="ed-sec" id="sec-proc">
         <summary><span class="sk">Processo e linha de base</span><span class="sr" id="sr-proc"></span></summary>
         <div class="in">
-          <p class="ed-hint">O processo que a solução ataca, como ele acontece hoje. Use a função de quem executa, nunca o nome da pessoa.</p>
-          <div class="row3">
-            <div class="fld"><label for="p-exec">Quem executa (função)</label><input type="text" id="p-exec" maxlength="80" placeholder="Ex.: Assistente financeiro"></div>
+          <p class="ed-hint">Os processos que a solução ataca, como eles acontecem hoje. Use a função de quem executa, nunca o nome da pessoa. Se a solução cobre mais de um processo, inclua um por vez: a carga da solução é a soma, e cada pessoa fica com a sua parte.</p>
+          <div class="row2">
             <div class="fld"><label for="p-doc">Está documentado?</label>
               <select id="p-doc"><option value="">Não informado</option><option value="sim">Sim</option><option value="parcial">Em parte</option><option value="nao">Não</option><option value="so_uma_pessoa">Só uma pessoa sabe fazer</option></select></div>
             <div class="fld"><label for="p-ent">Como a informação chega</label>
               <select id="p-ent"><option value="">Não informado</option><option value="estruturada">Estruturada (campo de sistema, planilha)</option><option value="nao_estruturada">Não estruturada (e-mail, PDF, foto, áudio)</option><option value="misto">Mista</option></select></div>
           </div>
-          <div class="row4">
-            <div class="fld"><label for="p-freq">Quantas vezes</label><input type="text" inputmode="decimal" id="p-freq" maxlength="10" placeholder="Ex.: 40"></div>
-            <div class="fld"><label for="p-un">Por</label>
-              <select id="p-un"><option value="mes">Mês</option><option value="semana">Semana</option><option value="dia">Dia</option></select></div>
-            <div class="fld" id="fld-dias"><label for="p-dias">Dias de operação no mês</label>
-              <select id="p-dias"><option value="21">21 (dias úteis)</option><option value="26">26 (inclui sábado)</option><option value="30">30 (contínuo)</option></select></div>
-            <div class="fld"><label for="p-min">Minutos por vez</label><input type="text" inputmode="decimal" id="p-min" maxlength="10" placeholder="Incluindo correções"></div>
-          </div>
+          <div class="procs-ed" id="procs"></div>
+          <div><button type="button" class="btn-s" id="btn-proc-add">+ Outro processo</button></div>
           <p class="calc" id="calc-carga"></p>
-          <div class="row2">
-            <div class="fld"><label for="p-conf">Origem dos números</label>
-              <select id="p-conf"><option value="">Não informada</option><option value="medido">Medido (cronometrado)</option><option value="informado">Informado por quem executa</option><option value="estimado">Estimado pelo gestor</option><option value="hipotese">Hipótese</option></select></div>
-            <label class="ck" style="align-self:end"><input type="checkbox" id="p-valid"><span>Linha de base validada com quem executa (3 casos cronometrados)</span></label>
-          </div>
+          <label class="ck"><input type="checkbox" id="p-valid"><span>Linha de base validada com quem executa (3 casos cronometrados)</span></label>
         </div>
       </details>
 
@@ -845,7 +843,7 @@
       <details class="ed-sec" id="sec-valor">
         <summary><span class="sk">Valor em reais por mês</span><span class="sr" id="sr-valor"></span></summary>
         <div class="in">
-          <p class="ed-hint">O custo-hora vem do RH ou do financeiro, já com encargos. O percentual eliminado é definido pela equipe técnica.</p>
+          <p class="ed-hint">O custo-hora vem do RH ou do financeiro, já com encargos. Com mais de um processo, use a média de quem executa. O percentual eliminado é definido pela equipe técnica.</p>
           <div class="row3">
             <div class="fld"><label for="v-ch">Custo-hora de quem executa (R$)</label><input type="text" inputmode="decimal" id="v-ch" maxlength="12"></div>
             <div class="fld"><label for="v-sup">Supervisão (h/mês)</label><input type="text" inputmode="decimal" id="v-sup" maxlength="10"></div>
@@ -1315,10 +1313,40 @@ function ocorrMes(p){
   if (p.unidade === 'semana') return f * 4.3;
   return f;
 }
-function cargaH(it){
+/* Processos da solução: processo.itens. O formato antigo, com um processo só nos campos soltos, vira o primeiro item. */
+const MAX_PROCS = 10;
+const CONF_ORD = ['hipotese', 'estimado', 'informado', 'medido'];
+function procsDe(it){
   const p = it && it.processo || {};
-  const o = ocorrMes(p), m = toNum(p.minutos);
+  if (Array.isArray(p.itens)) return p.itens.filter(x => x && typeof x === 'object');
+  const tem = v => v != null && String(v).trim() !== '';
+  if (!(tem(p.executor) || tem(p.frequencia) || tem(p.minutos) || tem(p.confianca))) return [];
+  return [{ nome:'', executor:p.executor || '', frequencia:p.frequencia, unidade:p.unidade, diasMes:p.diasMes, minutos:p.minutos, confianca:p.confianca || '' }];
+}
+function cargaItem(x){
+  const o = ocorrMes(x || {}), m = toNum(x && x.minutos);
   return o != null && m > 0 ? o * m / 60 : null;
+}
+const procsComCarga = it => procsDe(it).filter(x => cargaItem(x) != null);
+function cargaH(it){
+  const l = procsComCarga(it);
+  return l.length ? l.reduce((s, x) => s + cargaItem(x), 0) : null;
+}
+/* A origem dos números da solução é a mais fraca entre os processos que entram na soma. */
+function confDe(it){
+  const cs = procsComCarga(it).map(x => x.confianca);
+  if (!cs.length || cs.some(c => !CONFS[c])) return '';
+  return cs.reduce((a, b) => CONF_ORD.indexOf(b) < CONF_ORD.indexOf(a) ? b : a);
+}
+function executoresDe(it){ return [...new Set(procsDe(it).map(x => String(x.executor || '').trim()).filter(Boolean))]; }
+function textoItem(x){
+  const c = cargaItem(x); if (c == null) return '';
+  const un = { dia:'por dia', semana:'por semana', mes:'por mês' }[x.unidade] || 'por mês';
+  return `${fmt(c)} h/mês (${fmt(toNum(x.frequencia))} ${un} × ${fmt(toNum(x.minutos))} min)`;
+}
+const nomeProc = (x, i) => String(x.nome || '').trim() || `Processo ${i + 1}`;
+function detalheProcs(it){
+  return procsComCarga(it).map((x, i) => `${nomeProc(x, i)}${x.executor ? ` (${x.executor})` : ''}: ${textoItem(x)}${CONFS[x.confianca] ? ', ' + CONFS[x.confianca] : ''}`);
 }
 function custoAtual(it){
   const v = it && it.valor || {};
@@ -1333,10 +1361,14 @@ function ganho(it, cen){
 }
 const brl = n => 'R$ ' + Math.round(n).toLocaleString('pt-BR');
 function textoCarga(it){
-  const p = it && it.processo || {}, c = cargaH(it);
-  if (c == null) return '';
-  const un = { dia:'por dia', semana:'por semana', mes:'por mês' }[p.unidade] || 'por mês';
-  return `${fmt(c)} h/mês (${fmt(toNum(p.frequencia))} ${un} × ${fmt(toNum(p.minutos))} min)`;
+  const l = procsComCarga(it);
+  if (!l.length) return '';
+  return l.length === 1 ? textoItem(l[0]) : `${fmt(cargaH(it))} h/mês, soma de ${l.length} processos`;
+}
+function procsListaHTML(it){
+  const l = procsComCarga(it);
+  if (l.length < 2) return '';
+  return `<ul class="procs-lista">${l.map((x, i) => `<li>${esc(nomeProc(x, i))}${x.executor ? ` · ${esc(x.executor)}` : ''}: <b>${esc(textoItem(x))}</b>${CONFS[x.confianca] ? ' · ' + CONFS[x.confianca] : ''}</li>`).join('')}</ul>`;
 }
 const porData = campo => (a, b) => String(b[campo] || '').localeCompare(String(a[campo] || '')) || ordem(a, b);
 function ordemExec(a, b){ const x = atrasada(b) - atrasada(a); return x || porData('inicioExecucao')(a, b); }
@@ -1469,9 +1501,9 @@ function factsHTML(it, modo){
   const p = it.processo || {};
   if (DOCS[p.documentado] && p.documentado !== 'so_uma_pessoa') f.push(`<span class="fact">${DOCS[p.documentado]}</span>`);
   if (ENTRADAS[p.entrada]) f.push(`<span class="fact">${ENTRADAS[p.entrada]}</span>`);
-  const c = cargaH(it);
-  const selo = CONFS[p.confianca] ? `<span class="selo">${CONFS[p.confianca]}</span>` : '';
-  if (c != null) f.push(`<span class="fact" title="${esc(textoCarga(it))}">Carga <b>${fmt(c)} h/mês</b>${selo}</span>`);
+  const c = cargaH(it), conf = confDe(it), np = procsComCarga(it).length;
+  const selo = CONFS[conf] ? `<span class="selo">${CONFS[conf]}</span>` : '';
+  if (c != null) f.push(`<span class="fact" title="${esc(np > 1 ? detalheProcs(it).join('; ') + '. A origem dos números é a mais fraca entre os processos.' : textoCarga(it))}">Carga <b>${fmt(c)} h/mês</b>${np > 1 ? ` em ${np} processos` : ''}${selo}</span>`);
   const gc = ganho(it, 'Conservador'), gp = ganho(it, 'Provavel'), ca = custoAtual(it);
   if (gc != null || gp != null) {
     const faixaTxt = gc != null && gp != null && Math.round(gp) !== Math.round(gc) ? `${brl(gc)} a ${brl(gp)}` : brl(gc != null ? gc : gp);
@@ -1482,7 +1514,7 @@ function factsHTML(it, modo){
   const rec = toNum(it.valor && it.valor.receita);
   if (rec > 0) f.push(`<span class="fact" title="Ganho de receita informado; não validado e nunca somado ao custo">Receita <b>${brl(rec)}/mês</b><span class="selo">não validado${BASES_REC[it.valor.baseReceita] ? ' · ' + BASES_REC[it.valor.baseReceita] : ''}</span></span>`);
   if (modo !== 'implantada' && modo !== 'arquivada') travas(it).forEach(t => f.push(`<span class="fact ${t.c}" title="${esc(t.d)}">${esc(t.l)}</span>`));
-  return f.length ? `<div class="facts">${f.join('')}</div>` : '';
+  return f.length ? `<div class="facts">${f.join('')}</div>${procsListaHTML(it)}` : '';
 }
 
 /* ---------- Render geral ---------- */
@@ -1688,7 +1720,6 @@ function lerForm(){
   CRIT.forEach(c => { const r = document.querySelector(`input[name="c-${c.k}"]:checked`); notas[c.k] = r ? Number(r.value) : 0; });
   const checagens = {};
   CHECKS.forEach(c => { const r = document.querySelector(`input[name="k-${c.k}"]:checked`); if (r) checagens[c.k] = r.value; });
-  const un = ['dia','semana','mes'].includes($('#p-un').value) ? $('#p-un').value : 'mes';
   return {
     nome: $('#f-nome').value.trim(), setor: $('#f-setor').value.trim(),
     codigo: $('#f-cod').value.trim(), dependeDe: [...depSel],
@@ -1698,12 +1729,9 @@ function lerForm(){
     metas: [...document.querySelectorAll('input[name="meta"]:checked')].map(i => i.value),
     notas, justificativa: $('#f-just').value.trim(),
     processo: {
-      executor: $('#p-exec').value.trim(),
       documentado: DOCS[$('#p-doc').value] ? $('#p-doc').value : '',
       entrada: ENTRADAS[$('#p-ent').value] ? $('#p-ent').value : '',
-      frequencia: vNum('#p-freq'), unidade: un, diasMes: un === 'dia' ? Number($('#p-dias').value) || 21 : null,
-      minutos: vNum('#p-min'),
-      confianca: CONFS[$('#p-conf').value] ? $('#p-conf').value : '',
+      itens: lerProcs().filter(x => !procVazio(x)),
       baseValidada: $('#p-valid').checked
     },
     checagens,
@@ -1727,11 +1755,9 @@ const numTxt = v => { const n = toNum(v); return n == null ? '' : String(n).repl
 function preencherV2(it){
   const p = it.processo || {}, v = it.valor || {}, m = it.medicao || {}, ch = it.checagens || {};
   $('#f-nat').value = NATUREZAS[it.natureza] ? it.natureza : '';
-  $('#p-exec').value = p.executor || ''; $('#p-doc').value = DOCS[p.documentado] ? p.documentado : '';
+  $('#p-doc').value = DOCS[p.documentado] ? p.documentado : '';
   $('#p-ent').value = ENTRADAS[p.entrada] ? p.entrada : '';
-  $('#p-freq').value = numTxt(p.frequencia); $('#p-un').value = ['dia','semana','mes'].includes(p.unidade) ? p.unidade : 'mes';
-  $('#p-dias').value = ['21','26','30'].includes(String(p.diasMes)) ? String(p.diasMes) : '21';
-  $('#p-min').value = numTxt(p.minutos); $('#p-conf').value = CONFS[p.confianca] ? p.confianca : '';
+  renderProcs(procsDe(it).map(x => ({ ...x })));
   $('#p-valid').checked = !!p.baseValidada;
   CHECKS.forEach(c => document.querySelectorAll(`input[name="k-${c.k}"]`).forEach(r => { r.checked = r.value === ch[c.k]; }));
   $('#v-ch').value = numTxt(v.custoHora); $('#v-sup').value = numTxt(v.supervisaoHoras); $('#v-chs').value = numTxt(v.custoHoraSupervisor);
@@ -1740,15 +1766,71 @@ function preencherV2(it){
   $('#v-niv').value = VALORES[v.nivel] ? v.nivel : ''; $('#v-nconf').value = VALORES[v.nivel] && CONFS[v.nivelOrigem] ? v.nivelOrigem : '';
   $('#m-ind').value = m.indicador || ''; $('#m-met').value = m.metodo || ''; $('#m-base').value = m.base || '';
   $('#m-prazo').value = numTxt(m.prazoDias); $('#m-con').value = m.conservador || ''; $('#m-pro').value = m.provavel || ''; $('#m-oti').value = m.otimista || '';
-  $('#sec-proc').open = !!(p.frequencia || p.documentado || p.executor);
+  $('#sec-proc').open = procsDe(it).length > 0 || !!p.documentado || !!p.entrada;
   $('#sec-chk').open = Object.keys(ch).length > 0;
   $('#sec-valor').open = !!(v.custoHora || v.receita);
   $('#sec-med').open = !!(m.indicador || it.resultadoEsperado) || ['execucao','implantada'].includes(statusDe(it));
 }
+/* Editor de processos: uma caixa por processo, lida de volta do DOM */
+const OPT_UN = '<option value="mes">Mês</option><option value="semana">Semana</option><option value="dia">Dia</option>';
+const OPT_DIAS = '<option value="21">21 (dias úteis)</option><option value="26">26 (inclui sábado)</option><option value="30">30 (contínuo)</option>';
+const OPT_CONF = '<option value="">Não informada</option><option value="medido">Medido (cronometrado)</option><option value="informado">Informado por quem executa</option><option value="estimado">Estimado pelo gestor</option><option value="hipotese">Hipótese</option>';
+function procRowHTML(i, n){
+  const id = k => `pi-${k}-${i}`;
+  return `<div class="proc" data-proc="${i}">
+    <div class="proc-top"><div class="fld"><label for="${id('nome')}">Processo ${i + 1}${n > 1 ? '' : ' (nome opcional)'}</label><input type="text" id="${id('nome')}" class="pi-nome" maxlength="80" placeholder="Ex.: Conferência das notas de entrada"></div>${n > 1 ? `<button type="button" class="btn-s danger" data-proc-rm="${i}" aria-label="Remover o processo ${i + 1}">Remover</button>` : ''}</div>
+    <div class="row2">
+      <div class="fld"><label for="${id('exec')}">Quem executa (função)</label><input type="text" id="${id('exec')}" class="pi-exec" maxlength="80" placeholder="Ex.: Assistente financeiro"></div>
+      <div class="fld"><label for="${id('conf')}">Origem dos números</label><select id="${id('conf')}" class="pi-conf">${OPT_CONF}</select></div>
+    </div>
+    <div class="row4">
+      <div class="fld"><label for="${id('freq')}">Quantas vezes</label><input type="text" inputmode="decimal" id="${id('freq')}" class="pi-freq" maxlength="10" placeholder="Ex.: 40"></div>
+      <div class="fld"><label for="${id('un')}">Por</label><select id="${id('un')}" class="pi-un">${OPT_UN}</select></div>
+      <div class="fld pi-fld-dias"><label for="${id('dias')}">Dias de operação no mês</label><select id="${id('dias')}" class="pi-dias">${OPT_DIAS}</select></div>
+      <div class="fld"><label for="${id('min')}">Minutos por vez</label><input type="text" inputmode="decimal" id="${id('min')}" class="pi-min" maxlength="10" placeholder="Incluindo correções"></div>
+    </div>
+    <p class="calc pi-calc"></p>
+  </div>`;
+}
+function renderProcs(lista){
+  const l = (lista && lista.length ? lista : [{}]).slice(0, MAX_PROCS);
+  $('#procs').innerHTML = l.map((_, i) => procRowHTML(i, l.length)).join('');
+  [...document.querySelectorAll('#procs .proc')].forEach((r, i) => {
+    const x = l[i], q = c => r.querySelector('.' + c);
+    q('pi-nome').value = x.nome || ''; q('pi-exec').value = x.executor || '';
+    q('pi-conf').value = CONFS[x.confianca] ? x.confianca : '';
+    q('pi-freq').value = numTxt(x.frequencia); q('pi-min').value = numTxt(x.minutos);
+    q('pi-un').value = ['dia','semana','mes'].includes(x.unidade) ? x.unidade : 'mes';
+    q('pi-dias').value = ['21','26','30'].includes(String(x.diasMes)) ? String(x.diasMes) : '21';
+  });
+  $('#btn-proc-add').hidden = l.length >= MAX_PROCS;
+}
+function lerProcs(){
+  return [...document.querySelectorAll('#procs .proc')].map(r => {
+    const q = c => r.querySelector('.' + c);
+    const un = ['dia','semana','mes'].includes(q('pi-un').value) ? q('pi-un').value : 'mes';
+    return {
+      nome: q('pi-nome').value.trim(), executor: q('pi-exec').value.trim(),
+      frequencia: toNum(q('pi-freq').value), unidade: un, diasMes: un === 'dia' ? Number(q('pi-dias').value) || 21 : null,
+      minutos: toNum(q('pi-min').value), confianca: CONFS[q('pi-conf').value] ? q('pi-conf').value : ''
+    };
+  });
+}
+const procVazio = x => !x.nome && !x.executor && x.frequencia == null && x.minutos == null && !x.confianca;
 function atualizarV2(f){
-  $('#fld-dias').style.visibility = f.processo.unidade === 'dia' ? 'visible' : 'hidden';
-  const c = cargaH(f);
-  $('#calc-carga').innerHTML = c != null ? `Carga: <b>${esc(textoCarga(f))}</b>` : 'Informe quantas vezes acontece e quantos minutos leva para calcular a carga mensal.';
+  const rows = lerProcs(), els = [...document.querySelectorAll('#procs .proc')];
+  els.forEach((r, i) => {
+    const x = rows[i], ci = cargaItem(x);
+    r.querySelector('.pi-fld-dias').style.visibility = x.unidade === 'dia' ? 'visible' : 'hidden';
+    const pc = r.querySelector('.pi-calc');
+    pc.hidden = els.length < 2;
+    pc.innerHTML = ci != null ? `Carga deste processo: <b>${esc(textoItem(x))}</b>` : 'Informe quantas vezes acontece e quantos minutos leva.';
+  });
+  const c = cargaH(f), fora = rows.map((x, i) => !procVazio(x) && cargaItem(x) == null ? i + 1 : 0).filter(Boolean);
+  let ct = c == null ? 'Informe quantas vezes acontece e quantos minutos leva para calcular a carga mensal.'
+    : procsComCarga(f).length > 1 ? `Carga total: <b>${fmt(c)} h/mês</b>, soma de ${procsComCarga(f).length} processos.` : `Carga: <b>${esc(textoCarga(f))}</b>`;
+  if (c != null && fora.length) ct += ` ${fora.length > 1 ? 'Os processos' : 'O processo'} ${fora.join(', ')} ${fora.length > 1 ? 'ficaram' : 'ficou'} fora da soma: falta a frequência ou os minutos.`;
+  $('#calc-carga').innerHTML = ct;
   const ca = custoAtual(f), gc = ganho(f, 'Conservador'), gp = ganho(f, 'Provavel');
   let vt;
   if (c == null) vt = 'Preencha o processo e a linha de base para calcular o valor.';
@@ -1769,7 +1851,8 @@ function atualizarV2(f){
   $('#v-nconf').disabled = !f.valor.nivel;
   const tv = travas(f);
   $('#travas-live').innerHTML = tv.map(t => `<span class="fact ${t.c}" title="${esc(t.d)}">${esc(t.l)}</span>`).join('');
-  $('#sr-proc').textContent = c != null ? `${fmt(c)} h/mês${CONFS[f.processo.confianca] ? ' · ' + CONFS[f.processo.confianca] : ''}` : 'não preenchido';
+  const npF = procsComCarga(f).length, confF = confDe(f);
+  $('#sr-proc').textContent = c != null ? `${fmt(c)} h/mês${npF > 1 ? ` em ${npF} processos` : ''}${CONFS[confF] ? ' · ' + CONFS[confF] : ''}` : 'não preenchido';
   const nChk = Object.keys(f.checagens).length;
   $('#sr-chk').textContent = nChk ? CHECKS.map(k => `${k.n}: ${(CHK_NIVEIS.find(x => x.v === f.checagens[k.k]) || { l:'–' }).l}`).join(' · ') : 'não avaliadas';
   $('#sr-valor').textContent = gc != null ? `conservador ${brl(gc)}/mês` : ca != null ? `custo atual ${brl(ca)}/mês` : 'não preenchido';
@@ -1961,11 +2044,12 @@ PASSO 4. Checagens técnicas ("checagens"), cada uma "ok", "parcial", "falha" ou
 Use "desconhecido" quando faltar informação; não invente.`;
 function processoTexto(f){
   const p = f.processo || {};
-  const l = [];
-  if (p.executor) l.push(`Quem executa: ${p.executor}`);
+  const l = [], ex = executoresDe(f), conf = confDe(f);
+  if (ex.length) l.push(`Quem executa: ${ex.join(', ')}`);
   if (DOCS[p.documentado]) l.push(`Documentação: ${DOCS[p.documentado].toLowerCase()}`);
   if (ENTRADAS[p.entrada]) l.push(ENTRADAS[p.entrada]);
-  const c = textoCarga(f); if (c) l.push(`Carga: ${c}${CONFS[p.confianca] ? ' (' + CONFS[p.confianca] + ')' : ''}`);
+  const c = textoCarga(f); if (c) l.push(`Carga: ${c}${CONFS[conf] ? ' (' + CONFS[conf] + ')' : ''}`);
+  if (procsComCarga(f).length > 1) l.push(`Processos: ${detalheProcs(f).join('; ')}`);
   return l.length ? l.join('; ') : '(não informado)';
 }
 const FORMATO_V2 = `"natureza":"ia_automacao","checagens":{"dado":"ok","integracoes":"parcial","qualidade":"desconhecido","regras":"ok"}`;
@@ -2436,7 +2520,7 @@ async function exportarCSV(){
   const ordemStatus = { ativa:0, execucao:1, implantada:2, arquivada:3 };
   const lista = [...items].sort((a, b) => (ordemStatus[statusDe(a)] - ordemStatus[statusDe(b)]) || ordem(a, b));
   const cab = ['Situação','Área','Setor dono','Código','Solução','Facilidade','Valor','Origem do valor','Faixa','Base de (soluções na fila)','Depende de','Metas','Manual (4)','Infra (3)','Time técnico (2)','Cultura (1)','Justificativa','Responsável','Previsão','Início da execução','Implantada em','Meta (resultado esperado)','Resultado medido','Avaliação','O que faz','O que resolve','Ajustes manuais sobre a IA',
-    'Natureza','Travas','Chk dado','Chk integrações','Chk qualidade','Chk regras','Quem executa','Documentação','Entrada','Carga (h/mês)','Origem dos números','Linha de base validada',
+    'Natureza','Travas','Chk dado','Chk integrações','Chk qualidade','Chk regras','Quem executa','Documentação','Entrada','Carga (h/mês)','Processos','Origem dos números','Linha de base validada',
     'Custo atual (R$/mês)','Ganho conservador (R$/mês)','Ganho provável (R$/mês)','Custo da solução (R$/mês)','Ganho de receita (R$/mês, não validado)','Base da receita',
     'Indicador','Linha de base do indicador','Prazo (dias)','Método','Cenário conservador','Cenário provável','Cenário otimista'];
   const r0 = n => n == null ? '' : String(Math.round(n));
@@ -2445,7 +2529,7 @@ async function exportarCSV(){
   const extra = i => {
     const p = i.processo || {}, v = i.valor || {}, m = i.medicao || {};
     return [NATUREZAS[i.natureza] || '', travas(i).map(t => t.l).join(' | '), ...CHECKS.map(c => chkL(i, c.k)),
-      p.executor || '', DOCS[p.documentado] || '', ENTRADAS[p.entrada] || '', n1(cargaH(i)), CONFS[p.confianca] || '', p.baseValidada ? 'sim' : 'não',
+      executoresDe(i).join(', '), DOCS[p.documentado] || '', ENTRADAS[p.entrada] || '', n1(cargaH(i)), detalheProcs(i).join(' | '), CONFS[confDe(i)] || '', p.baseValidada ? 'sim' : 'não',
       r0(custoAtual(i)), r0(ganho(i, 'Conservador')), r0(ganho(i, 'Provavel')), r0(toNum(v.custoSolucao)), r0(toNum(v.receita)), BASES_REC[v.baseReceita] || '',
       m.indicador || '', m.base || '', r0(toNum(m.prazoDias)), m.metodo || '', m.conservador || '', m.provavel || '', m.otimista || ''];
   };
@@ -2486,7 +2570,10 @@ $('#btn-cancel').addEventListener('click', fecharEditor);
 $('#dlg').addEventListener('close', () => { if (iaCtl) { iaCtl.abort(); iaCtl = null; } });
 $('#frm').addEventListener('submit', salvar);
 $('#frm').addEventListener('change', e => {
-  if (e.target.id === 'p-valid' && e.target.checked) $('#p-conf').value = 'medido';
+  if (e.target.id === 'p-valid' && e.target.checked) {
+    const rows = lerProcs();
+    document.querySelectorAll('#procs .proc').forEach((r, i) => { if (!procVazio(rows[i])) r.querySelector('.pi-conf').value = 'medido'; });
+  }
   if (e.target.id === 'f-dep') return addDep();
   if (e.target.id === 'f-setor') { const l = donosDaArea(e.target.value.trim()); renderDonos(donosMarcados().filter(s => l.includes(s))); }
   if (e.target.id === 'f-status') {
@@ -2496,7 +2583,7 @@ $('#frm').addEventListener('change', e => {
   }
   if (e.target.id === 'v-niv' && e.target.value && !$('#v-nconf').value) {
     const f0 = lerForm();
-    $('#v-nconf').value = valorRef(f0) != null ? (CONFS[f0.processo.confianca] ? f0.processo.confianca : 'estimado') : 'hipotese';
+    $('#v-nconf').value = valorRef(f0) != null ? (confDe(f0) || 'estimado') : 'hipotese';
   }
   atualizarLive();
   if (e.target.matches('input[name="meta"], #deps .rad input')) renderDiverg();
@@ -2508,6 +2595,16 @@ $('#btn-base').addEventListener('click', () => {
   $('#m-base').value = t;
   if (!$('#m-ind').value.trim()) $('#m-ind').value = 'Horas de trabalho por mês no processo';
   atualizarLive();
+});
+$('#btn-proc-add').addEventListener('click', () => {
+  const l = lerProcs(); if (l.length >= MAX_PROCS) return;
+  renderProcs([...l, {}]); atualizarLive();
+  const novo = document.querySelector('#procs .proc:last-child .pi-nome'); if (novo) novo.focus();
+});
+$('#procs').addEventListener('click', e => {
+  const b = e.target.closest('button[data-proc-rm]'); if (!b) return;
+  const l = lerProcs(); l.splice(Number(b.dataset.procRm), 1);
+  renderProcs(l); atualizarLive();
 });
 $('#f-limite').addEventListener('change', salvarLimite);
 $('#f-dep').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addDep(); } });
@@ -2521,7 +2618,7 @@ $('#calc-nivel').addEventListener('click', e => {
   const f0 = lerForm(), sug = valorSugerido(f0); if (!sug) return;
   $('#v-niv').value = sug;
   $('#v-nconf').disabled = false;
-  $('#v-nconf').value = CONFS[f0.processo.confianca] ? f0.processo.confianca : 'estimado';
+  $('#v-nconf').value = confDe(f0) || 'estimado';
   atualizarLive();
 });
 $('#diverg').addEventListener('input', e => { const k = e.target.dataset && e.target.dataset.key; if (k && e.target.tagName === 'TEXTAREA') motivosU[k] = e.target.value; });
