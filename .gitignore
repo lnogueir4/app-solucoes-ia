@@ -1,0 +1,7 @@
+node_modules/
+# Dados do app (soluções, perfil, logos e backups): ficam só neste computador
+data/
+# Chaves de API: o .env real nunca vai para o repositório; o modelo sem valores vai
+.env
+.env.*
+!.env.example

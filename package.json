@@ -1,0 +1,20 @@
+{
+  "name": "solucoes-ia-local",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Soluções de IA (versão local): catálogo e priorização das soluções de IA por área, com servidor local e IA por chave de API.",
+  "license": "MIT",
+  "author": "3Value Brasil Tecnologia Dados Negócios LTDA - Leandro Nogueira",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "abrir": "node server.js --abrir"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "1.12.0"
+  }
+}

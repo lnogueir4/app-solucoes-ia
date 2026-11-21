@@ -1,0 +1,2317 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soluções de IA</title>
+<link rel="icon" href="/api/logo/light">
+<style>
+  /* Layout: relatório executivo (coluna única larga) — filtros, roadmap por área, execução, implantadas, arquivadas, perfil da empresa, metodologia; editor em diálogo */
+  :root {
+    --bg:#f5f7f8; --surface:#ffffff; --surface-2:#eef1f3;
+    --ink:#182126; --ink-soft:#45535b; --muted:#6a767e;
+    --line:#dce1e5; --line-strong:#c6cdd2;
+    --accent:#0e6b67; --accent-ink:#0e6b67; --accent-soft:#d8ece9; --on-accent:#ffffff;
+    --good:#1c874a; --good-soft:#dcefe2;
+    --warn:#a86d10; --warn-soft:#f4e8cf;
+    --crit:#b93a2c; --crit-soft:#f4dbd5;
+    --scrim:rgba(10,16,19,.5);
+    --font-display:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --font-body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --font-mono:ui-monospace,"SF Mono","Cascadia Code","Roboto Mono",Menlo,Consolas,monospace;
+    --maxw:1040px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0d1316; --surface:#141c20; --surface-2:#1a242a;
+      --ink:#e9eef0; --ink-soft:#a9b5bb; --muted:#7c898f;
+      --line:#243036; --line-strong:#31424a;
+      --accent:#3fb9b1; --accent-ink:#5fccc4; --accent-soft:#0f312e; --on-accent:#0d1316;
+      --good:#4bc47e; --good-soft:#123021;
+      --warn:#d6a244; --warn-soft:#312611;
+      --crit:#e46b5c; --crit-soft:#331611;
+      --scrim:rgba(0,0,0,.6);
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:#0d1316; --surface:#141c20; --surface-2:#1a242a;
+    --ink:#e9eef0; --ink-soft:#a9b5bb; --muted:#7c898f;
+    --line:#243036; --line-strong:#31424a;
+    --accent:#3fb9b1; --accent-ink:#5fccc4; --accent-soft:#0f312e; --on-accent:#0d1316;
+    --good:#4bc47e; --good-soft:#123021;
+    --warn:#d6a244; --warn-soft:#312611;
+    --crit:#e46b5c; --crit-soft:#331611;
+    --scrim:rgba(0,0,0,.6);
+    color-scheme:dark;
+  }
+
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--font-body); line-height:1.6; font-size:16px; -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:var(--maxw); margin:0 auto; padding-block:clamp(24px,5vw,56px) 80px;
+    padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+  @media (min-width:700px){ .wrap { padding-left:max(32px, env(safe-area-inset-left, 0px)); padding-right:max(32px, env(safe-area-inset-right, 0px)); } }
+  :focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  input[type="checkbox"] { accent-color:var(--accent); }
+
+  /* Header & logos */
+  .top-nav { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:30px; }
+  @media (max-width:1200px){ .top-nav { margin-top:44px; } }
+  .top-eyebrow { font-family:var(--font-mono); font-size:15px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent-ink); font-weight:600; margin:0; }
+  .brand-logo { height:66px; width:auto; object-fit:contain; }
+  @media (max-width:600px){ .brand-logo { height:50px; } .top-eyebrow { font-size:13px; } }
+  .brand-logo-dark { display:none; }
+  .brand-logo-light { display:block; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .brand-logo-dark { display:block; }
+    :root:not([data-theme="light"]) .brand-logo-light { display:none; }
+  }
+  :root[data-theme="dark"] .brand-logo-dark { display:block; }
+  :root[data-theme="dark"] .brand-logo-light { display:none; }
+
+  .theme-btn {
+    position:fixed; top:calc(20px + env(safe-area-inset-top, 0px)); right:calc(20px + env(safe-area-inset-right, 0px)); z-index:9999;
+    background:color-mix(in srgb, var(--surface-2) 85%, transparent); color:var(--ink); border:1px solid var(--line-strong);
+    padding:8px 16px; border-radius:999px; font-family:var(--font-mono); font-size:12px;
+    font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:8px;
+    box-shadow:0 4px 14px color-mix(in srgb, var(--ink) 14%, transparent); backdrop-filter:blur(8px);
+    transition:background .2s ease, border-color .2s ease, transform .2s ease;
+  }
+  .theme-btn:hover { background:var(--surface); border-color:var(--accent); transform:translateY(-1px); }
+  @media (max-width:600px){ .theme-btn { top:calc(12px + env(safe-area-inset-top, 0px)); right:calc(12px + env(safe-area-inset-right, 0px)); padding:6px 12px; font-size:11px; } }
+
+  .eyebrow { font-family:var(--font-mono); font-size:13.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--accent-ink); margin:0 0 14px; }
+  h1 { font-family:var(--font-display); font-weight:680; letter-spacing:-.02em; font-size:clamp(28px,4.8vw,40px); line-height:1.15; margin:0 0 16px; text-wrap:balance; }
+  .lede { font-size:clamp(16px,2.4vw,18px); color:var(--ink-soft); margin:0 0 24px; max-width:70ch; }
+
+  .status-row { display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; }
+  .badge { display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:12.5px; font-weight:600; letter-spacing:.02em; padding:6px 12px; border-radius:999px; border:1px solid transparent; }
+  .badge.good { background:var(--good-soft); color:var(--good); border-color:color-mix(in srgb,var(--good) 30%,transparent); }
+  .badge.warn { background:var(--warn-soft); color:var(--warn); border-color:color-mix(in srgb,var(--warn) 30%,transparent); }
+  .badge.crit { background:var(--crit-soft); color:var(--crit); border-color:color-mix(in srgb,var(--crit) 30%,transparent); }
+  .badge.acc { background:var(--accent-soft); color:var(--accent-ink); border-color:color-mix(in srgb,var(--accent) 30%,transparent); }
+  .badge.mute { background:var(--surface-2); color:var(--ink-soft); border-color:var(--line-strong); }
+  .badge .dot { width:8px; height:8px; border-radius:50%; background:currentColor; }
+  .meta-inline { font-family:var(--font-mono); font-size:12.5px; color:var(--muted); }
+
+  hr.rule { border:0; border-top:1px solid var(--line); margin:34px 0; }
+
+  .ficha { display:grid; grid-template-columns:repeat(auto-fit,minmax(132px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:12px; overflow:hidden; margin:6px 0 4px; }
+  .ficha div { background:var(--surface); padding:14px 14px; min-width:0; }
+  .ficha dt { font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ficha dd { margin:0; font-size:22px; font-weight:640; color:var(--ink); font-variant-numeric:tabular-nums; line-height:1.2; white-space:nowrap; }
+  .ficha dd small { font-size:12px; font-weight:500; color:var(--muted); font-family:var(--font-mono); }
+  .ficha dd.alert { color:var(--crit); }
+
+  .legend-link { margin:14px 0 0; font-size:14px; color:var(--ink-soft); }
+  .legend-link a { color:var(--accent-ink); font-weight:600; text-decoration:underline; text-underline-offset:3px; }
+
+  /* Filtros globais */
+  .filters { display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin:28px 0 0; padding:14px 16px; border:1px solid var(--line); border-radius:12px; background:var(--surface); }
+  .filters .l, .filters .r { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  .filters .lbl { font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+
+  section.sec { margin-top:46px; scroll-margin-top:24px; }
+  .sec-head { display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+  .sec-head .spacer { margin-left:auto; }
+  .sec-num { font-family:var(--font-mono); font-size:13px; font-weight:600; color:var(--accent-ink); border:1px solid color-mix(in srgb,var(--accent) 35%,transparent); border-radius:6px; padding:2px 8px; flex:none; }
+  .sec-count { font-family:var(--font-mono); font-size:12px; color:var(--muted); }
+  h2 { font-family:var(--font-display); font-weight:660; letter-spacing:-.015em; font-size:clamp(20px,3.2vw,25px); margin:0; }
+  .sec-intro { font-size:14px; color:var(--ink-soft); margin:-6px 0 16px; max-width:75ch; }
+  /* Seções recolhíveis: o título é o botão; o estado fica em solucoes-ia-secoes */
+  .sec-t { display:flex; min-width:0; }
+  .sec-tg { display:inline-flex; align-items:center; gap:12px; margin:0; padding:0; border:0; background:none; font:inherit; letter-spacing:inherit; color:inherit; text-align:left; cursor:pointer; border-radius:8px; }
+  .sec-tg:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
+  .sec-tg .sec-num { letter-spacing:normal; }
+  .sec-tg .chev { width:9px; height:9px; flex:none; margin:0 3px 5px; border-right:2px solid var(--muted); border-bottom:2px solid var(--muted); transform:rotate(45deg); transition:transform .18s ease, margin .18s ease; }
+  .sec-tg:hover .chev { border-color:var(--accent-ink); }
+  .sec-tg[aria-expanded="false"] .chev { transform:rotate(-45deg); margin:0 5px 0 1px; }
+  section.sec.fechada .sec-head { margin-bottom:0; }
+  section.sec.fechada + section.sec { margin-top:28px; }
+  section.sec.fechada .sec-head .spacer { display:none; }
+  .sec-tools { display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; justify-content:flex-end; margin:14px 0 0; }
+  .sec-tools .lbl { font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+  .sec-tools + section.sec { margin-top:26px; }
+  .seg button:disabled { opacity:.45; cursor:default; }
+  @media (prefers-reduced-motion: reduce){ .sec-tg .chev { transition:none; } }
+  @media print { .sec-body[hidden] { display:block !important; } .sec-tg .chev, .sec-tools { display:none; } }
+  p { margin:0 0 16px; } p:last-child { margin-bottom:0; }
+  .muted { color:var(--ink-soft); }
+  strong { font-weight:640; }
+
+  /* Legenda */
+  .legend { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
+  .lg { border:1px solid var(--line); border-radius:12px; padding:18px 20px; background:var(--surface); min-width:0; }
+  .lg h3 { margin:0 0 4px; font-size:15.5px; font-weight:650; }
+  .lg .hint { font-size:13px; color:var(--ink-soft); margin:0 0 12px; }
+  .lg-k { font-family:var(--font-mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:12px 0 6px; }
+  .lg-k:first-of-type { margin-top:0; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .mt { font-family:var(--font-mono); font-size:11.5px; padding:2px 9px; border-radius:999px; border:1px solid var(--line-strong); color:var(--ink-soft); background:transparent; white-space:nowrap; }
+  .mt.p { background:var(--accent-soft); border-color:color-mix(in srgb,var(--accent) 30%,transparent); color:var(--accent-ink); }
+  table.wt { width:100%; border-collapse:collapse; font-size:13px; font-variant-numeric:tabular-nums; }
+  table.wt th { font-family:var(--font-mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); font-weight:600; text-align:right; padding:0 0 6px 8px; }
+  table.wt th:first-child, table.wt td:first-child { text-align:left; padding-left:0; }
+  table.wt td { padding:6px 0 6px 8px; border-top:1px solid var(--line); text-align:right; }
+  table.wt td:first-child { color:var(--ink); }
+  table.wt td.g { color:var(--good); font-weight:640; }
+  table.wt td.w { color:var(--warn); }
+  table.wt td.c { color:var(--crit); }
+  .tiers { display:flex; flex-direction:column; gap:8px; margin:0; padding:0; list-style:none; }
+  .tiers li { display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:center; font-size:13px; color:var(--ink-soft); }
+  .tiers .rng { font-family:var(--font-mono); font-size:12px; color:var(--ink); text-align:right; font-variant-numeric:tabular-nums; }
+
+  /* Pills */
+  .st { display:inline-flex; flex-direction:row; align-items:center; gap:7px; font-family:var(--font-mono); font-size:11.5px; font-weight:600; padding:3px 10px; border-radius:999px; white-space:nowrap; }
+  .st .dot { width:7px; height:7px; border-radius:50%; background:currentColor; flex:none; }
+  .st.good { background:var(--good-soft); color:var(--good); }
+  .st.acc { background:var(--accent-soft); color:var(--accent-ink); }
+  .st.warn { background:var(--warn-soft); color:var(--warn); }
+  .st.crit { background:var(--crit-soft); color:var(--crit); }
+  .st.mute { background:var(--surface-2); color:var(--muted); }
+
+  /* Controles */
+  .seg { display:inline-flex; border:1px solid var(--line-strong); border-radius:9px; overflow:hidden; background:var(--surface); }
+  .seg button { font:600 12px var(--font-mono); padding:7px 12px; border:0; background:transparent; color:var(--ink-soft); cursor:pointer; }
+  .seg button + button { border-left:1px solid var(--line-strong); }
+  .seg button[aria-pressed="true"] { background:var(--accent-soft); color:var(--accent-ink); }
+  .search { font:14px var(--font-body); padding:8px 12px; border:1px solid var(--line-strong); border-radius:9px; background:var(--bg); color:var(--ink); width:min(240px, 100%); }
+  .btn { font:600 13px var(--font-body); padding:9px 16px; border-radius:9px; border:1px solid var(--accent); background:var(--accent); color:var(--on-accent); cursor:pointer; display:inline-flex; align-items:center; gap:8px; }
+  .btn:hover { filter:brightness(1.07); }
+  .btn:disabled { opacity:.55; cursor:default; filter:none; }
+  .btn.ghost { background:var(--surface); color:var(--accent-ink); border-color:color-mix(in srgb,var(--accent) 45%,transparent); }
+  .btn.plain { background:transparent; color:var(--ink-soft); border-color:var(--line-strong); }
+  .btn-s { font:600 11.5px var(--font-mono); padding:5px 10px; border-radius:7px; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink-soft); cursor:pointer; }
+  .btn-s:hover { border-color:var(--accent); color:var(--accent-ink); }
+  .btn-s.go { border-color:color-mix(in srgb,var(--accent) 45%,transparent); color:var(--accent-ink); }
+  .btn-s.danger:hover { border-color:var(--crit); color:var(--crit); }
+  .btn-s.confirm { background:var(--crit); border-color:var(--crit); color:var(--surface); }
+
+  /* Grupos e linhas */
+  .grp { margin-top:28px; }
+  .grp:first-child { margin-top:0; }
+  .grp-h { display:flex; align-items:baseline; justify-content:space-between; gap:8px 16px; flex-wrap:wrap; margin:0 0 10px; }
+  .grp-h h3 { margin:0; font-size:17px; font-weight:660; letter-spacing:-.01em; }
+  .sol-list { display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  .sol { display:grid; grid-template-columns:76px minmax(0,1fr) 236px; gap:18px; padding:18px 20px; background:var(--surface); }
+  .score { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; border-radius:10px; padding:12px 6px; height:max-content; }
+  .score b { font-family:var(--font-display); font-size:25px; line-height:1; font-variant-numeric:tabular-nums; font-weight:700; }
+  .score span { font-family:var(--font-mono); font-size:10.5px; opacity:.85; }
+  .score.good { background:var(--good-soft); color:var(--good); }
+  .score.acc { background:var(--accent-soft); color:var(--accent-ink); }
+  .score.warn { background:var(--warn-soft); color:var(--warn); }
+  .score.crit { background:var(--crit-soft); color:var(--crit); }
+  .score.out b { text-decoration:line-through; text-decoration-thickness:2px; }
+  .pos { font-family:var(--font-mono); font-size:11px; color:var(--muted); text-align:center; margin-top:6px; }
+  .sol-main { min-width:0; }
+  .sol-top { display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; margin-bottom:4px; }
+  .sol-top h4 { margin:0; font-size:16px; font-weight:650; }
+  .when { font-family:var(--font-mono); font-size:11.5px; color:var(--muted); margin:0 0 6px; }
+  .when b { color:var(--ink-soft); font-weight:600; }
+  .when .late { color:var(--crit); font-weight:600; }
+  .sol-desc { font-size:14px; color:var(--ink); margin:0 0 6px; }
+  .sol-res { font-size:13px; color:var(--ink-soft); margin:0 0 10px; }
+  .sol-res span { font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-right:4px; }
+  .sol-why { font-size:13px; color:var(--ink-soft); margin:10px 0 0; padding-left:10px; border-left:2px solid var(--line-strong); }
+  .resu { margin-top:12px; padding:10px 12px; border-radius:8px; background:var(--surface-2); font-size:13px; color:var(--ink-soft); }
+  .resu p { margin:6px 0 0; }
+  .resu p b { color:var(--ink); font-weight:600; }
+  .notas-col { display:flex; flex-direction:column; gap:7px; padding-top:2px; }
+  .cr { display:grid; grid-template-columns:58px 1fr 38px; gap:8px; align-items:center; font-size:12px; }
+  .cr .n { color:var(--ink-soft); }
+  .cr .v { font-family:var(--font-mono); text-align:right; font-variant-numeric:tabular-nums; color:var(--ink); }
+  .cr .v.z { color:var(--crit); }
+  .bar { height:6px; border-radius:3px; background:var(--surface-2); overflow:hidden; }
+  .bar i { display:block; height:100%; border-radius:3px; background:var(--good); }
+  .bar i.h { background:var(--warn); }
+  .notas-col .tot { display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:11px; color:var(--muted); border-top:1px solid var(--line); padding-top:6px; margin-top:2px; }
+  .acts { grid-column:2 / -1; display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end; margin-top:-8px; }
+  .acts .btn-s { font-size:10.5px; padding:4px 9px; white-space:nowrap; }
+  @media (max-width:760px){
+    .sol { grid-template-columns:60px minmax(0,1fr); gap:14px; padding:16px; }
+    .notas-col { grid-column:1 / -1; }
+    .acts { grid-column:1 / -1; margin-top:-4px; }
+    .score b { font-size:21px; }
+  }
+
+  .empty { border:1px dashed var(--line-strong); border-radius:12px; padding:24px 22px; text-align:center; color:var(--ink-soft); background:var(--surface); font-size:14px; }
+  .empty strong { display:block; color:var(--ink); font-size:15.5px; margin-bottom:4px; }
+
+  details.arch { border:1px solid var(--line); border-radius:12px; background:var(--surface); }
+  details.arch > summary { cursor:pointer; padding:14px 18px; font-weight:600; font-size:14.5px; list-style:none; display:flex; justify-content:space-between; gap:12px; align-items:center; }
+  details.arch > summary::-webkit-details-marker { display:none; }
+  details.arch > summary::after { content:"Mostrar"; font:600 11.5px var(--font-mono); color:var(--accent-ink); }
+  details.arch[open] > summary::after { content:"Ocultar"; }
+  details.arch .sol-list { border-radius:0 0 12px 12px; border-left:0; border-right:0; border-bottom:0; }
+  details.arch .sol { opacity:.88; }
+
+  /* Perfil da empresa */
+  .perfil { border:1px solid var(--line); border-radius:12px; background:var(--surface); padding:18px 20px; display:flex; flex-direction:column; gap:16px; }
+  .pf-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  .pf-list label { display:flex; gap:10px; align-items:flex-start; padding:10px 14px; background:var(--surface); font-size:14px; cursor:pointer; }
+  .pf-list input { margin-top:4px; flex:none; width:16px; height:16px; }
+  .pf-row { display:grid; grid-template-columns:220px 1fr; gap:14px; }
+  @media (max-width:640px){ .pf-row { grid-template-columns:1fr; } }
+  .pf-actions { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  .pf-status { font-size:13px; color:var(--ink-soft); margin:0; }
+  .pf-status.err { color:var(--crit); }
+  .recalc { border:1px solid color-mix(in srgb,var(--accent) 35%,transparent); border-radius:12px; background:var(--accent-soft); padding:16px 18px; display:flex; flex-direction:column; gap:12px; }
+  .recalc h3 { margin:0; font-size:15.5px; }
+  .rc-list { display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  .rc-list label { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:10px 12px; align-items:start; padding:10px 14px; background:var(--surface); cursor:pointer; }
+  .rc-list input { margin-top:4px; width:16px; height:16px; }
+  .rc-n { font-weight:600; font-size:14px; }
+  .rc-d { font-size:12.5px; color:var(--ink-soft); margin:2px 0 0; }
+  .rc-t { font-family:var(--font-mono); font-size:13px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .rc-t .up { color:var(--good); } .rc-t .down { color:var(--crit); }
+
+  /* Diálogo do editor */
+  dialog.ed { border:1px solid var(--line-strong); border-radius:14px; background:var(--surface); color:var(--ink); padding:0; width:min(780px, calc(100vw - 24px)); max-height:calc(100dvh - 24px); }
+  dialog.ed::backdrop { background:var(--scrim); }
+  .ed form { display:flex; flex-direction:column; max-height:calc(100dvh - 26px); }
+  .ed-h { padding:18px 22px 12px; border-bottom:1px solid var(--line); }
+  .ed-h h2 { font-size:20px; }
+  .ed-b { padding:18px 22px; overflow-y:auto; display:flex; flex-direction:column; gap:16px; }
+  .ed-f { padding:14px 22px; border-top:1px solid var(--line); display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; align-items:center; background:var(--surface); }
+  .ed-f .r { display:flex; gap:10px; flex-wrap:wrap; }
+  .ed-sep { font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent-ink); font-weight:700; border-top:1px solid var(--line); padding-top:14px; margin:0; }
+  .row3 { display:grid; grid-template-columns:2fr 1fr 1fr; gap:14px; }
+  .row2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:640px){ .row3, .row2 { grid-template-columns:1fr; } }
+  .fld { display:flex; flex-direction:column; gap:5px; min-width:0; }
+  .fld > label, .fld-k { font-family:var(--font-mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+  .fld input[type="text"], .fld input[type="date"], .fld textarea, .fld select { font:14.5px var(--font-body); padding:9px 11px; border:1px solid var(--line-strong); border-radius:8px; background:var(--bg); color:var(--ink); width:100%; }
+  .fld textarea { resize:vertical; min-height:62px; line-height:1.5; }
+  .ia-box { display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; padding:12px 14px; border-radius:10px; background:var(--accent-soft); border:1px solid color-mix(in srgb,var(--accent) 30%,transparent); }
+  .ia-box p { margin:0; font-size:13px; color:var(--ink); flex:1 1 220px; }
+  .ia-status { font-size:13px; color:var(--ink-soft); min-height:1.2em; margin:0; }
+  .ia-status.err { color:var(--crit); }
+  .tg { display:flex; flex-wrap:wrap; gap:8px; }
+  .tg label { position:relative; cursor:pointer; }
+  .tg input { position:absolute; opacity:0; inset:0; margin:0; cursor:pointer; }
+  .tg span { display:inline-block; font:600 12px var(--font-mono); padding:6px 12px; border-radius:999px; border:1px solid var(--line-strong); color:var(--ink-soft); background:var(--surface); }
+  .tg input:checked + span { background:var(--accent); border-color:var(--accent); color:var(--on-accent); }
+  .tg input:focus-visible + span { outline:2px solid var(--accent); outline-offset:2px; }
+  .tg-group { display:flex; flex-direction:column; gap:6px; }
+  .tg-group small { font-size:12px; color:var(--muted); }
+  .metas-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:600px){ .metas-grid { grid-template-columns:1fr; } }
+  .deps { display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  .dep { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px 14px; align-items:center; padding:10px 14px; background:var(--surface); }
+  .dep .q { font-size:13.5px; color:var(--ink); }
+  .dep .q small { display:block; font-family:var(--font-mono); font-size:11px; color:var(--muted); }
+  @media (max-width:600px){ .dep { grid-template-columns:1fr; } }
+  .rad { display:inline-flex; border:1px solid var(--line-strong); border-radius:8px; overflow:hidden; }
+  .rad label { position:relative; cursor:pointer; }
+  .rad label + label { border-left:1px solid var(--line-strong); }
+  .rad input { position:absolute; opacity:0; inset:0; margin:0; cursor:pointer; }
+  .rad span { display:block; font:600 11.5px var(--font-mono); padding:6px 10px; color:var(--ink-soft); background:var(--surface); white-space:nowrap; }
+  .rad input:checked + span.f1 { background:var(--good-soft); color:var(--good); }
+  .rad input:checked + span.f5 { background:var(--warn-soft); color:var(--warn); }
+  .rad input:checked + span.f0 { background:var(--crit-soft); color:var(--crit); }
+  .rad input:focus-visible + span { outline:2px solid var(--accent); outline-offset:-2px; }
+  .live { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .live b { font-family:var(--font-display); font-size:22px; font-variant-numeric:tabular-nums; }
+  .live .of { font-family:var(--font-mono); font-size:12px; color:var(--muted); }
+  .warnline { font-size:13px; color:var(--crit); margin:0; }
+  .form-err { font-size:13px; color:var(--crit); margin:0; }
+
+  /* Explicações da IA e ajustes */
+  [data-tip] { cursor:help; }
+  .tg label[data-tip] { cursor:pointer; }
+  #tip { position:fixed; z-index:30; max-width:340px; background:var(--ink); color:var(--bg); font-size:12.5px; line-height:1.45; padding:9px 11px; border-radius:8px; pointer-events:none; white-space:pre-line; box-shadow:0 6px 20px color-mix(in srgb, var(--ink) 25%, transparent); }
+  .fld-k .hint-k { text-transform:none; letter-spacing:0; font-weight:500; color:var(--muted); }
+  .dv-box { border:1px solid color-mix(in srgb,var(--warn) 40%,transparent); background:var(--warn-soft); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:10px; }
+  .dv-h { display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; justify-content:space-between; }
+  .dv-hint { font-size:12.5px; color:var(--ink-soft); margin:0; }
+  .dv { background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:10px 12px; display:flex; flex-direction:column; gap:8px; }
+  .dv-t { margin:0; font-weight:600; font-size:13.5px; }
+  .dv-ia, .dv-resp { margin:0; font-size:13px; color:var(--ink-soft); }
+  .dv-resp { color:var(--accent-ink); }
+  .dv-a { display:flex; justify-content:flex-end; }
+  details.ia-exp { border:1px solid var(--line); border-radius:10px; }
+  details.ia-exp > summary { cursor:pointer; padding:10px 14px; font-size:13.5px; font-weight:600; }
+  .ia-exp ul { margin:0; padding:0 14px 12px 30px; font-size:13px; color:var(--ink-soft); display:flex; flex-direction:column; gap:4px; }
+  .ia-exp li b { color:var(--ink); }
+  .cr .adj { color:var(--warn); font-size:11px; }
+
+  /* v2: processo, valor, travas, medição */
+  .facts { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 0; }
+  .fact { font-family:var(--font-mono); font-size:11px; padding:2px 8px; border-radius:6px; background:var(--surface-2); color:var(--ink-soft); border:1px solid var(--line); white-space:nowrap; }
+  .fact b { color:var(--ink); font-weight:600; }
+  .fact.money { background:var(--good-soft); color:var(--good); border-color:color-mix(in srgb,var(--good) 30%,transparent); }
+  .fact.money b { color:var(--good); }
+  .fact.lock { background:var(--warn-soft); color:var(--warn); border-color:color-mix(in srgb,var(--warn) 35%,transparent); }
+  .fact.bad { background:var(--crit-soft); color:var(--crit); border-color:color-mix(in srgb,var(--crit) 30%,transparent); }
+  .fact .selo { font-size:9.5px; text-transform:uppercase; letter-spacing:.06em; opacity:.8; margin-left:4px; }
+  .plano { margin-top:12px; padding:10px 12px; border-radius:8px; background:var(--surface-2); font-size:13px; color:var(--ink-soft); }
+  .plano .pk { font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0 0 4px; }
+  .plano p { margin:4px 0 0; }
+  .plano p b { color:var(--ink); font-weight:600; }
+  .plano .st { margin:6px 6px 0 0; }
+  details.ed-sec { border:1px solid var(--line); border-radius:10px; background:var(--surface); }
+  details.ed-sec > summary { cursor:pointer; padding:11px 14px; list-style:none; display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; }
+  details.ed-sec > summary::-webkit-details-marker { display:none; }
+  details.ed-sec > summary .sk { font:700 11px var(--font-mono); letter-spacing:.1em; text-transform:uppercase; color:var(--accent-ink); }
+  details.ed-sec > summary .sk::before { content:"▸ "; }
+  details.ed-sec[open] > summary .sk::before { content:"▾ "; }
+  details.ed-sec > summary .sr { font-size:12.5px; color:var(--muted); }
+  details.ed-sec .in { padding:2px 14px 14px; display:flex; flex-direction:column; gap:12px; }
+  .ed-hint { font-size:12.5px; color:var(--ink-soft); margin:0; }
+  .row4 { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px; }
+  @media (max-width:640px){ .row4 { grid-template-columns:1fr 1fr; } }
+  .calc { font-size:13px; color:var(--ink-soft); margin:0; padding:8px 12px; background:var(--surface-2); border-radius:8px; }
+  .calc b { color:var(--ink); }
+  .ck { display:flex; gap:8px; align-items:flex-start; font-size:13.5px; cursor:pointer; }
+  .ck input { margin-top:4px; width:16px; height:16px; flex:none; }
+  .rad input:checked + span.fq { background:var(--surface-2); color:var(--ink); }
+  .travas-live { display:flex; flex-wrap:wrap; gap:6px; }
+  .btn-link { background:none; border:0; padding:0; font:600 12px var(--font-body); color:var(--accent-ink); cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+
+  /* v2: régua de prontidão */
+  .pf-k { font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:600; margin:0; }
+  .regua { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:12px; }
+  .rg { border:1px solid var(--line); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:6px; min-width:0; }
+  .rg-h { display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+  .rg-h label { font-size:14px; font-weight:640; }
+  .rg-h span { font-family:var(--font-mono); font-size:11px; color:var(--muted); }
+  .rg select { font:13.5px var(--font-body); padding:8px 10px; border:1px solid var(--line-strong); border-radius:8px; background:var(--bg); color:var(--ink); width:100%; }
+  .rg.um { border-color:color-mix(in srgb,var(--crit) 45%,transparent); }
+  .prontidao { border:1px solid color-mix(in srgb,var(--accent) 35%,transparent); background:var(--accent-soft); border-radius:12px; padding:14px 18px; display:flex; flex-direction:column; gap:6px; }
+  .prontidao .pt { display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 14px; }
+  .prontidao .pt b { font-family:var(--font-display); font-size:26px; font-variant-numeric:tabular-nums; }
+  .prontidao .pt strong { font-size:15px; }
+  .prontidao p { margin:0; font-size:13.5px; color:var(--ink-soft); }
+  .prontidao p.bloq { color:var(--crit); font-weight:600; }
+  .lim { display:inline-flex; align-items:center; gap:8px; font:600 11.5px var(--font-mono); color:var(--muted); }
+  .lim select { font:600 12px var(--font-mono); padding:5px 8px; border:1px solid var(--line-strong); border-radius:7px; background:var(--surface); color:var(--ink); }
+  .fila { font-size:14px; color:var(--ink-soft); margin:-6px 0 16px; }
+  .fila b { color:var(--ink); }
+  .fila .over { color:var(--crit); font-weight:600; }
+
+  .toast { position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom, 0px)); transform:translateX(-50%); background:var(--ink); color:var(--bg); padding:10px 16px; border-radius:10px; font-size:13.5px; z-index:10000; box-shadow:0 6px 20px color-mix(in srgb, var(--ink) 25%, transparent); max-width:calc(100vw - 32px); }
+
+  /* Footer & aviso confidencial */
+  footer { margin-top:56px; padding-top:22px; border-top:1px solid var(--line); font-family:var(--font-mono); font-size:11.5px; color:var(--muted); display:flex; flex-direction:column; gap:12px; }
+  .footer-top { display:flex; flex-wrap:wrap; gap:6px 18px; justify-content:space-between; }
+  .footer-notice { font-size:11px; color:var(--crit); background:var(--crit-soft); border:1px solid color-mix(in srgb,var(--crit) 30%,transparent); padding:8px 14px; border-radius:8px; text-align:center; font-weight:500; letter-spacing:0.02em; }
+  .footer-legal { display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; font-size:11px; padding-top:14px; border-top:1px solid var(--line); }
+  .footer-legal p { margin:0; }
+  .footer-legal strong { color:var(--ink-soft); font-weight:600; }
+  .footer-legal a { color:var(--accent-ink); text-decoration:underline; text-underline-offset:3px; }
+
+  
+  /* Versão local: configurações */
+  .cfg-inline { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  .cfg-inline input[type="password"] { flex:1 1 240px; min-width:0; font:14.5px var(--font-body); padding:9px 11px; border:1px solid var(--line-strong); border-radius:8px; background:var(--bg); color:var(--ink); }
+  .cfg-hint { font-size:13px; color:var(--ink-soft); margin:0; }
+  dialog.ed.ini { width:min(620px, calc(100vw - 24px)); }
+  .ini-ops { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
+  .ini-op { text-align:left; font:inherit; color:var(--ink); background:var(--surface); border:1px solid var(--line-strong); border-radius:12px; padding:16px 18px; cursor:pointer; display:flex; flex-direction:column; gap:6px; }
+  .ini-op:hover, .ini-op:focus-visible { border-color:var(--accent); background:var(--accent-soft); }
+  .ini-op strong { font-size:15.5px; }
+  .ini-op span { font-size:13px; color:var(--ink-soft); line-height:1.45; }
+  .ini-op[disabled] { opacity:.6; cursor:progress; }
+  .cfg-key { font-size:13.5px; padding:10px 12px; border-radius:8px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink); }
+  .cfg-key.ok { border-color:color-mix(in srgb,var(--good) 35%,transparent); background:var(--good-soft); }
+  .cfg-key.off { border-color:color-mix(in srgb,var(--warn) 40%,transparent); background:var(--warn-soft); }
+  .cfg-key code, .cfg-hint code { font-family:var(--font-mono); font-size:.85em; background:var(--surface); border:1px solid var(--line); border-radius:5px; padding:1px 5px; overflow-wrap:anywhere; }
+  .cfg-logos { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:640px){ .cfg-logos { grid-template-columns:1fr; } }
+  .cfg-logo { display:flex; flex-direction:column; gap:8px; min-width:0; }
+  .cfg-logo .pv { height:96px; border-radius:10px; border:1px solid var(--line-strong); display:flex; align-items:center; justify-content:center; padding:12px; }
+  .cfg-logo.claro .pv { background:#ffffff; }
+  .cfg-logo.escuro .pv { background:#0d1316; }
+  .cfg-logo img { max-height:100%; max-width:100%; object-fit:contain; }
+
+  @media (prefers-reduced-motion: reduce){ * { transition:none !important; } html { scroll-behavior:auto; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="top-nav">
+    <span class="top-eyebrow"><span class="js-empresa">Minha empresa</span> · IA na Empresa</span>
+    <div class="logo-box">
+      <img src="/api/logo/light" alt="Logo da empresa" id="logo-light" class="brand-logo brand-logo-light">
+      <img src="/api/logo/dark" alt="Logo da empresa" id="logo-dark" class="brand-logo brand-logo-dark">
+    </div>
+  </header>
+  <button id="themeToggle" class="theme-btn" type="button" aria-label="Alternar tema">
+    <span id="themeIcon">🌙</span> <span id="themeLabel">Modo Escuro</span>
+  </button>
+
+  <p class="eyebrow">Relatório Executivo · Priorização de projetos de IA · Versão local</p>
+  <h1>Soluções de IA</h1>
+  <p class="lede">O catálogo das soluções de IA por área, do roadmap até a implantação. Cada solução recebe uma nota de 0 a 10 pelo que muda no negócio e pelo quanto depende de trabalho manual, infraestrutura, gente técnica e cultura. Ela também registra o processo que ataca, com linha de base e valor em reais, e passa por checagens que travam o que ainda não está pronto. A execução é feita em série, com plano de medição.</p>
+
+  <div class="status-row">
+    <span class="badge good"><span class="dot"></span><span id="b-comecar">Carregando…</span></span>
+    <span class="badge acc"><span class="dot"></span><span id="b-exec">–</span></span>
+    <span class="badge crit" id="b-atraso" hidden><span class="dot"></span><span id="b-atraso-t"></span></span>
+    <span class="badge mute"><span class="dot"></span><span id="b-impl">–</span></span>
+    <span class="badge warn" id="b-modo" hidden><span class="dot"></span><span id="b-modo-t"></span></span>
+    <span class="meta-inline"><span class="js-empresa">Minha empresa</span> · <span id="mes-atual"></span></span>
+  </div>
+
+  <hr class="rule">
+
+  <dl class="ficha" id="kpis">
+    <div><dt title="Soluções no roadmap">Roadmap</dt><dd id="k-roadmap">–</dd></div>
+    <div><dt title="Nota de 9 a 10">Começar já</dt><dd id="k-comecar">–</dd></div>
+    <div><dt title="Soluções em execução">Em execução</dt><dd id="k-exec">–</dd></div>
+    <div><dt title="Em execução com previsão vencida">Atrasadas</dt><dd id="k-atraso">–</dd></div>
+    <div><dt title="Soluções implantadas">Implantadas</dt><dd id="k-impl">–</dd></div>
+    <div><dt title="Nota média do roadmap">Nota média</dt><dd id="k-media">–</dd></div>
+    <div><dt title="Prontidão da empresa para IA (régua de 1 a 5)">Prontidão</dt><dd id="k-pront">–</dd></div>
+  </dl>
+  <p class="legend-link">Como as notas e as faixas são definidas: <a href="#legenda">veja a metodologia</a>. As dependências consideram o <a href="#perfil">perfil da empresa</a>.</p>
+
+  <div class="filters" role="search">
+    <div class="l">
+      <span class="lbl">Filtrar</span>
+      <select id="filtro-setor" class="search" aria-label="Filtrar por área"><option value="">Todas as áreas</option></select>
+      <input type="search" id="busca" class="search" placeholder="Buscar solução" aria-label="Buscar solução">
+    </div>
+    <div class="r">
+      <button type="button" class="btn plain" id="btn-config">Configurações</button>
+      <button type="button" class="btn plain" id="btn-csv" hidden>Exportar CSV</button>
+      <button type="button" class="btn" id="btn-nova" hidden>+ Nova solução</button>
+    </div>
+  </div>
+
+  <div class="sec-tools" role="group" aria-label="Mostrar ou esconder as seções 01 a 06">
+    <span class="lbl">Seções</span>
+    <div class="seg">
+      <button type="button" id="sec-expandir">Expandir todas</button>
+      <button type="button" id="sec-recolher">Recolher todas</button>
+    </div>
+  </div>
+
+  <!-- 01 Roadmap -->
+  <section class="sec" id="roadmap">
+    <div class="sec-head">
+      <h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-roadmap"><span class="chev" aria-hidden="true"></span><span class="sec-num">01</span><span>Roadmap das soluções</span></button></h2><span class="sec-count" id="c-roadmap"></span>
+      <div class="seg spacer" role="group" aria-label="Forma de exibição do roadmap">
+        <button type="button" id="v-setor" aria-pressed="true">Por área</button>
+        <button type="button" id="v-geral" aria-pressed="false">Ranking geral</button>
+      </div>
+    </div>
+    <div class="sec-body" id="sb-roadmap">
+      <p class="sec-intro">Soluções ainda não iniciadas, em ordem de prioridade. Comece pelas de nota mais alta.</p>
+      <div id="lista">
+        <div class="empty"><strong>Carregando as soluções…</strong>A lista aparece aqui assim que o banco da página responder.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 Em execução -->
+  <section class="sec" id="execucao">
+    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-execucao"><span class="chev" aria-hidden="true"></span><span class="sec-num">02</span><span>Soluções em execução</span></button></h2><span class="sec-count" id="c-exec"></span>
+      <label class="lim spacer" for="f-limite">Em paralelo, no máximo
+        <select id="f-limite"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
+      </label>
+    </div>
+    <div class="sec-body" id="sb-execucao">
+      <p class="sec-intro">Execução em série: uma solução de cada vez, começando pela de retorno mais rápido. A próxima começa quando a anterior estiver em uso. As atrasadas aparecem primeiro.</p>
+      <p class="fila" id="fila" aria-live="polite"></p>
+      <div id="lista-exec"></div>
+    </div>
+  </section>
+
+  <!-- 03 Implantadas -->
+  <section class="sec" id="implantadas">
+    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-implantadas"><span class="chev" aria-hidden="true"></span><span class="sec-num">03</span><span>Soluções já implantadas</span></button></h2><span class="sec-count" id="c-impl"></span></div>
+    <div class="sec-body" id="sb-implantadas">
+      <p class="sec-intro">Soluções que já estão rodando na empresa, com o resultado esperado e o resultado medido.</p>
+      <div id="lista-impl"></div>
+    </div>
+  </section>
+
+  <!-- 04 Arquivadas -->
+  <section class="sec" id="arquivadas">
+    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-arquivadas"><span class="chev" aria-hidden="true"></span><span class="sec-num">04</span><span>Arquivadas</span></button></h2></div>
+    <div class="sec-body" id="sb-arquivadas">
+      <p class="sec-intro">Soluções arquivadas saem das listas e das contas. Ao restaurar, cada uma volta para onde estava.</p>
+      <details class="arch" id="arch">
+        <summary><span id="arch-sum">Nenhuma solução arquivada</span></summary>
+        <div id="arch-lista"></div>
+      </details>
+    </div>
+  </section>
+
+  <!-- 05 Perfil da empresa -->
+  <section class="sec" id="perfil">
+    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-perfil"><span class="chev" aria-hidden="true"></span><span class="sec-num">05</span><span>Perfil da empresa</span></button></h2></div>
+    <div class="sec-body" id="sb-perfil">
+      <p class="sec-intro">Avalie a empresa em seis dimensões, de 1 a 5, e marque os sistemas que ela já tem. A IA usa essas respostas ao classificar cada solução e pode revisar todas as notas de uma vez. Nenhuma nota muda sem a sua aprovação.</p>
+      <div class="perfil">
+        <p class="pf-k">Régua de prontidão para IA</p>
+        <div class="regua" id="regua"></div>
+        <div class="prontidao" id="pront-box" aria-live="polite"></div>
+        <p class="pf-k">Sistemas e estrutura que a empresa já tem</p>
+        <div class="pf-list" id="pf-list"></div>
+        <div class="pf-row">
+          <div class="fld"><label for="p-porte">Porte</label>
+            <select id="p-porte">
+              <option value="">Não informado</option>
+              <option value="pequena">Pequena (até 50 pessoas, incluindo campo)</option>
+              <option value="media">Média (50 a 500 pessoas, incluindo campo)</option>
+              <option value="grande">Grande (mais de 500 pessoas, incluindo campo)</option>
+            </select>
+          </div>
+          <div class="fld"><label for="p-obs">Observações</label><textarea id="p-obs" rows="2" maxlength="600" placeholder="Ex.: usamos um ERP próprio e um CRM na nuvem; o comercial atende por um app de mensagens comum"></textarea></div>
+        </div>
+        <div class="pf-actions">
+          <button type="button" class="btn" id="btn-perfil">Salvar perfil</button>
+          <button type="button" class="btn ghost" id="btn-recalc" hidden>Recalcular notas com o perfil</button>
+          <button type="button" class="btn plain" id="btn-recalc-stop" hidden>Parar</button>
+          <p class="pf-status" id="pf-status" aria-live="polite"></p>
+        </div>
+        <div id="recalc-out"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 Metodologia -->
+  <section class="sec" id="legenda">
+    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-legenda"><span class="chev" aria-hidden="true"></span><span class="sec-num">06</span><span>Como a nota é calculada</span></button></h2></div>
+    <div class="sec-body" id="sb-legenda">
+      <div class="legend">
+        <div class="lg">
+          <h3>Passo 1 · Metas</h3>
+          <p class="hint">O projeto vai mexer em pelo menos uma destas? Se não mexer em nenhuma, abandone.</p>
+          <div class="lg-k">Primárias</div>
+          <div class="chips"><span class="mt p">Receita</span><span class="mt p">Custo</span><span class="mt p">Margem</span></div>
+          <div class="lg-k">Secundárias</div>
+          <div class="chips"><span class="mt">Risco</span><span class="mt">Produtividade</span><span class="mt">Valuation</span></div>
+          <p class="hint" style="margin:12px 0 0">Aumentar receita, diminuir custo e aumentar margem vêm primeiro. Diminuir risco, aumentar produtividade e aumentar valuation/equity desempatam.</p>
+        </div>
+        <div class="lg">
+          <h3>Passo 2 · "Ok, mas como?"</h3>
+          <p class="hint">Pontos ganhos quando o projeto <strong>não depende</strong> de cada item. Dependência parcial vale metade. O que a empresa já tem (seção 05) reduz a dependência. A revisão humana exigida por segurança e o trabalho feito com o resultado não contam como manutenção manual: esse tempo entra no ganho.</p>
+          <table class="wt">
+            <thead><tr><th>Depende de…</th><th>Não</th><th>Em parte</th><th>Sim</th></tr></thead>
+            <tbody>
+              <tr><td>Gente para manter funcionando na mão</td><td class="g">4</td><td class="w">2</td><td class="c">0</td></tr>
+              <tr><td>Muita infra, integração ou tecnologia</td><td class="g">3</td><td class="w">1,5</td><td class="c">0</td></tr>
+              <tr><td>Gente técnica para continuar (dados, integração ou IA)</td><td class="g">2</td><td class="w">1</td><td class="c">0</td></tr>
+              <tr><td>Mudança de cultura</td><td class="g">1</td><td class="w">0,5</td><td class="c">0</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="lg">
+          <h3>Faixas do roadmap</h3>
+          <p class="hint">Ordem: faixa, nota total, número de metas primárias e, por fim, ganho conservador em reais.</p>
+          <ul class="tiers">
+            <li><span class="st good"><span class="dot"></span>Começar já</span><span class="rng">9 a 10, sem trava</span></li>
+            <li><span class="st warn"><span class="dot"></span>Destravar antes</span><span class="rng">9 a 10, com trava</span></li>
+            <li><span class="st acc"><span class="dot"></span>Próxima onda</span><span class="rng">7 a 8,5</span></li>
+            <li><span class="st warn"><span class="dot"></span>Avaliar com cuidado</span><span class="rng">5 a 6,5</span></li>
+            <li><span class="st crit"><span class="dot"></span>Projeto estrutural</span><span class="rng">abaixo de 5</span></li>
+            <li><span class="st crit"><span class="dot"></span>Abandonar</span><span class="rng">nenhuma meta</span></li>
+          </ul>
+          <p class="hint" style="margin:12px 0 0">Nas linhas: barra verde = não depende, amarela = depende em parte, vazia = depende.</p>
+        </div>
+        <div class="lg">
+          <h3>Ciclo de cada solução</h3>
+          <p class="hint">Os botões de cada linha movem a solução entre as seções.</p>
+          <ul class="tiers">
+            <li><span class="st good"><span class="dot"></span>Roadmap</span><span class="rng">priorizada, não iniciada</span></li>
+            <li><span class="st acc"><span class="dot"></span>Em execução</span><span class="rng">com responsável e prazo</span></li>
+            <li><span class="st crit"><span class="dot"></span>Atrasada</span><span class="rng">previsão vencida</span></li>
+            <li><span class="st good"><span class="dot"></span>Implantada</span><span class="rng">resultado medido</span></li>
+            <li><span class="st mute"><span class="dot"></span>Arquivada</span><span class="rng">fora das listas</span></li>
+          </ul>
+          <p class="hint" style="margin:12px 0 0">Execução em série: ao iniciar uma solução acima do limite definido na seção 02, ou uma solução com trava, a página pede confirmação.</p>
+        </div>
+        <div class="lg">
+          <h3>Travas</h3>
+          <p class="hint">Processo antes de ferramenta. Uma solução com trava não entra em "Começar já", mesmo com nota alta.</p>
+          <ul class="tiers">
+            <li><span class="st warn"><span class="dot"></span>Natureza: processo</span><span class="rng">organizar antes</span></li>
+            <li><span class="st warn"><span class="dot"></span>Só uma pessoa sabe</span><span class="rng">documentar antes</span></li>
+            <li><span class="st crit"><span class="dot"></span>Checagem com falha</span><span class="rng">dado, integração, qualidade ou regra</span></li>
+            <li><span class="st warn"><span class="dot"></span>Regra sem resposta</span><span class="rng">exigência legal a confirmar</span></li>
+          </ul>
+          <p class="hint" style="margin:12px 0 0">Comece sempre com revisão humana em pagamentos, exclusão de dados, acessos, decisões fiscais, jurídicas ou de RH e mensagens a clientes.</p>
+        </div>
+        <div class="lg">
+          <h3>Valor em reais</h3>
+          <p class="hint">Mostrado como faixa, sempre com o cenário conservador primeiro.</p>
+          <ul class="tiers">
+            <li><span class="rng">Carga</span><span>ocorrências por mês × minutos ÷ 60 (semana × 4,3; dia × dias de operação)</span></li>
+            <li><span class="rng">Custo atual</span><span>carga × custo-hora + supervisão × custo-hora de quem supervisiona. É o teto do ganho.</span></li>
+            <li><span class="rng">Ganho</span><span>custo atual × % do tempo eliminado − custo mensal da solução</span></li>
+            <li><span class="rng">Receita</span><span>informada à parte, não validada, nunca somada ao custo</span></li>
+          </ul>
+          <p class="hint" style="margin:12px 0 0">O selo indica a origem dos números: medido, informado, estimado ou hipótese.</p>
+        </div>
+        <div class="lg">
+          <h3>Régua de prontidão</h3>
+          <p class="hint">Média ponderada das seis dimensões do perfil.</p>
+          <table class="wt">
+            <thead><tr><th>Dimensão</th><th>Peso</th></tr></thead>
+            <tbody>
+              <tr><td>Dados</td><td>25%</td></tr><tr><td>Sistemas e integrações</td><td>20%</td></tr><tr><td>Time técnico</td><td>20%</td></tr>
+              <tr><td>Processos</td><td>15%</td></tr><tr><td>Orçamento</td><td>10%</td></tr><tr><td>Cultura</td><td>10%</td></tr>
+            </tbody>
+          </table>
+          <p class="hint" style="margin:12px 0 0">Até 2,5: organize dados e processos primeiro. De 2,6 a 3,5: pilotos, um de cada vez. Acima de 3,5: dá para tocar várias soluções em paralelo. Uma dimensão em nível 1 é um bloqueio.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-top">
+      <span>Soluções de IA · versão local · <span class="js-empresa">Minha empresa</span></span>
+      <span>Classificação: <span id="ft-ia">–</span></span>
+    </div>
+    <div class="footer-notice">
+      🔒 <strong>DOCUMENTO CONFIDENCIAL · <span class="js-empresa">Minha empresa</span>:</strong> Proibida a reprodução, alteração ou divulgação sem autorização prévia.
+    </div>
+    <div class="footer-legal">
+      <p>Desenvolvido por <strong>3Value Brasil Tecnologia Dados Negócios LTDA</strong> - Leandro Nogueira</p>
+      <p>© 2026 · Distribuído sob a <a href="/licenca" target="_blank" rel="noopener">Licença MIT</a></p>
+    </div>
+  </footer>
+</div>
+
+<dialog class="ed" id="dlg" aria-labelledby="dlg-t">
+  <form id="frm" novalidate>
+    <div class="ed-h">
+      <p class="eyebrow" style="margin:0 0 4px" id="dlg-k">Nova solução</p>
+      <h2 id="dlg-t">Cadastrar solução</h2>
+    </div>
+    <div class="ed-b">
+      <div class="row3">
+        <div class="fld"><label for="f-nome">Nome</label><input type="text" id="f-nome" maxlength="90" required></div>
+        <div class="fld"><label for="f-setor">Área</label><input type="text" id="f-setor" list="dl-setores" maxlength="40" required placeholder="Escolha ou digite"></div>
+        <div class="fld"><label for="f-status">Situação</label>
+          <select id="f-status">
+            <option value="ativa">No roadmap</option>
+            <option value="execucao">Em execução</option>
+            <option value="implantada">Implantada</option>
+          </select>
+        </div>
+      </div>
+      <datalist id="dl-setores"></datalist>
+      <div class="fld"><label for="f-desc">O que faz</label><textarea id="f-desc" rows="2" maxlength="500"></textarea></div>
+      <div class="fld"><label for="f-res">O que resolve</label><textarea id="f-res" rows="2" maxlength="500"></textarea></div>
+      <div class="fld" data-tip="nat:natureza"><label for="f-nat">Natureza da solução <span class="hint-k">· passe o mouse para ver o porquê da IA</span></label>
+        <select id="f-nat">
+          <option value="">Não definida</option>
+          <option value="ia">IA (texto, documentos, julgamento assistido)</option>
+          <option value="automacao">Automação (dado estruturado e regra clara)</option>
+          <option value="ia_automacao">IA + automação (a IA lê, a regra grava)</option>
+          <option value="processo">Organizar o processo (padrão, responsável)</option>
+          <option value="treinamento">Treinamento (a ferramenta existe, mas é pouco usada)</option>
+        </select>
+      </div>
+
+      <div class="ia-box" id="ia-box" hidden>
+        <p>A IA lê o nome, a área, as descrições e o perfil da empresa e sugere metas, pontos e justificativa. Você revisa antes de salvar.</p>
+        <button type="button" class="btn ghost" id="btn-ia">Classificar com IA</button>
+        <button type="button" class="btn plain" id="btn-ia-stop" hidden>Parar</button>
+      </div>
+      <p class="ia-status" id="ia-status" aria-live="polite"></p>
+
+      <div class="fld">
+        <span class="fld-k">Passo 1 · Metas que o projeto move <span class="hint-k">· passe o mouse para ver o porquê da IA</span></span>
+        <div class="metas-grid">
+          <div class="tg-group"><small>Primárias</small><div class="tg" id="tg-p"></div></div>
+          <div class="tg-group"><small>Secundárias</small><div class="tg" id="tg-s"></div></div>
+        </div>
+      </div>
+
+      <div class="fld">
+        <span class="fld-k">Passo 2 · Do que o projeto depende <span class="hint-k">· passe o mouse para ver o porquê da IA</span></span>
+        <div class="deps" id="deps"></div>
+      </div>
+
+      <div class="live">
+        <span class="fld-k">Nota</span><b id="live-t">0</b><span class="of">de 10</span><span class="st" id="live-f"></span>
+      </div>
+      <p class="warnline" id="live-w" hidden>Nenhuma meta marcada: pela regra, o projeto deve ser abandonado.</p>
+      <div id="diverg"></div>
+      <details class="ia-exp" id="ia-exp" hidden><summary>Explicações da IA para cada item</summary><ul id="ia-exp-list"></ul></details>
+
+      <div class="fld"><label for="f-just">Justificativa</label><textarea id="f-just" rows="2" maxlength="400" placeholder="Por que essa nota, em uma frase"></textarea></div>
+
+      <div class="travas-live" id="travas-live"></div>
+
+      <details class="ed-sec" id="sec-proc">
+        <summary><span class="sk">Processo e linha de base</span><span class="sr" id="sr-proc"></span></summary>
+        <div class="in">
+          <p class="ed-hint">O processo que a solução ataca, como ele acontece hoje. Use a função de quem executa, nunca o nome da pessoa.</p>
+          <div class="row3">
+            <div class="fld"><label for="p-exec">Quem executa (função)</label><input type="text" id="p-exec" maxlength="80" placeholder="Ex.: Assistente financeiro"></div>
+            <div class="fld"><label for="p-doc">Está documentado?</label>
+              <select id="p-doc"><option value="">Não informado</option><option value="sim">Sim</option><option value="parcial">Em parte</option><option value="nao">Não</option><option value="so_uma_pessoa">Só uma pessoa sabe fazer</option></select></div>
+            <div class="fld"><label for="p-ent">Como a informação chega</label>
+              <select id="p-ent"><option value="">Não informado</option><option value="estruturada">Estruturada (campo de sistema, planilha)</option><option value="nao_estruturada">Não estruturada (e-mail, PDF, foto, áudio)</option><option value="misto">Mista</option></select></div>
+          </div>
+          <div class="row4">
+            <div class="fld"><label for="p-freq">Quantas vezes</label><input type="text" inputmode="decimal" id="p-freq" maxlength="10" placeholder="Ex.: 40"></div>
+            <div class="fld"><label for="p-un">Por</label>
+              <select id="p-un"><option value="mes">Mês</option><option value="semana">Semana</option><option value="dia">Dia</option></select></div>
+            <div class="fld" id="fld-dias"><label for="p-dias">Dias de operação no mês</label>
+              <select id="p-dias"><option value="21">21 (dias úteis)</option><option value="26">26 (inclui sábado)</option><option value="30">30 (contínuo)</option></select></div>
+            <div class="fld"><label for="p-min">Minutos por vez</label><input type="text" inputmode="decimal" id="p-min" maxlength="10" placeholder="Incluindo correções"></div>
+          </div>
+          <p class="calc" id="calc-carga"></p>
+          <div class="row2">
+            <div class="fld"><label for="p-conf">Origem dos números</label>
+              <select id="p-conf"><option value="">Não informada</option><option value="medido">Medido (cronometrado)</option><option value="informado">Informado por quem executa</option><option value="estimado">Estimado pelo gestor</option><option value="hipotese">Hipótese</option></select></div>
+            <label class="ck" style="align-self:end"><input type="checkbox" id="p-valid"><span>Linha de base validada com quem executa (3 casos cronometrados)</span></label>
+          </div>
+        </div>
+      </details>
+
+      <details class="ed-sec" id="sec-chk">
+        <summary><span class="sk">Checagens técnicas</span><span class="sr" id="sr-chk"></span></summary>
+        <div class="in">
+          <p class="ed-hint">Uma checagem com falha trava a solução. "Não sei" é uma resposta válida e vira item de estudo. Passe o mouse para ver o porquê da IA.</p>
+          <div class="deps" id="chks"></div>
+        </div>
+      </details>
+
+      <details class="ed-sec" id="sec-valor">
+        <summary><span class="sk">Valor em reais por mês</span><span class="sr" id="sr-valor"></span></summary>
+        <div class="in">
+          <p class="ed-hint">O custo-hora vem do RH ou do financeiro, já com encargos. O percentual eliminado é definido pela equipe técnica.</p>
+          <div class="row3">
+            <div class="fld"><label for="v-ch">Custo-hora de quem executa (R$)</label><input type="text" inputmode="decimal" id="v-ch" maxlength="12"></div>
+            <div class="fld"><label for="v-sup">Supervisão (h/mês)</label><input type="text" inputmode="decimal" id="v-sup" maxlength="10"></div>
+            <div class="fld"><label for="v-chs">Custo-hora de quem supervisiona (R$)</label><input type="text" inputmode="decimal" id="v-chs" maxlength="12"></div>
+          </div>
+          <div class="row3">
+            <div class="fld"><label for="v-pc">% do tempo eliminado, conservador</label><input type="text" inputmode="decimal" id="v-pc" maxlength="5" placeholder="Ex.: 30"></div>
+            <div class="fld"><label for="v-pp">% do tempo eliminado, provável</label><input type="text" inputmode="decimal" id="v-pp" maxlength="5" placeholder="Ex.: 50"></div>
+            <div class="fld"><label for="v-cs">Custo mensal da solução (R$)</label><input type="text" inputmode="decimal" id="v-cs" maxlength="12" placeholder="Licenças, consumo, manutenção"></div>
+          </div>
+          <p class="calc" id="calc-valor"></p>
+          <div class="row2">
+            <div class="fld"><label for="v-rec">Ganho de receita (R$/mês)</label><input type="text" inputmode="decimal" id="v-rec" maxlength="12" placeholder="Não validado; nunca somado ao custo"></div>
+            <div class="fld"><label for="v-brec">Base do ganho de receita</label>
+              <select id="v-brec"><option value="">Não informada</option><option value="conta">Conta (o cálculo foi mostrado)</option><option value="estimativa">Estimativa</option><option value="sem_base">Sem base</option></select></div>
+          </div>
+        </div>
+      </details>
+
+      <p class="ed-sep">Acompanhamento</p>
+      <div class="row2">
+        <div class="fld"><label for="f-resp">Responsável</label><input type="text" id="f-resp" maxlength="80" placeholder="Nome de quem conduz"></div>
+        <div class="fld"><label for="f-prev">Previsão de entrega</label><input type="date" id="f-prev"></div>
+      </div>
+      <details class="ed-sec" id="sec-med">
+        <summary><span class="sk">Plano de medição</span><span class="sr" id="sr-med"></span></summary>
+        <div class="in">
+          <div class="row2">
+            <div class="fld"><label for="m-ind">Indicador</label><input type="text" id="m-ind" maxlength="160" placeholder="O que vamos medir"></div>
+            <div class="fld"><label for="m-met">Método</label><input type="text" id="m-met" maxlength="200" placeholder="Como e onde o número será medido"></div>
+          </div>
+          <div class="fld"><label for="m-base">Linha de base <button type="button" class="btn-link" id="btn-base">usar a carga do processo</button></label><input type="text" id="m-base" maxlength="200" placeholder="Quanto é hoje"></div>
+          <div class="row2">
+            <div class="fld"><label for="f-esp">Meta</label><input type="text" id="f-esp" maxlength="300" placeholder="Para quanto deve ir"></div>
+            <div class="fld"><label for="m-prazo">Prazo (dias)</label><input type="text" inputmode="numeric" id="m-prazo" maxlength="4" placeholder="Ex.: 60"></div>
+          </div>
+          <div class="row3">
+            <div class="fld"><label for="m-con">Cenário conservador</label><input type="text" id="m-con" maxlength="200"></div>
+            <div class="fld"><label for="m-pro">Cenário provável</label><input type="text" id="m-pro" maxlength="200"></div>
+            <div class="fld"><label for="m-oti">Cenário otimista</label><input type="text" id="m-oti" maxlength="200"></div>
+          </div>
+          <p class="ed-hint">Durante a construção o ganho é zero e ele cresce conforme a equipe adota a solução. Cobre pelo cenário conservador.</p>
+        </div>
+      </details>
+      <div id="grp-medido" hidden>
+        <div class="row2">
+          <div class="fld"><label for="f-med">Resultado medido</label><textarea id="f-med" rows="2" maxlength="400" placeholder="O que aconteceu de fato, com número e período"></textarea></div>
+          <div class="fld"><label for="f-aval">Avaliação</label>
+            <select id="f-aval">
+              <option value="">Ainda não medido</option>
+              <option value="atingido">Atingido</option>
+              <option value="parcial">Atingido em parte</option>
+              <option value="nao">Não atingido</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ed-f">
+      <p class="form-err" id="f-err" aria-live="polite"></p>
+      <div class="r">
+        <button type="button" class="btn plain" id="btn-cancel">Cancelar</button>
+        <button type="submit" class="btn" id="btn-save">Salvar</button>
+      </div>
+    </div>
+  </form>
+  <div id="tip" role="tooltip" hidden></div>
+</dialog>
+
+<dialog class="ed" id="dlg-cfg" aria-labelledby="cfg-t">
+  <form id="frm-cfg" novalidate>
+    <div class="ed-h">
+      <p class="eyebrow" style="margin:0 0 4px">Versão local</p>
+      <h2 id="cfg-t">Configurações</h2>
+    </div>
+    <div class="ed-b">
+      <p class="ed-sep">Inteligência artificial</p>
+      <div class="row3">
+        <div class="fld"><label for="c-prov">Provedor</label><select id="c-prov"></select></div>
+        <div class="fld"><label for="c-modelo">Modelo</label><input type="text" id="c-modelo" list="dl-modelos" maxlength="120" spellcheck="false" autocomplete="off"></div>
+        <div class="fld"><label for="c-esforco">Esforço</label><select id="c-esforco"></select></div>
+      </div>
+      <datalist id="dl-modelos"></datalist>
+      <p class="cfg-hint" id="c-esforco-hint"></p>
+      <div class="fld" id="fld-base" hidden><label for="c-base">Endereço da API (padrão OpenAI)</label><input type="text" id="c-base" placeholder="http://localhost:11434/v1" spellcheck="false" autocomplete="off"></div>
+      <div class="cfg-key" id="c-key" aria-live="polite"></div>
+      <div class="cfg-inline">
+        <input type="password" id="c-chave" autocomplete="off" placeholder="Colar uma chave só para esta sessão" aria-label="Chave de API só para esta sessão">
+        <button type="button" class="btn plain" id="c-chave-usar">Usar nesta sessão</button>
+        <button type="button" class="btn plain" id="c-chave-esquecer" hidden>Esquecer a chave da sessão</button>
+      </div>
+      <p class="cfg-hint">A chave colada fica só na memória do servidor local e some ao fechá-lo. Para uso permanente, grave a chave no arquivo <code>.env</code> da pasta do app.</p>
+      <div class="cfg-inline">
+        <button type="button" class="btn ghost" id="c-testar">Testar conexão e listar modelos</button>
+        <span class="cfg-hint" id="c-testar-st" aria-live="polite"></span>
+      </div>
+
+      <p class="ed-sep">Empresa e logo</p>
+      <div class="fld"><label for="c-empresa">Nome da empresa</label><input type="text" id="c-empresa" maxlength="60" placeholder="Minha empresa"></div>
+      <div class="cfg-logos">
+        <div class="cfg-logo claro">
+          <span class="fld-k">Logo · modo claro</span>
+          <div class="pv"><img id="pv-light" alt="Logo usada no modo claro"></div>
+          <div class="cfg-inline">
+            <button type="button" class="btn plain" id="bt-up-light">Trocar imagem…</button>
+            <button type="button" class="btn plain" id="bt-reset-light">Usar a padrão</button>
+            <input type="file" id="up-light" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" hidden>
+          </div>
+        </div>
+        <div class="cfg-logo escuro">
+          <span class="fld-k">Logo · modo escuro</span>
+          <div class="pv"><img id="pv-dark" alt="Logo usada no modo escuro"></div>
+          <div class="cfg-inline">
+            <button type="button" class="btn plain" id="bt-up-dark">Trocar imagem…</button>
+            <button type="button" class="btn plain" id="bt-reset-dark">Usar a padrão</button>
+            <input type="file" id="up-dark" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" hidden>
+          </div>
+        </div>
+      </div>
+      <p class="cfg-hint">PNG, JPG, WebP, GIF ou SVG, até 2 MB. A troca vale na hora. Sem uma logo própria para o modo escuro, a página usa a do modo claro.</p>
+      <p class="cfg-hint" id="c-logo-st" aria-live="polite"></p>
+
+      <p class="ed-sep">Áreas</p>
+      <div class="fld"><label for="c-areas">Áreas sugeridas no cadastro, uma por linha, na ordem de exibição</label><textarea id="c-areas" rows="8"></textarea></div>
+      <p class="cfg-hint">Para incluir uma área, acrescente uma linha. No cadastro de uma solução você também pode digitar uma área nova direto no campo "Área". Tirar uma área desta lista não muda as soluções que já usam essa área.</p>
+
+      <p class="ed-sep">Soluções</p>
+      <p class="cfg-hint" id="c-sol-info"></p>
+      <div class="cfg-inline">
+        <button type="button" class="btn plain" id="c-ex-carregar">Carregar os exemplos</button>
+        <button type="button" class="btn plain" id="c-sol-apagar">Apagar todas as soluções…</button>
+      </div>
+      <p class="cfg-hint">Carregar os exemplos não substitui nada: um exemplo que já está no banco continua como está. Antes de apagar, o app guarda uma cópia do banco em <code>data/backups</code>. Essas ações valem na hora, sem precisar clicar em Salvar.</p>
+      <p class="cfg-hint" id="c-sol-st" aria-live="polite"></p>
+    </div>
+    <div class="ed-f">
+      <p class="form-err" id="c-err" aria-live="polite"></p>
+      <div class="r">
+        <button type="button" class="btn plain" id="c-cancel">Cancelar</button>
+        <button type="submit" class="btn" id="c-salvar">Salvar</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="ed ini" id="dlg-inicio" aria-labelledby="ini-t">
+  <form method="dialog">
+    <div class="ed-h">
+      <p class="eyebrow" style="margin:0 0 4px">Primeiro acesso</p>
+      <h2 id="ini-t">Como você quer começar?</h2>
+    </div>
+    <div class="ed-b">
+      <p class="cfg-hint">Ainda não há nenhuma solução cadastrada.</p>
+      <div class="ini-ops">
+        <button type="button" class="ini-op" id="ini-exemplos">
+          <strong id="ini-exemplos-t">Carregar os exemplos</strong>
+          <span>Soluções de IA de várias áreas, já classificadas, para ver como o app funciona. Você pode editar ou apagar cada uma depois.</span>
+        </button>
+        <button type="button" class="ini-op" id="ini-zero">
+          <strong>Começar do zero</strong>
+          <span>Abre sem nenhuma solução, para você cadastrar as da sua empresa.</span>
+        </button>
+      </div>
+      <p class="cfg-hint" id="ini-st" aria-live="polite"></p>
+      <p class="cfg-hint">Dá para mudar de ideia depois, em Configurações → Soluções.</p>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="/local.js"></script>
+
+<script>
+/* ---------- Tema (claro/escuro, guardado em solucoes-ia-theme) ---------- */
+(function(){
+  const root = document.documentElement;
+  const icon = document.getElementById('themeIcon');
+  const label = document.getElementById('themeLabel');
+  function ui(t){ if (t === 'dark') { icon.textContent = '☀️'; label.textContent = 'Modo Claro'; } else { icon.textContent = '🌙'; label.textContent = 'Modo Escuro'; } }
+  let saved = null;
+  try { saved = localStorage.getItem('solucoes-ia-theme'); } catch (e) {}
+  const sys = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  let cur = saved === 'dark' || saved === 'light' ? saved : (sys ? 'dark' : 'light');
+  root.setAttribute('data-theme', cur); ui(cur);
+  document.getElementById('themeToggle').addEventListener('click', function(){
+    cur = cur === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', cur); ui(cur);
+    try { localStorage.setItem('solucoes-ia-theme', cur); } catch (e) {}
+  });
+})();
+
+/* ---------- Seções 01 a 06 recolhíveis (as recolhidas ficam em solucoes-ia-secoes) ---------- */
+(function(){
+  const CHAVE = 'solucoes-ia-secoes';
+  const secoes = [...document.querySelectorAll('section.sec')];
+  const btExpandir = document.getElementById('sec-expandir');
+  const btRecolher = document.getElementById('sec-recolher');
+  function mostrar(sec, aberta) {
+    sec.classList.toggle('fechada', !aberta);
+    sec.querySelector('.sec-tg').setAttribute('aria-expanded', String(aberta));
+    sec.querySelector('.sec-body').hidden = !aberta;
+  }
+  function botoes() {
+    const n = secoes.filter(s => s.classList.contains('fechada')).length;
+    btExpandir.disabled = n === 0;
+    btRecolher.disabled = n === secoes.length;
+  }
+  function guardar() {
+    const fechadas = secoes.filter(s => s.classList.contains('fechada')).map(s => s.id);
+    try { localStorage.setItem(CHAVE, JSON.stringify(fechadas)); } catch (e) {}
+    botoes();
+  }
+  // Um link para a seção, ou para algo dentro dela, abre a seção antes de rolar até lá.
+  function abrirAlvo(hash) {
+    if (!hash || hash.length < 2) return;
+    let alvo = null;
+    try { alvo = document.getElementById(decodeURIComponent(hash.slice(1))); } catch (e) {}
+    const sec = alvo && alvo.closest('section.sec');
+    if (sec && sec.classList.contains('fechada')) { mostrar(sec, true); guardar(); }
+  }
+  let fechadas = [];
+  try { const v = JSON.parse(localStorage.getItem(CHAVE) || '[]'); if (Array.isArray(v)) fechadas = v; } catch (e) {}
+  secoes.forEach(s => mostrar(s, !fechadas.includes(s.id)));
+  botoes();
+  abrirAlvo(location.hash);
+  secoes.forEach(s => s.querySelector('.sec-tg').addEventListener('click', () => { mostrar(s, s.classList.contains('fechada')); guardar(); }));
+  btExpandir.addEventListener('click', () => { secoes.forEach(s => mostrar(s, true)); guardar(); });
+  btRecolher.addEventListener('click', () => { secoes.forEach(s => mostrar(s, false)); guardar(); });
+  document.addEventListener('click', e => { const a = e.target.closest && e.target.closest('a[href^="#"]'); if (a) abrirAlvo(a.getAttribute('href')); });
+  window.addEventListener('hashchange', () => abrirAlvo(location.hash));
+})();
+
+/* ---------- Modelo ---------- */
+const IA_OPTS = {}; /* provedor, modelo e esforço vêm das Configurações (local.js) */
+let SETORES = ['Atendimento','Vendas','Marketing','Financeiro','Pessoas','Operação','Dados'];
+const METAS = [
+  { k:'receita', n:'Receita', d:'Aumentar receita', p:true },
+  { k:'custo', n:'Custo', d:'Diminuir custo', p:true },
+  { k:'margem', n:'Margem', d:'Aumentar margem', p:true },
+  { k:'risco', n:'Risco', d:'Diminuir risco', p:false },
+  { k:'produtividade', n:'Produtividade', d:'Aumentar produtividade', p:false },
+  { k:'valuation', n:'Valuation', d:'Aumentar valuation/equity', p:false }
+];
+const CRIT = [
+  { k:'manual', n:'Manual', d:'Gente para manter funcionando na mão', peso:4 },
+  { k:'infra', n:'Infra', d:'Muita infra, integração ou tecnologia', peso:3 },
+  { k:'dados', n:'Técnico', d:'Gente técnica para dar continuidade (dados, integração ou IA)', peso:2 },
+  { k:'cultura', n:'Cultura', d:'Mudança de cultura e comportamento', peso:1 }
+];
+const NIVEIS = [ { f:1, l:'Não depende', c:'f1' }, { f:0.5, l:'Em parte', c:'f5' }, { f:0, l:'Depende', c:'f0' } ];
+const FAIXAS = {
+  comecar:{ l:'Começar já', c:'good', r:0 }, destravar:{ l:'Destravar antes', c:'warn', r:1 }, proxima:{ l:'Próxima onda', c:'acc', r:2 },
+  avaliar:{ l:'Avaliar com cuidado', c:'warn', r:3 }, estrutural:{ l:'Projeto estrutural', c:'crit', r:4 },
+  abandonar:{ l:'Abandonar', c:'crit', r:5 }
+};
+const STATUS = { ativa:'No roadmap', execucao:'Em execução', implantada:'Implantada', arquivada:'Arquivada' };
+const AVAL = { atingido:{ l:'Resultado atingido', c:'good' }, parcial:{ l:'Atingido em parte', c:'warn' }, nao:{ l:'Não atingido', c:'crit' } };
+const PERFIL_ITENS = [
+  { k:'crm', l:'Já usa um CRM' },
+  { k:'whatsapp', l:'Tem número na API oficial de um app de mensagens' },
+  { k:'erp', l:'Tem ERP ou sistema financeiro integrado' },
+  { k:'atendimentoDedicado', l:'Tem equipe dedicada de atendimento ou suporte' }
+];
+/* Itens do perfil da v1 que viraram dimensões da régua: só entram no prompt enquanto a dimensão não for avaliada */
+const PERFIL_LEGADO = [
+  { k:'dadosCentralizados', dim:'dados', l:'Os dados dos sistemas já estão centralizados (BI ou data warehouse)' },
+  { k:'pessoaDados', dim:'time', l:'Tem alguém de dados ou BI no time' },
+  { k:'ti', dim:'tecnologia', l:'Tem TI interna ou parceiro para integrações' },
+  { k:'cultura', dim:'cultura', l:'O time costuma adotar ferramentas novas sem resistência' }
+];
+const PORTES = { pequena:'pequena (até 50 pessoas, incluindo campo)', media:'média (50 a 500 pessoas, incluindo campo)', grande:'grande (mais de 500 pessoas, incluindo campo)' };
+const REGUA = [
+  { k:'dados', n:'Dados', peso:0.25, dep:'dados', niveis:[
+    'Dados em planilhas soltas e e-mails, com registros duplicados',
+    'Parte dos dados nos sistemas, sem dono; limpeza manual frequente',
+    'Dados centralizados, com responsável e relatórios confiáveis',
+    'Integração automática e monitorada, com histórico de 2 anos ou mais',
+    'Dados em tempo quase real, com acesso direto pelas áreas'] },
+  { k:'tecnologia', n:'Sistemas e integrações', peso:0.20, dep:'infra', niveis:[
+    'Sistemas antigos, sem integração nem exportação',
+    'Mistura de sistemas; poucas integrações e muita cópia manual',
+    'Sistemas principais com API ou na nuvem; integrações básicas',
+    'Integrações padronizadas (API, n8n, webhooks) e monitoradas',
+    'Integra qualquer sistema rápido; IA já roda em produção'] },
+  { k:'time', n:'Time técnico', peso:0.20, dep:'dados', niveis:[
+    'Ninguém técnico; tudo depende de fornecedor',
+    'TI de suporte; análise de dados só em Excel',
+    'Alguém que programa ou integra e alguém de dados ou BI',
+    'Time de dados e integração, com experiência prática em IA',
+    'Time dedicado de dados e IA, com dono de cada produto'] },
+  { k:'processos', n:'Processos', peso:0.15, dep:'manual', niveis:[
+    'Processos só na cabeça das pessoas',
+    'Alguns escritos, desatualizados e espalhados',
+    'Principais processos documentados, com dono',
+    'Processos com indicadores e exceções documentadas',
+    'Processos mapeados com regras e exceções, prontos para automatizar'] },
+  { k:'orcamento', n:'Orçamento', peso:0.10, dep:'', niveis:[
+    'Nenhuma verba para IA',
+    'Verba pontual, sem compromisso',
+    'Verba definida para pilotos por 12 a 18 meses',
+    'Orçamento de vários anos, incluindo manutenção',
+    'IA é prioridade da diretoria, com verba protegida'] },
+  { k:'cultura', n:'Cultura', peso:0.10, dep:'cultura', niveis:[
+    'Resistência forte; medo de substituição',
+    'Curiosidade, mas mudanças anteriores foram difíceis',
+    'Aberta a ferramentas novas; a liderança comunica a visão',
+    'Melhoria contínua; as pessoas sugerem automações',
+    'Todas as áreas buscam oportunidades de IA'] }
+];
+const PRONT_NIVEIS = [
+  { max:1.5, l:'Não pronta', r:'Cuide primeiro da base digital: dados, sistemas e processos.' },
+  { max:2.0, l:'Estágio inicial', r:'Feche as lacunas de dados e tecnologia antes de investir em IA.' },
+  { max:2.5, l:'Em desenvolvimento', r:'Comece por soluções estreitas e de baixo risco, uma de cada vez.' },
+  { max:3.0, l:'Quase pronta', r:'Base boa: pilotos bem delimitados, um de cada vez.' },
+  { max:3.5, l:'Pronta para pilotos', r:'Pode começar pilotos agora, com escopo bem definido.' },
+  { max:4.0, l:'Pronta para escalar', r:'Pode tocar mais de uma solução ao mesmo tempo.' },
+  { max:4.5, l:'Avançada', r:'Bem posicionada para soluções mais sofisticadas.' },
+  { max:5.1, l:'Referência', r:'Na fronteira do uso de IA no setor.' }
+];
+const NATUREZAS = {
+  ia:'IA', automacao:'Automação', ia_automacao:'IA + automação', processo:'Organizar o processo', treinamento:'Treinamento'
+};
+const CHECKS = [
+  { k:'dado', n:'Dado', d:'A informação necessária existe e dá para ler e gravar nos sistemas?' },
+  { k:'integracoes', n:'Integrações', d:'Os sistemas envolvidos permitem integração?' },
+  { k:'qualidade', n:'Qualidade', d:'O histórico está completo e padronizado o suficiente?' },
+  { k:'regras', n:'Regras', d:'Há exigência legal, fiscal ou regulatória atendida?' }
+];
+const CHK_NIVEIS = [ { v:'ok', l:'OK', c:'f1' }, { v:'parcial', l:'Parcial', c:'f5' }, { v:'falha', l:'Falha', c:'f0' }, { v:'desconhecido', l:'Não sei', c:'fq' } ];
+const DOCS = { sim:'Documentado', parcial:'Documentado em parte', nao:'Não documentado', so_uma_pessoa:'Só uma pessoa sabe' };
+const ENTRADAS = { estruturada:'Entrada estruturada', nao_estruturada:'Entrada não estruturada', misto:'Entrada mista' };
+const CONFS = { medido:'medido', informado:'informado', estimado:'estimado', hipotese:'hipótese' };
+const BASES_REC = { conta:'conta', estimativa:'estimativa', sem_base:'sem base' };
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const fmt = n => Number(n).toLocaleString('pt-BR', { maximumFractionDigits:1 });
+const fmtData = iso => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString('pt-BR'); };
+const fmtDia = ymd => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(ymd || '')); return m ? `${m[3]}/${m[2]}/${m[1]}` : ''; };
+function hojeYMD(){ const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); }
+function snap(v, peso){ const x = Number(v); if (!isFinite(x)) return 0; return [0, peso/2, peso].reduce((a,b) => Math.abs(b-x) < Math.abs(a-x) ? b : a); }
+function nota(it, c){ return snap(it && it.notas ? it.notas[c.k] : 0, c.peso); }
+function total(it){ return CRIT.reduce((s,c) => s + nota(it,c), 0); }
+function metasDe(it){ const m = Array.isArray(it && it.metas) ? it.metas : []; return METAS.filter(x => m.includes(x.k)); }
+function primarias(it){ return metasDe(it).filter(m => m.p).length; }
+function statusDe(it){ return STATUS[it && it.status] ? it.status : 'ativa'; }
+function atrasada(it){ return statusDe(it) === 'execucao' && /^\d{4}-\d{2}-\d{2}$/.test(it.previsao || '') && it.previsao < hojeYMD(); }
+function travas(it){
+  const t = [];
+  const p = it && it.processo || {};
+  const ch = it && it.checagens || {};
+  if (it && it.natureza === 'processo') t.push({ l:'Organizar o processo antes', d:'A solução é organizar o processo. Tecnologia só depois.', c:'lock' });
+  else if (p.documentado === 'so_uma_pessoa') t.push({ l:'Só uma pessoa sabe fazer', d:'Documente e padronize o processo antes de automatizar.', c:'lock' });
+  CHECKS.forEach(c => { if (ch[c.k] === 'falha') t.push({ l:`${c.n} com falha`, d:`Checagem de ${c.n.toLowerCase()} com falha: ${c.d}`, c:'bad' }); });
+  if (ch.regras === 'desconhecido') t.push({ l:'Regra legal sem resposta', d:'Confirme se há exigência legal, fiscal ou regulatória antes de começar.', c:'lock' });
+  return t;
+}
+function faixa(it){
+  if (!metasDe(it).length) return FAIXAS.abandonar;
+  const t = total(it);
+  if (t >= 9) return travas(it).length ? FAIXAS.destravar : FAIXAS.comecar;
+  return t >= 7 ? FAIXAS.proxima : t >= 5 ? FAIXAS.avaliar : FAIXAS.estrutural;
+}
+function ordem(a, b){
+  const r = faixa(a).r - faixa(b).r; if (r) return r;
+  const d = total(b) - total(a); if (d) return d;
+  const p = primarias(b) - primarias(a); if (p) return p;
+  const ga = ganho(a, 'Conservador'), gb = ganho(b, 'Conservador');
+  if (ga !== gb) return (gb == null ? -Infinity : gb) - (ga == null ? -Infinity : ga);
+  return String(a.nome || '').localeCompare(String(b.nome || ''), 'pt-BR');
+}
+
+/* ---------- Linha de base e valor ---------- */
+function toNum(v){
+  if (typeof v === 'number') return isFinite(v) ? v : null;
+  const s = String(v == null ? '' : v).trim().replace(/\s|R\$|%/g, '');
+  if (!s) return null;
+  const milhar = /^\d{1,3}(\.\d{3})+$/.test(s);
+  const n = Number(s.includes(',') || milhar ? s.replace(/\./g, '').replace(',', '.') : s);
+  return isFinite(n) ? n : null;
+}
+function ocorrMes(p){
+  const f = toNum(p.frequencia); if (!(f > 0)) return null;
+  if (p.unidade === 'dia') return f * (toNum(p.diasMes) || 21);
+  if (p.unidade === 'semana') return f * 4.3;
+  return f;
+}
+function cargaH(it){
+  const p = it && it.processo || {};
+  const o = ocorrMes(p), m = toNum(p.minutos);
+  return o != null && m > 0 ? o * m / 60 : null;
+}
+function custoAtual(it){
+  const v = it && it.valor || {};
+  const c = cargaH(it), ch = toNum(v.custoHora);
+  if (c == null || !(ch > 0)) return null;
+  return c * ch + (toNum(v.supervisaoHoras) || 0) * (toNum(v.custoHoraSupervisor) || 0);
+}
+function ganho(it, cen){
+  const ca = custoAtual(it); if (ca == null) return null;
+  const pct = toNum(it.valor && it.valor['pct' + cen]); if (pct == null) return null;
+  return ca * Math.min(Math.max(pct, 0), 100) / 100 - (toNum(it.valor.custoSolucao) || 0);
+}
+const brl = n => 'R$ ' + Math.round(n).toLocaleString('pt-BR');
+function textoCarga(it){
+  const p = it && it.processo || {}, c = cargaH(it);
+  if (c == null) return '';
+  const un = { dia:'por dia', semana:'por semana', mes:'por mês' }[p.unidade] || 'por mês';
+  return `${fmt(c)} h/mês (${fmt(toNum(p.frequencia))} ${un} × ${fmt(toNum(p.minutos))} min)`;
+}
+const porData = campo => (a, b) => String(b[campo] || '').localeCompare(String(a[campo] || '')) || ordem(a, b);
+function ordemExec(a, b){ const x = atrasada(b) - atrasada(a); return x || porData('inicioExecucao')(a, b); }
+function setorOrd(s){ const i = SETORES.indexOf(s); return i < 0 ? 100 : i; }
+function slug(s){
+  const b = String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
+  return b || 'solucao';
+}
+const plural = (n, um, varios) => n === 1 ? `1 ${um}` : `${n} ${varios}`;
+
+/* ---------- Estado ---------- */
+let items = [];
+let perfil = null;
+let perfilSujo = false;
+let view = 'setor';
+let busca = '';
+let filtroSetor = '';
+let db = null;
+let sample = null;
+let downloads = null;
+let canWrite = true;
+let loaded = false;
+let dbState = 'loading';
+let editId = null;
+let iaCtl = null;
+let recCtl = null;
+let propostas = null;
+let iaAtual = null;
+let motivosU = {};
+let reCtl = null;
+let proximaId = null;
+function limiteExec(){ const n = Number(perfil && perfil.limiteExec); return n >= 1 && n <= 4 ? n : 1; }
+
+try { const v = localStorage.getItem('ranking-ia-view'); if (v === 'geral' || v === 'setor') view = v; } catch (e) {}
+try { filtroSetor = localStorage.getItem('ranking-ia-setor') || ''; } catch (e) {}
+
+/* ---------- Render das linhas ---------- */
+const ACOES = {
+  ativa:     [['editar','Editar'], ['iniciar','Iniciar execução','go'], ['arquivar','Arquivar'], ['excluir','Excluir','danger']],
+  execucao:  [['editar','Editar'], ['implantar','Marcar como implantada','go'], ['voltar-roadmap','Voltar ao roadmap'], ['arquivar','Arquivar'], ['excluir','Excluir','danger']],
+  implantada:[['editar','Editar'], ['voltar-execucao','Voltar para execução'], ['arquivar','Arquivar'], ['excluir','Excluir','danger']],
+  arquivada: [['restaurar','Restaurar','go'], ['excluir','Excluir','danger']]
+};
+function rowHTML(it, pos, modo){
+  const fx = faixa(it), t = total(it), out = !metasDe(it).length;
+  const metas = metasDe(it).map(m => `<span class="mt${m.p ? ' p' : ''}" title="${esc(m.d)}">${esc(m.n)}</span>`).join('');
+  const crit = CRIT.map(c => {
+    const v = nota(it, c), f = v / c.peso;
+    const temIA = it.ia && it.ia.dependencias;
+    const iaV = temIA ? snap(it.ia.dependencias[c.k], 1) * c.peso : null;
+    const adj = iaV !== null && iaV !== v;
+    const motU = adj && it.motivosUsuario ? it.motivosUsuario['dep:' + c.k] : '';
+    const motIA = temIA && it.ia.motivos && it.ia.motivos.dependencias ? it.ia.motivos.dependencias[c.k] : '';
+    const tip = adj ? `${c.d}. Ajustado por você (IA: ${nivelL(iaV, c.peso)}).${motU ? ' Seu motivo: ' + motU : ''}` : (motIA ? `${c.d}. IA: ${motIA}` : c.d);
+    return `<div class="cr" title="${esc(tip)}"><span class="n">${c.n}${adj ? ' <span class="adj">✎</span>' : ''}</span><span class="bar"><i class="${f > 0 && f < 1 ? 'h' : ''}" style="width:${f * 100}%"></i></span><span class="v${v === 0 ? ' z' : ''}">${fmt(v)}/${c.peso}</span></div>`;
+  }).join('');
+  const acts = (canWrite && db)
+    ? `<div class="acts">${ACOES[modo].map(([a, l, cls]) => `<button type="button" class="btn-s${cls ? ' ' + cls : ''}" data-act="${a}" data-id="${esc(it.id)}">${l}</button>`).join('')}</div>`
+    : '';
+  let pill;
+  if (modo === 'ativa') pill = `<span class="st ${fx.c}"><span class="dot"></span>${fx.l}</span>${it.id === proximaId ? '<span class="st acc"><span class="dot"></span>Próxima da fila</span>' : ''}`;
+  else if (modo === 'execucao') pill = atrasada(it) ? `<span class="st crit"><span class="dot"></span>Atrasada</span>` : `<span class="st acc"><span class="dot"></span>Em execução</span>`;
+  else if (modo === 'implantada') pill = `<span class="st good"><span class="dot"></span>Implantada</span>`;
+  else pill = `<span class="st mute"><span class="dot"></span>Arquivada${it.statusAnterior && it.statusAnterior !== 'ativa' && STATUS[it.statusAnterior] ? ' · era ' + STATUS[it.statusAnterior].toLowerCase() : ''}</span>`;
+  const setorPill = (modo !== 'ativa' || view === 'geral') ? `<span class="mt">${esc(it.setor || 'Sem área')}</span>` : '';
+
+  const info = [];
+  if (modo === 'execucao' && it.inicioExecucao) info.push(`Em execução desde <b>${fmtData(it.inicioExecucao)}</b>`);
+  if (modo === 'implantada' && it.implantadaEm) info.push(`Implantada em <b>${fmtData(it.implantadaEm)}</b>`);
+  if (it.responsavel) info.push(`Responsável: <b>${esc(it.responsavel)}</b>`);
+  if (it.previsao && modo !== 'implantada') info.push(atrasada(it) ? `<span class="late">Previsão: ${fmtDia(it.previsao)} (vencida)</span>` : `Previsão: <b>${fmtDia(it.previsao)}</b>`);
+
+  const facts = factsHTML(it, modo);
+  let resu = '';
+  if (modo === 'execucao' || modo === 'implantada') {
+    const m = it.medicao || {};
+    const linhas = [];
+    if (m.indicador) linhas.push(`<p><b>Indicador:</b> ${esc(m.indicador)}${m.metodo ? ` · <b>Método:</b> ${esc(m.metodo)}` : ''}</p>`);
+    if (m.base || it.resultadoEsperado) linhas.push(`<p>${m.base ? `<b>Hoje:</b> ${esc(m.base)}` : ''}${m.base && it.resultadoEsperado ? ' → ' : ''}${it.resultadoEsperado ? `<b>Meta:</b> ${esc(it.resultadoEsperado)}` : ''}${toNum(m.prazoDias) > 0 ? ` em ${fmt(toNum(m.prazoDias))} dias` : ''}</p>`);
+    if (m.conservador || m.provavel || m.otimista) linhas.push(`<p><b>Conservador:</b> ${esc(m.conservador || '–')} · Provável: ${esc(m.provavel || '–')} · Otimista: ${esc(m.otimista || '–')}</p>`);
+    const pills = [];
+    if (modo === 'implantada') {
+      const av = AVAL[it.resultadoAvaliacao];
+      pills.push(av ? `<span class="st ${av.c}"><span class="dot"></span>${av.l}</span>` : `<span class="st warn"><span class="dot"></span>Resultado ainda não medido</span>`);
+      if (it.resultadoMedido) linhas.push(`<p><b>Medido:</b> ${esc(it.resultadoMedido)}</p>`);
+    } else {
+      if (!m.indicador) pills.push(`<span class="st warn"><span class="dot"></span>Sem plano de medição</span>`);
+      if (!(it.processo && it.processo.baseValidada)) pills.push(`<span class="st warn"><span class="dot"></span>Linha de base a validar com quem executa</span>`);
+    }
+    if (linhas.length || pills.length) resu = `<div class="plano"><p class="pk">Plano de medição</p>${pills.join('')}${linhas.join('') || '<p>Defina indicador, linha de base, meta e prazo em Editar.</p>'}</div>`;
+  }
+
+  return `<article class="sol">
+    <div><div class="score ${fx.c}${out ? ' out' : ''}"><b>${fmt(t)}</b><span>de 10</span></div>${pos ? `<div class="pos">#${pos}</div>` : ''}</div>
+    <div class="sol-main">
+      <div class="sol-top"><h4>${esc(it.nome || 'Sem nome')}</h4>${pill}${setorPill}</div>
+      ${info.length ? `<p class="when">${info.join(' · ')}</p>` : ''}
+      ${it.descricao ? `<p class="sol-desc">${esc(it.descricao)}</p>` : ''}
+      ${it.resolve ? `<p class="sol-res"><span>Resolve</span>${esc(it.resolve)}</p>` : ''}
+      <div class="chips">${metas || '<span class="mt">Nenhuma meta</span>'}</div>
+      ${facts}
+      ${it.justificativa ? `<p class="sol-why">${esc(it.justificativa)}</p>` : ''}
+      ${resu}
+    </div>
+    <div class="notas-col">${crit}<div class="tot"><span>Total</span><span>${fmt(t)} / 10</span></div></div>
+    ${acts}
+  </article>`;
+}
+
+function factsHTML(it, modo){
+  const f = [];
+  if (NATUREZAS[it.natureza]) f.push(`<span class="fact" title="Natureza da solução">${NATUREZAS[it.natureza]}</span>`);
+  const p = it.processo || {};
+  if (DOCS[p.documentado] && p.documentado !== 'so_uma_pessoa') f.push(`<span class="fact">${DOCS[p.documentado]}</span>`);
+  if (ENTRADAS[p.entrada]) f.push(`<span class="fact">${ENTRADAS[p.entrada]}</span>`);
+  const c = cargaH(it);
+  const selo = CONFS[p.confianca] ? `<span class="selo">${CONFS[p.confianca]}</span>` : '';
+  if (c != null) f.push(`<span class="fact" title="${esc(textoCarga(it))}">Carga <b>${fmt(c)} h/mês</b>${selo}</span>`);
+  const gc = ganho(it, 'Conservador'), gp = ganho(it, 'Provavel'), ca = custoAtual(it);
+  if (gc != null || gp != null) {
+    const faixaTxt = gc != null && gp != null && Math.round(gp) !== Math.round(gc) ? `${brl(gc)} a ${brl(gp)}` : brl(gc != null ? gc : gp);
+    f.push(`<span class="fact money" title="Ganho de custo por mês: ${gc != null ? 'conservador ' + brl(gc) : ''}${gp != null ? ' · provável ' + brl(gp) : ''}. Teto (custo atual): ${brl(ca)}">Ganho <b>${faixaTxt}/mês</b>${selo}</span>`);
+  } else if (ca != null) {
+    f.push(`<span class="fact" title="Custo atual do processo: é o teto do ganho de custo">Custo atual <b>${brl(ca)}/mês</b>${selo}</span>`);
+  }
+  const rec = toNum(it.valor && it.valor.receita);
+  if (rec > 0) f.push(`<span class="fact" title="Ganho de receita informado; não validado e nunca somado ao custo">Receita <b>${brl(rec)}/mês</b><span class="selo">não validado${BASES_REC[it.valor.baseReceita] ? ' · ' + BASES_REC[it.valor.baseReceita] : ''}</span></span>`);
+  if (modo !== 'implantada' && modo !== 'arquivada') travas(it).forEach(t => f.push(`<span class="fact ${t.c}" title="${esc(t.d)}">${esc(t.l)}</span>`));
+  return f.length ? `<div class="facts">${f.join('')}</div>` : '';
+}
+
+/* ---------- Render geral ---------- */
+function render(){
+  const roadmap = items.filter(i => statusDe(i) === 'ativa');
+  const exec = items.filter(i => statusDe(i) === 'execucao');
+  const impl = items.filter(i => statusDe(i) === 'implantada');
+  const arquivadas = items.filter(i => statusDe(i) === 'arquivada').sort(ordem);
+  const vivas = items.filter(i => statusDe(i) !== 'arquivada');
+  const atrasadas = exec.filter(atrasada).length;
+  const lim = limiteExec();
+  const prox = roadmap.filter(i => faixa(i) === FAIXAS.comecar).sort(ordem)[0];
+  proximaId = prox ? prox.id : null;
+
+  const pr = prontidao(perfil && perfil.regua);
+  $('#k-pront').innerHTML = pr ? `${fmt(pr.score)} <small>de 5</small>` : '–';
+  $('#k-pront').classList.toggle('alert', !!(pr && pr.bloqueios.length));
+
+  const ls = $('#f-limite');
+  ls.value = String(lim);
+  ls.disabled = !(db && canWrite && loaded);
+
+  if (loaded) {
+    const comecar = roadmap.filter(i => faixa(i) === FAIXAS.comecar).length;
+    const media = roadmap.length ? roadmap.reduce((s,i) => s + total(i), 0) / roadmap.length : 0;
+    $('#k-roadmap').textContent = roadmap.length;
+    $('#k-comecar').textContent = comecar;
+    $('#k-exec').innerHTML = `${exec.length} <small>de ${lim}</small>`;
+    $('#k-exec').classList.toggle('alert', exec.length > lim);
+    const fila = $('#fila');
+    if (exec.length > lim) fila.innerHTML = `<span class="over">${exec.length} soluções em execução, acima do limite de ${lim}.</span> Conclua ou devolva ao roadmap antes de iniciar outra.`;
+    else if (exec.length === lim) fila.innerHTML = `Limite atingido (${exec.length} de ${lim}).${prox ? ` Quando uma entrar em uso, a próxima da fila é <b>${esc(prox.nome)}</b> (${fmt(total(prox))}).` : ''}`;
+    else fila.innerHTML = prox ? `Há espaço para iniciar ${plural(lim - exec.length, 'solução', 'soluções')}. Próxima da fila: <b>${esc(prox.nome)}</b> (${esc(prox.setor || 'sem área')}, nota ${fmt(total(prox))}).` : `Há espaço para iniciar ${plural(lim - exec.length, 'solução', 'soluções')}, mas nenhuma do roadmap está em "Começar já" sem trava.`;
+    $('#k-atraso').textContent = atrasadas;
+    $('#k-atraso').classList.toggle('alert', atrasadas > 0);
+    $('#k-impl').textContent = impl.length;
+    $('#k-media').innerHTML = roadmap.length ? `${fmt(media)} <small>de 10</small>` : '–';
+    $('#b-comecar').textContent = plural(comecar, 'solução para começar já', 'soluções para começar já');
+    $('#b-exec').textContent = plural(exec.length, 'em execução', 'em execução');
+    $('#b-impl').textContent = plural(impl.length, 'implantada', 'implantadas');
+    $('#b-atraso').hidden = !atrasadas;
+    $('#b-atraso-t').textContent = plural(atrasadas, 'atrasada', 'atrasadas');
+  } else {
+    $('#b-comecar').textContent = dbState === 'off' ? 'Banco indisponível' : 'Carregando…';
+  }
+  const bm = $('#b-modo');
+  if (db && !canWrite) { bm.hidden = false; $('#b-modo-t').textContent = 'Somente leitura'; } else bm.hidden = true;
+  $('#btn-nova').hidden = !(db && canWrite && loaded);
+  $('#btn-csv').hidden = !(downloads && loaded && items.length);
+
+  const setores = [...new Set([...SETORES, ...items.map(i => i.setor).filter(Boolean)])].sort((a,b) => setorOrd(a) - setorOrd(b) || a.localeCompare(b, 'pt-BR'));
+  $('#dl-setores').innerHTML = setores.map(s => `<option value="${esc(s)}"></option>`).join('');
+
+  const setoresVivos = [...new Set(vivas.map(i => i.setor || 'Sem área'))].sort((a,b) => setorOrd(a) - setorOrd(b) || a.localeCompare(b, 'pt-BR'));
+  if (loaded && filtroSetor && !setoresVivos.includes(filtroSetor)) filtroSetor = '';
+  const fs = $('#filtro-setor');
+  fs.innerHTML = `<option value="">Todas as áreas</option>` + setoresVivos.map(s => {
+    const n = vivas.filter(i => (i.setor || 'Sem área') === s).length;
+    return `<option value="${esc(s)}">${esc(s)} (${n})</option>`;
+  }).join('');
+  fs.value = filtroSetor;
+
+  $('#v-setor').setAttribute('aria-pressed', view === 'setor');
+  $('#v-geral').setAttribute('aria-pressed', view === 'geral');
+
+  const q = busca.trim().toLowerCase();
+  const filtrar = arr => arr
+    .filter(i => !filtroSetor || (i.setor || 'Sem área') === filtroSetor)
+    .filter(i => !q || [i.nome, i.descricao, i.resolve, i.setor, i.responsavel].join(' ').toLowerCase().includes(q));
+  const filtrando = !!(filtroSetor || q);
+  const contagem = (vis, tot) => filtrando ? `${vis} de ${tot}` : plural(tot, 'solução', 'soluções');
+
+  const lista = $('#lista'), lExec = $('#lista-exec'), lImpl = $('#lista-impl');
+  if (!loaded) {
+    let msg;
+    if (dbState === 'off') msg = `<div class="empty"><strong>O servidor local não respondeu.</strong>Confira se a janela do iniciar.cmd continua aberta e recarregue a página.</div>`;
+    else if (dbState === 'error') msg = `<div class="empty"><strong>Não foi possível ler as soluções.</strong>Recarregue a página em alguns instantes.</div>`;
+    else if (dbState === 'slow') msg = `<div class="empty"><strong>O banco ainda não respondeu.</strong>A lista aparece aqui assim que a conexão voltar.</div>`;
+    else msg = `<div class="empty"><strong>Carregando as soluções…</strong>A lista aparece aqui assim que o banco da página responder.</div>`;
+    lista.innerHTML = msg; lExec.innerHTML = ''; lImpl.innerHTML = '';
+  } else {
+    const semFiltro = `<div class="empty"><strong>Nenhuma solução com esses filtros.</strong>Troque a área ou o termo de busca.</div>`;
+
+    const vis = filtrar(roadmap).sort(ordem);
+    $('#c-roadmap').textContent = contagem(vis.length, roadmap.length);
+    if (!roadmap.length) {
+      lista.innerHTML = `<div class="empty"><strong>Nenhuma solução no roadmap.</strong>${canWrite ? 'Clique em “+ Nova solução” para cadastrar, ou restaure uma arquivada.' : 'Ainda não há soluções cadastradas.'}</div>`;
+    } else if (!vis.length) {
+      lista.innerHTML = semFiltro;
+    } else if (view === 'geral') {
+      lista.innerHTML = `<div class="sol-list">${vis.map((it, i) => rowHTML(it, i + 1, 'ativa')).join('')}</div>`;
+    } else {
+      const grupos = new Map();
+      vis.forEach(it => { const s = it.setor || 'Sem área'; if (!grupos.has(s)) grupos.set(s, []); grupos.get(s).push(it); });
+      const keys = [...grupos.keys()].sort((a,b) => setorOrd(a) - setorOrd(b) || a.localeCompare(b, 'pt-BR'));
+      lista.innerHTML = keys.map(s => {
+        const g = grupos.get(s);
+        const med = g.reduce((a,i) => a + total(i), 0) / g.length;
+        return `<div class="grp"><div class="grp-h"><h3>${esc(s)}</h3><span class="meta-inline">${plural(g.length, 'solução', 'soluções')} · média ${fmt(med)}</span></div><div class="sol-list">${g.map(it => rowHTML(it, 0, 'ativa')).join('')}</div></div>`;
+      }).join('');
+    }
+
+    const vExec = filtrar(exec).sort(ordemExec);
+    $('#c-exec').textContent = contagem(vExec.length, exec.length);
+    lExec.innerHTML = !exec.length
+      ? `<div class="empty"><strong>Nenhuma solução em execução.</strong>Use “Iniciar execução” numa solução do roadmap.</div>`
+      : !vExec.length ? semFiltro
+      : `<div class="sol-list">${vExec.map(it => rowHTML(it, 0, 'execucao')).join('')}</div>`;
+
+    const vImpl = filtrar(impl).sort(porData('implantadaEm'));
+    $('#c-impl').textContent = contagem(vImpl.length, impl.length);
+    lImpl.innerHTML = !impl.length
+      ? `<div class="empty"><strong>Nenhuma solução implantada ainda.</strong>Use “Marcar como implantada” quando uma solução em execução entrar em operação.</div>`
+      : !vImpl.length ? semFiltro
+      : `<div class="sol-list">${vImpl.map(it => rowHTML(it, 0, 'implantada')).join('')}</div>`;
+  }
+
+  $('#arch-sum').textContent = arquivadas.length ? plural(arquivadas.length, 'solução arquivada', 'soluções arquivadas') : 'Nenhuma solução arquivada';
+  $('#arch-lista').innerHTML = arquivadas.length ? `<div class="sol-list">${arquivadas.map(it => rowHTML(it, 0, 'arquivada')).join('')}</div>` : `<p class="muted" style="font-size:13.5px;padding:0 18px 16px;margin:0">Use “Arquivar” numa solução para tirá-la das listas sem perdê-la.</p>`;
+
+  renderPerfil();
+}
+
+/* ---------- Toast ---------- */
+let toastT = null;
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 3200); }
+
+/* ---------- Ações nas linhas ---------- */
+function onRowClick(e){
+  const b = e.target.closest('button[data-act]'); if (!b || !db) return;
+  const id = b.dataset.id, act = b.dataset.act;
+  const it = items.find(i => i.id === id); if (!it) return;
+  const agora = new Date().toISOString();
+  if (act === 'editar') return abrirEditor(id);
+  if (act === 'iniciar') {
+    const nExec = items.filter(i => statusDe(i) === 'execucao').length, lim = limiteExec();
+    const avisos = [];
+    if (nExec >= lim) avisos.push(`já há ${nExec} em execução e o limite é ${lim}`);
+    const tv = travas(it);
+    if (tv.length) avisos.push('trava: ' + tv.map(t => t.l.toLowerCase()).join(', '));
+    if (avisos.length && b.dataset.confirm !== '1') {
+      b.dataset.confirm = '1'; b.classList.add('confirm'); b.textContent = 'Iniciar mesmo assim?';
+      toast('Atenção: ' + avisos.join('; ') + '.');
+      setTimeout(() => { if (b.isConnected) { b.dataset.confirm = ''; b.classList.remove('confirm'); b.textContent = 'Iniciar execução'; } }, 5000);
+      return;
+    }
+    return mover(id, { status:'execucao', inicioExecucao: agora }, 'Solução em execução. Defina responsável, previsão e plano de medição em Editar.');
+  }
+  if (act === 'implantar') return mover(id, { status:'implantada', implantadaEm: agora }, 'Solução marcada como implantada. Registre o resultado em Editar.');
+  if (act === 'voltar-roadmap') return mover(id, { status:'ativa' }, 'Solução voltou ao roadmap');
+  if (act === 'voltar-execucao') return mover(id, { status:'execucao' }, 'Solução voltou para execução');
+  if (act === 'arquivar') return mover(id, { status:'arquivada', statusAnterior: statusDe(it) }, 'Solução arquivada');
+  if (act === 'restaurar') {
+    const volta = STATUS[it.statusAnterior] && it.statusAnterior !== 'arquivada' ? it.statusAnterior : 'ativa';
+    return mover(id, { status: volta, statusAnterior: null }, `Solução restaurada: ${STATUS[volta].toLowerCase()}`);
+  }
+  if (act === 'excluir') {
+    if (b.dataset.confirm !== '1') {
+      b.dataset.confirm = '1'; b.classList.add('confirm'); b.textContent = 'Confirmar exclusão';
+      setTimeout(() => { if (b.isConnected) { b.dataset.confirm = ''; b.classList.remove('confirm'); b.textContent = 'Excluir'; } }, 4000);
+      return;
+    }
+    b.disabled = true;
+    db.collection('solucoes').doc(id).delete().then(() => toast('Solução excluída')).catch(err => { b.disabled = false; falhaEscrita(err); });
+  }
+}
+async function mover(id, campos, msg){
+  try { await db.collection('solucoes').doc(id).update(Object.assign({}, campos, { atualizadoEm: new Date().toISOString() })); toast(msg); }
+  catch (err) { falhaEscrita(err); }
+}
+function falhaEscrita(err){
+  const code = err && err.code;
+  if (code === 'invalid_argument' && canWrite !== true) { canWrite = false; render(); toast('Só quem edita a página pode alterar as soluções.'); return; }
+  if (code === 'quota_exceeded') { toast('O banco da página está cheio. Exclua soluções que não usa mais.'); return; }
+  if (code === 'revoked' || code === 'not_granted') { toast('O acesso à edição foi retirado nesta visualização.'); return; }
+  toast('Não foi possível salvar a alteração. Tente de novo em instantes.');
+}
+
+/* ---------- Editor ---------- */
+function montarEditor(){
+  $('#tg-p').innerHTML = METAS.filter(m => m.p).map(m => `<label data-tip="meta:${m.k}"><input type="checkbox" name="meta" value="${m.k}" id="m-${m.k}"><span>${m.n}</span></label>`).join('');
+  $('#tg-s').innerHTML = METAS.filter(m => !m.p).map(m => `<label data-tip="meta:${m.k}"><input type="checkbox" name="meta" value="${m.k}" id="m-${m.k}"><span>${m.n}</span></label>`).join('');
+  $('#deps').innerHTML = CRIT.map(c => `<div class="dep" data-tip="dep:${c.k}"><div class="q">${esc(c.d)}?<small>peso ${c.peso}</small></div><div class="rad" role="radiogroup" aria-label="${esc(c.d)}">${NIVEIS.map(nv => `<label><input type="radio" name="c-${c.k}" id="c-${c.k}-${nv.c}" value="${nv.f * c.peso}"><span class="${nv.c}">${nv.l} · ${fmt(nv.f * c.peso)}</span></label>`).join('')}</div></div>`).join('');
+  $('#chks').innerHTML = CHECKS.map(c => `<div class="dep" data-tip="chk:${c.k}"><div class="q">${esc(c.n)}<small>${esc(c.d)}</small></div><div class="rad" role="radiogroup" aria-label="${esc(c.n)}">${CHK_NIVEIS.map(nv => `<label><input type="radio" name="k-${c.k}" value="${nv.v}"><span class="${nv.c}">${nv.l}</span></label>`).join('')}</div></div>`).join('');
+}
+const vNum = sel => { const n = toNum($(sel).value); return n == null ? null : n; };
+function lerForm(){
+  const notas = {};
+  CRIT.forEach(c => { const r = document.querySelector(`input[name="c-${c.k}"]:checked`); notas[c.k] = r ? Number(r.value) : 0; });
+  const checagens = {};
+  CHECKS.forEach(c => { const r = document.querySelector(`input[name="k-${c.k}"]:checked`); if (r) checagens[c.k] = r.value; });
+  const un = ['dia','semana','mes'].includes($('#p-un').value) ? $('#p-un').value : 'mes';
+  return {
+    nome: $('#f-nome').value.trim(), setor: $('#f-setor').value.trim(),
+    descricao: $('#f-desc').value.trim(), resolve: $('#f-res').value.trim(),
+    natureza: NATUREZAS[$('#f-nat').value] ? $('#f-nat').value : '',
+    metas: [...document.querySelectorAll('input[name="meta"]:checked')].map(i => i.value),
+    notas, justificativa: $('#f-just').value.trim(),
+    processo: {
+      executor: $('#p-exec').value.trim(),
+      documentado: DOCS[$('#p-doc').value] ? $('#p-doc').value : '',
+      entrada: ENTRADAS[$('#p-ent').value] ? $('#p-ent').value : '',
+      frequencia: vNum('#p-freq'), unidade: un, diasMes: un === 'dia' ? Number($('#p-dias').value) || 21 : null,
+      minutos: vNum('#p-min'),
+      confianca: CONFS[$('#p-conf').value] ? $('#p-conf').value : '',
+      baseValidada: $('#p-valid').checked
+    },
+    checagens,
+    valor: {
+      custoHora: vNum('#v-ch'), supervisaoHoras: vNum('#v-sup'), custoHoraSupervisor: vNum('#v-chs'),
+      pctConservador: vNum('#v-pc'), pctProvavel: vNum('#v-pp'), custoSolucao: vNum('#v-cs'),
+      receita: vNum('#v-rec'), baseReceita: BASES_REC[$('#v-brec').value] ? $('#v-brec').value : ''
+    },
+    medicao: {
+      indicador: $('#m-ind').value.trim(), metodo: $('#m-met').value.trim(), base: $('#m-base').value.trim(),
+      prazoDias: vNum('#m-prazo'), conservador: $('#m-con').value.trim(), provavel: $('#m-pro').value.trim(), otimista: $('#m-oti').value.trim()
+    },
+    responsavel: $('#f-resp').value.trim(), previsao: $('#f-prev').value || '',
+    resultadoEsperado: $('#f-esp').value.trim(), resultadoMedido: $('#f-med').value.trim(),
+    resultadoAvaliacao: AVAL[$('#f-aval').value] ? $('#f-aval').value : ''
+  };
+}
+const numTxt = v => { const n = toNum(v); return n == null ? '' : String(n).replace('.', ','); };
+function preencherV2(it){
+  const p = it.processo || {}, v = it.valor || {}, m = it.medicao || {}, ch = it.checagens || {};
+  $('#f-nat').value = NATUREZAS[it.natureza] ? it.natureza : '';
+  $('#p-exec').value = p.executor || ''; $('#p-doc').value = DOCS[p.documentado] ? p.documentado : '';
+  $('#p-ent').value = ENTRADAS[p.entrada] ? p.entrada : '';
+  $('#p-freq').value = numTxt(p.frequencia); $('#p-un').value = ['dia','semana','mes'].includes(p.unidade) ? p.unidade : 'mes';
+  $('#p-dias').value = ['21','26','30'].includes(String(p.diasMes)) ? String(p.diasMes) : '21';
+  $('#p-min').value = numTxt(p.minutos); $('#p-conf').value = CONFS[p.confianca] ? p.confianca : '';
+  $('#p-valid').checked = !!p.baseValidada;
+  CHECKS.forEach(c => document.querySelectorAll(`input[name="k-${c.k}"]`).forEach(r => { r.checked = r.value === ch[c.k]; }));
+  $('#v-ch').value = numTxt(v.custoHora); $('#v-sup').value = numTxt(v.supervisaoHoras); $('#v-chs').value = numTxt(v.custoHoraSupervisor);
+  $('#v-pc').value = numTxt(v.pctConservador); $('#v-pp').value = numTxt(v.pctProvavel); $('#v-cs').value = numTxt(v.custoSolucao);
+  $('#v-rec').value = numTxt(v.receita); $('#v-brec').value = BASES_REC[v.baseReceita] ? v.baseReceita : '';
+  $('#m-ind').value = m.indicador || ''; $('#m-met').value = m.metodo || ''; $('#m-base').value = m.base || '';
+  $('#m-prazo').value = numTxt(m.prazoDias); $('#m-con').value = m.conservador || ''; $('#m-pro').value = m.provavel || ''; $('#m-oti').value = m.otimista || '';
+  $('#sec-proc').open = !!(p.frequencia || p.documentado || p.executor);
+  $('#sec-chk').open = Object.keys(ch).length > 0;
+  $('#sec-valor').open = !!(v.custoHora || v.receita);
+  $('#sec-med').open = !!(m.indicador || it.resultadoEsperado) || ['execucao','implantada'].includes(statusDe(it));
+}
+function atualizarV2(f){
+  $('#fld-dias').style.visibility = f.processo.unidade === 'dia' ? 'visible' : 'hidden';
+  const c = cargaH(f);
+  $('#calc-carga').innerHTML = c != null ? `Carga: <b>${esc(textoCarga(f))}</b>` : 'Informe quantas vezes acontece e quantos minutos leva para calcular a carga mensal.';
+  const ca = custoAtual(f), gc = ganho(f, 'Conservador'), gp = ganho(f, 'Provavel');
+  let vt;
+  if (c == null) vt = 'Preencha o processo e a linha de base para calcular o valor.';
+  else if (ca == null) vt = 'Informe o custo-hora de quem executa para calcular o custo atual.';
+  else {
+    vt = `Custo atual (teto do ganho): <b>${brl(ca)}/mês</b>.`;
+    if (gc != null || gp != null) vt += ` Ganho de custo: conservador <b>${gc != null ? brl(gc) : '–'}</b>, provável <b>${gp != null ? brl(gp) : '–'}</b> por mês.`;
+    if (toNum(f.valor.pctConservador) > 100 || toNum(f.valor.pctProvavel) > 100) vt += ' Percentuais acima de 100% são limitados a 100%.';
+    if (gc != null && gc <= 0) vt += ' O cenário conservador não se paga: o custo da solução supera a economia.';
+  }
+  $('#calc-valor').innerHTML = vt;
+  const tv = travas(f);
+  $('#travas-live').innerHTML = tv.map(t => `<span class="fact ${t.c}" title="${esc(t.d)}">${esc(t.l)}</span>`).join('');
+  $('#sr-proc').textContent = c != null ? `${fmt(c)} h/mês${CONFS[f.processo.confianca] ? ' · ' + CONFS[f.processo.confianca] : ''}` : 'não preenchido';
+  const nChk = Object.keys(f.checagens).length;
+  $('#sr-chk').textContent = nChk ? CHECKS.map(k => `${k.n}: ${(CHK_NIVEIS.find(x => x.v === f.checagens[k.k]) || { l:'–' }).l}`).join(' · ') : 'não avaliadas';
+  $('#sr-valor').textContent = gc != null ? `conservador ${brl(gc)}/mês` : ca != null ? `custo atual ${brl(ca)}/mês` : 'não preenchido';
+  $('#sr-med').textContent = f.medicao.indicador ? f.medicao.indicador.slice(0, 50) : 'sem indicador';
+}
+function preencher(it){
+  $('#f-nome').value = it.nome || ''; $('#f-setor').value = it.setor || '';
+  $('#f-desc').value = it.descricao || ''; $('#f-res').value = it.resolve || '';
+  $('#f-just').value = it.justificativa || '';
+  $('#f-resp').value = it.responsavel || ''; $('#f-prev').value = /^\d{4}-\d{2}-\d{2}$/.test(it.previsao || '') ? it.previsao : '';
+  $('#f-esp').value = it.resultadoEsperado || ''; $('#f-med').value = it.resultadoMedido || '';
+  $('#f-aval').value = AVAL[it.resultadoAvaliacao] ? it.resultadoAvaliacao : '';
+  const st = statusDe(it); $('#f-status').value = st === 'arquivada' ? 'ativa' : st;
+  const ms = Array.isArray(it.metas) ? it.metas : [];
+  document.querySelectorAll('input[name="meta"]').forEach(i => { i.checked = ms.includes(i.value); });
+  CRIT.forEach(c => {
+    const v = snap(it.notas ? it.notas[c.k] : 0, c.peso);
+    document.querySelectorAll(`input[name="c-${c.k}"]`).forEach(r => { r.checked = Number(r.value) === v; });
+  });
+  preencherV2(it);
+  atualizarLive();
+}
+function atualizarLive(){
+  const f = lerForm(), fx = faixa(f);
+  $('#live-t').textContent = fmt(total(f));
+  const lf = $('#live-f'); lf.className = 'st ' + fx.c; lf.innerHTML = `<span class="dot"></span>${fx.l}`;
+  $('#live-w').hidden = f.metas.length > 0;
+  $('#grp-medido').hidden = $('#f-status').value !== 'implantada';
+  atualizarV2(f);
+}
+function abrirEditor(id){
+  editId = id || null;
+  const it = id ? items.find(i => i.id === id) : null;
+  $('#dlg-k').textContent = it ? 'Editar solução' : 'Nova solução';
+  $('#dlg-t').textContent = it ? (it.nome || 'Solução') : 'Cadastrar solução';
+  preencher(it || { setor: filtroSetor || '', status:'ativa', notas: { manual:0, infra:0, dados:0, cultura:0 }, metas: [] });
+  iaAtual = it && it.ia && it.ia.dependencias ? JSON.parse(JSON.stringify(it.ia)) : null;
+  motivosU = Object.assign({}, it && it.motivosUsuario);
+  renderDiverg();
+  $('#f-err').textContent = ''; setIA('', false);
+  $('#ia-box').hidden = !sample;
+  const d = $('#dlg');
+  if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', '');
+  setTimeout(() => $('#f-nome').focus(), 30);
+}
+function fecharEditor(){
+  if (iaCtl) { iaCtl.abort(); iaCtl = null; }
+  if (reCtl) { reCtl.abort(); reCtl = null; }
+  esconderTip();
+  const d = $('#dlg'); if (d.open) d.close();
+}
+async function salvar(e){
+  e.preventDefault();
+  const f = lerForm();
+  if (!f.nome) { $('#f-err').textContent = 'Dê um nome à solução.'; $('#f-nome').focus(); return; }
+  if (!f.setor) { $('#f-err').textContent = 'Escolha ou digite a área.'; $('#f-setor').focus(); return; }
+  const prev = editId ? items.find(i => i.id === editId) : null;
+  const id = editId || (slug(f.nome) + '-' + Math.random().toString(36).slice(2, 6));
+  const agora = new Date().toISOString();
+  const novoStatus = $('#f-status').value in STATUS ? $('#f-status').value : 'ativa';
+  const antigo = prev ? statusDe(prev) : null;
+  const body = Object.assign({}, prev || {}, f, {
+    status: novoStatus,
+    origem: prev && prev.origem ? prev.origem : 'cadastrada',
+    criadoEm: prev && prev.criadoEm ? prev.criadoEm : agora,
+    atualizadoEm: agora
+  });
+  delete body.id;
+  const divKeys = new Set(divergencias(f, iaAtual).map(d => d.key));
+  body.motivosUsuario = Object.fromEntries(Object.entries(motivosU).filter(([k, v]) => divKeys.has(k) && String(v || '').trim()).map(([k, v]) => [k, String(v).trim().slice(0, 400)]));
+  if (iaAtual) body.ia = iaAtual; else delete body.ia;
+  if (novoStatus === 'execucao' && (antigo !== 'execucao' || !body.inicioExecucao)) body.inicioExecucao = antigo === 'implantada' && body.inicioExecucao ? body.inicioExecucao : agora;
+  if (novoStatus === 'implantada' && (antigo !== 'implantada' || !body.implantadaEm)) body.implantadaEm = agora;
+  const btn = $('#btn-save'); btn.disabled = true; $('#f-err').textContent = '';
+  try {
+    await db.collection('solucoes').doc(id).set(body);
+    fecharEditor(); toast(prev ? 'Solução atualizada' : 'Solução cadastrada');
+  } catch (err) {
+    const code = err && err.code;
+    $('#f-err').textContent = code === 'quota_exceeded' ? 'O banco da página está cheio. Exclua soluções antigas e tente de novo.'
+      : code === 'invalid_argument' ? 'Só quem edita a página pode salvar alterações.'
+      : 'Não foi possível salvar. Tente de novo em instantes.';
+  } finally { btn.disabled = false; }
+}
+
+/* ---------- IA: textos comuns ---------- */
+function nivelRegua(v){ const n = Math.round(Number(v)); return n >= 1 && n <= 5 ? n : 0; }
+function prontidao(regua){
+  const r = regua || {};
+  if (!REGUA.every(d => nivelRegua(r[d.k]))) return null;
+  const score = Math.round(REGUA.reduce((s, d) => s + nivelRegua(r[d.k]) * d.peso, 0) * 100) / 100;
+  const nivel = PRONT_NIVEIS.find(n => score <= n.max) || PRONT_NIVEIS[PRONT_NIVEIS.length - 1];
+  return { score, nivel, bloqueios: REGUA.filter(d => nivelRegua(r[d.k]) === 1) };
+}
+function perfilTexto(){
+  const p = perfil || {};
+  const r = p.regua || {};
+  const algumaDim = REGUA.some(d => nivelRegua(r[d.k]));
+  const algum = algumaDim || PERFIL_ITENS.some(i => typeof p[i.k] === 'boolean') || p.porte || p.obs;
+  if (!algum) return 'Perfil não informado: considere uma empresa de pequeno ou médio porte, sem time de dados dedicado e sem sistemas integrados.';
+  const linhas = [];
+  if (algumaDim) {
+    linhas.push('Régua de prontidão (1 a 5):');
+    REGUA.forEach(d => { const n = nivelRegua(r[d.k]); linhas.push(`- ${d.n}: ${n ? n + ' (' + d.niveis[n - 1] + ')' : 'não avaliado'}`); });
+    const pr = prontidao(r);
+    if (pr) linhas.push(`- Prontidão geral: ${fmt(pr.score)} de 5 (${pr.nivel.l})`);
+    if (pr && pr.bloqueios.length) linhas.push(`- BLOQUEIO: ${pr.bloqueios.map(d => d.n).join(', ')} em nível 1. Soluções que dependem disso devem ser marcadas como dependentes.`);
+  }
+  PERFIL_LEGADO.forEach(i => { if (typeof p[i.k] === 'boolean' && !nivelRegua(r[i.dim])) linhas.push(`- ${i.l}: ${p[i.k] ? 'sim' : 'não'}`); });
+  PERFIL_ITENS.forEach(i => linhas.push(`- ${i.l}: ${p[i.k] ? 'sim' : 'não'}`));
+  if (p.porte && PORTES[p.porte]) linhas.push(`- Porte: ${PORTES[p.porte]}`);
+  if (p.obs) linhas.push(`- Observações: ${String(p.obs).slice(0, 600)}`);
+  return linhas.join('\n');
+}
+const REGRAS = `PASSO 1. Metas que o projeto move de forma direta e clara (pode ser nenhuma):
+- primárias: "receita" (aumentar receita), "custo" (diminuir custo), "margem" (aumentar margem)
+- secundárias: "risco" (diminuir risco), "produtividade" (aumentar produtividade), "valuation" (aumentar valuation/equity)
+
+PASSO 2. Para cada dependência, diga quanto o projeto depende dela para funcionar e se manter NESTA empresa, considerando o que ela já tem: 1 = não depende, 0.5 = depende em parte, 0 = depende.
+- "manual": para continuar funcionando, precisa de trabalho manual recorrente? Conta: alimentar dados ou documentos na mão, conferir e corrigir respostas com frequência, manter atualizados a base de conhecimento, as regras ou os prompts. Uma solução que age sozinha também precisa de alguém conferindo o que ela faz. Não conta: a revisão humana exigida por segurança ou por lei (avaliada na checagem "regras") nem o trabalho que as pessoas fazem com o resultado, como a abordagem do vendedor ou a execução de um plano; esse tempo reduz o ganho, não esta nota. (peso 4)
+- "infra": precisa de muita infra, integração ou tecnologia que a empresa ainda não tem? Uma IA usada por API quase não exige servidor; pese a integração com os sistemas e o acesso aos dados. (peso 3)
+- "dados": precisa de gente técnica para dar continuidade (dados, integração ou IA: ajustar prompts, avaliar a qualidade das respostas, manter as integrações)? Aqui conta se existe quem saiba consertar e evoluir a solução; o volume de trabalho repetido fica em "manual". (peso 2)
+- "cultura": precisa de mudança de cultura e comportamento? (peso 1)
+
+PASSO 3. Natureza da solução ("natureza"), uma destas:
+- "ia": texto repetido, leitura de documentos, triagem, busca em base de conhecimento ou apoio a decisões, sempre com revisão humana
+- "automacao": dado estruturado e regra clara (relatório, painel, integração, importação, alerta, cópia entre sistemas)
+- "ia_automacao": a IA lê ou interpreta e uma regra grava no sistema
+- "processo": o problema é falta de padrão, de responsável ou de documentação; tecnologia só depois
+- "treinamento": a ferramenta já existe, mas é mal usada ou ignorada
+Se só uma pessoa sabe fazer o processo e nada está documentado, prefira "processo".
+
+PASSO 4. Checagens técnicas ("checagens"), cada uma "ok", "parcial", "falha" ou "desconhecido":
+- "dado": a informação necessária existe e dá para ler e gravar nos sistemas?
+- "integracoes": os sistemas envolvidos permitem integração?
+- "qualidade": o histórico está completo e padronizado o suficiente?
+- "regras": há exigência legal, fiscal ou regulatória, e ela está atendida? Pagamentos, exclusão de dados, concessão de acessos, decisões fiscais, jurídicas ou de RH e mensagens a clientes sem revisão exigem revisão humana: use no máximo "parcial" e diga isso no motivo.
+Use "desconhecido" quando faltar informação; não invente.`;
+function processoTexto(f){
+  const p = f.processo || {};
+  const l = [];
+  if (p.executor) l.push(`Quem executa: ${p.executor}`);
+  if (DOCS[p.documentado]) l.push(`Documentação: ${DOCS[p.documentado].toLowerCase()}`);
+  if (ENTRADAS[p.entrada]) l.push(ENTRADAS[p.entrada]);
+  const c = textoCarga(f); if (c) l.push(`Carga: ${c}${CONFS[p.confianca] ? ' (' + CONFS[p.confianca] + ')' : ''}`);
+  return l.length ? l.join('; ') : '(não informado)';
+}
+const FORMATO_V2 = `"natureza":"ia_automacao","checagens":{"dado":"ok","integracoes":"parcial","qualidade":"desconhecido","regras":"ok"}`;
+const IA_FALHA = {
+  rate_limited:'Muitas chamadas à IA em pouco tempo. Espere um pouco e tente de novo.',
+  no_key:'Não há chave de API para o provedor escolhido. Abra Configurações para ver como incluir a chave.',
+  auth_failed:'O provedor recusou a chave de API. Confira a chave em Configurações.',
+  model_not_found:'O provedor não encontrou esse modelo. Escolha outro em Configurações.',
+  network:'Não foi possível falar com o provedor de IA. Confira a internet ou, no caso de modelo local, se ele está rodando.',
+  server_down:'O servidor local não respondeu. Confira se a janela do iniciar.cmd continua aberta.',
+  invalid_json:'A IA não devolveu uma resposta válida. Tente de novo.',
+  empty_completion:'A IA não devolveu uma resposta válida. Tente de novo.',
+  refused:'A IA não processou esse pedido. Ajuste os textos e tente de novo.',
+  prompt_too_large:'Há soluções demais para revisar de uma vez. Arquive as que não usa e tente de novo.'
+};
+const IA_INDISPONIVEL = ['not_granted','sampling_disabled','not_declared','capability_disabled','capability_removed'];
+function falhaIA(e, padrao){ return e && e.message ? 'A IA respondeu com erro: ' + String(e.message).slice(0, 300) : padrao; }
+function desligarIA(){ sample = null; $('#ia-box').hidden = true; $('#btn-recalc').hidden = true; }
+
+/* ---------- IA: classificar uma solução ---------- */
+function setIA(msg, err){ const s = $('#ia-status'); s.textContent = msg; s.classList.toggle('err', !!err); }
+function promptIA(f){
+  const exemplos = items.filter(i => statusDe(i) !== 'arquivada' && i.id !== editId).sort(ordem).slice(0, 8).map(i =>
+    `- ${i.nome} (${i.setor}): metas=${JSON.stringify(Array.isArray(i.metas) ? i.metas : [])}; manual=${nota(i, CRIT[0])}/4, infra=${nota(i, CRIT[1])}/3, dados=${nota(i, CRIT[2])}/2, cultura=${nota(i, CRIT[3])}/1`
+  ).join('\n');
+  return `Você classifica soluções de IA para uma empresa usando o framework abaixo. Seja criterioso e consistente com os exemplos.
+
+PERFIL DA EMPRESA
+${perfilTexto()}
+
+${REGRAS}
+
+Exemplos já classificados (pontos = fator x peso):
+${exemplos || '- (nenhum ainda)'}
+
+SOLUÇÃO A CLASSIFICAR
+Área: ${f.setor || '(não informada)'}
+Nome: ${f.nome || '(não informado)'}
+O que faz: ${f.descricao || '(não informado)'}
+O que resolve: ${f.resolve || '(não informado)'}
+Processo atual: ${processoTexto(f)}
+
+Dê um motivo curto para TODAS as 6 metas (por que move ou não move), as 4 dependências (por que esse nível), a natureza e as 4 checagens.
+
+Responda só com um objeto JSON, sem outro texto, neste formato:
+{"metas":["receita","produtividade"],"dependencias":{"manual":1,"infra":0.5,"dados":1,"cultura":0.5},${FORMATO_V2},${FORMATO_MOTIVOS},"justificativa":"Uma frase curta em português explicando a nota, citando a principal dependência."}`;
+}
+async function classificarIA(){
+  if (!sample) return;
+  const f = lerForm();
+  if (!f.nome && !f.descricao) { setIA('Preencha ao menos o nome e o que a solução faz.', true); return; }
+  if (iaCtl) iaCtl.abort();
+  const ctl = new AbortController(); iaCtl = ctl;
+  $('#btn-ia').disabled = true; $('#btn-ia-stop').hidden = false;
+  setIA(`Classificando com ${LOCAL.iaNome()}… pode levar até um minuto.`, false);
+  try {
+    const r = await sample.json(promptIA(f), Object.assign({ signal: ctl.signal }, IA_OPTS));
+    const ia = normalizarIA(r);
+    if (!ia) throw { code:'invalid_json' };
+    aplicarValoresIA(ia);
+    if (ia.justificativa) $('#f-just').value = ia.justificativa;
+    iaAtual = ia; motivosU = {};
+    atualizarLive(); renderDiverg();
+    setIA('Sugestão da IA aplicada. Passe o mouse sobre cada meta e dependência para ver o porquê. Revise e clique em Salvar.', false);
+  } catch (e) {
+    const code = e && e.code;
+    if (code === 'cancelled') setIA('Classificação interrompida.', false);
+    else if (IA_INDISPONIVEL.includes(code)) { desligarIA(); setIA('A classificação com IA não está disponível nesta visualização. Preencha as notas manualmente.', true); }
+    else setIA(IA_FALHA[code] || falhaIA(e, 'A classificação falhou por um problema temporário. Tente de novo.'), true);
+  } finally {
+    if (iaCtl === ctl) iaCtl = null;
+    $('#btn-ia').disabled = false; $('#btn-ia-stop').hidden = true;
+  }
+}
+
+/* ---------- IA: explicações por item, ajustes e reavaliação ---------- */
+const FORMATO_MOTIVOS = `"motivos":{"metas":{"receita":"por que move ou não move, até 20 palavras","custo":"…","margem":"…","risco":"…","produtividade":"…","valuation":"…"},"dependencias":{"manual":"por que esse nível, até 20 palavras","infra":"…","dados":"…","cultura":"…"},"natureza":"por que essa natureza, até 20 palavras","checagens":{"dado":"por que esse resultado, até 20 palavras","integracoes":"…","qualidade":"…","regras":"…"}}`;
+function nivelL(v, peso){ const f = peso ? v / peso : v; return f >= 1 ? 'Não depende' : f > 0 ? 'Em parte' : 'Depende'; }
+function normalizarIA(r){
+  if (!r || typeof r !== 'object') return null;
+  const dep = r.dependencias && typeof r.dependencias === 'object' ? r.dependencias : null;
+  if (!dep) return null;
+  const txt = v => typeof v === 'string' ? v.trim().slice(0, 300) : '';
+  const metas = Array.isArray(r.metas) ? METAS.filter(m => r.metas.map(String).includes(m.k)).map(m => m.k) : [];
+  const mo = r.motivos && typeof r.motivos === 'object' ? r.motivos : {};
+  const moM = mo.metas && typeof mo.metas === 'object' ? mo.metas : {};
+  const moD = mo.dependencias && typeof mo.dependencias === 'object' ? mo.dependencias : {};
+  const moC = mo.checagens && typeof mo.checagens === 'object' ? mo.checagens : {};
+  const chIn = r.checagens && typeof r.checagens === 'object' ? r.checagens : {};
+  const checagens = {};
+  CHECKS.forEach(c => { const v = String(chIn[c.k] || ''); if (CHK_NIVEIS.some(n => n.v === v)) checagens[c.k] = v; });
+  const respostas = r.respostas && typeof r.respostas === 'object'
+    ? Object.fromEntries(Object.entries(r.respostas).filter(([, v]) => typeof v === 'string').map(([k, v]) => [String(k), v.trim().slice(0, 300)]))
+    : {};
+  return {
+    metas,
+    dependencias: Object.fromEntries(CRIT.map(c => [c.k, snap(dep[c.k], 1)])),
+    natureza: NATUREZAS[r.natureza] ? r.natureza : '',
+    checagens,
+    motivos: { metas: Object.fromEntries(METAS.map(m => [m.k, txt(moM[m.k])])), dependencias: Object.fromEntries(CRIT.map(c => [c.k, txt(moD[c.k])])),
+      natureza: txt(mo.natureza), checagens: Object.fromEntries(CHECKS.map(c => [c.k, txt(moC[c.k])])) },
+    respostas,
+    justificativa: typeof r.justificativa === 'string' ? r.justificativa.trim().slice(0, 400) : '',
+    em: new Date().toISOString(),
+    modelo: IA_OPTS.model
+  };
+}
+function aplicarValoresIA(ia, soKey){
+  if (!soKey) {
+    if (ia.natureza) $('#f-nat').value = ia.natureza;
+    const ch = ia.checagens || {};
+    CHECKS.forEach(c => { if (ch[c.k]) document.querySelectorAll(`input[name="k-${c.k}"]`).forEach(r => { r.checked = r.value === ch[c.k]; }); });
+    if (Object.keys(ch).length) $('#sec-chk').open = true;
+  }
+  METAS.forEach(m => { if (!soKey || soKey === 'meta:' + m.k) { const el = $('#m-' + m.k); if (el) el.checked = ia.metas.includes(m.k); } });
+  CRIT.forEach(c => {
+    if (soKey && soKey !== 'dep:' + c.k) return;
+    const v = snap(ia.dependencias[c.k], 1) * c.peso;
+    document.querySelectorAll(`input[name="c-${c.k}"]`).forEach(x => { x.checked = Number(x.value) === v; });
+  });
+}
+function divergencias(f, ia){
+  if (!ia || !ia.dependencias) return [];
+  const out = [];
+  const fm = Array.isArray(f.metas) ? f.metas : [];
+  const im = Array.isArray(ia.metas) ? ia.metas : [];
+  METAS.forEach(m => { const a = im.includes(m.k), u = fm.includes(m.k); if (a !== u) out.push({ key:'meta:' + m.k, tipo:'meta', k:m.k, n:m.n, ia:a, user:u }); });
+  CRIT.forEach(c => {
+    const a = snap(ia.dependencias[c.k], 1) * c.peso, u = snap(f.notas ? f.notas[c.k] : 0, c.peso);
+    if (a !== u) out.push({ key:'dep:' + c.k, tipo:'dep', k:c.k, n:c.n, peso:c.peso, ia:a, user:u });
+  });
+  return out;
+}
+function descrDiv(d){
+  return d.tipo === 'meta'
+    ? `${d.n}: a IA ${d.ia ? 'marcou' : 'não marcou'}, você ${d.user ? 'marcou' : 'desmarcou'}`
+    : `${d.n}: a IA marcou “${nivelL(d.ia, d.peso)}”, você mudou para “${nivelL(d.user, d.peso)}”`;
+}
+function motivoIA(ia, d){ return ia && ia.motivos ? (d.tipo === 'meta' ? ia.motivos.metas[d.k] : ia.motivos.dependencias[d.k]) : ''; }
+function renderExp(){
+  const det = $('#ia-exp');
+  if (!iaAtual) { det.hidden = true; return; }
+  det.hidden = false;
+  const li = [
+    ...METAS.map(m => `<li><b>${m.n}</b> · ${iaAtual.metas.includes(m.k) ? 'move' : 'não move'}: ${esc(iaAtual.motivos.metas[m.k] || 'sem explicação registrada')}</li>`),
+    ...CRIT.map(c => `<li><b>${c.n}</b> · ${nivelL(snap(iaAtual.dependencias[c.k], 1), 1)}: ${esc(iaAtual.motivos.dependencias[c.k] || 'sem explicação registrada')}</li>`),
+    ...(NATUREZAS[iaAtual.natureza] ? [`<li><b>Natureza</b> · ${NATUREZAS[iaAtual.natureza]}: ${esc(iaAtual.motivos.natureza || 'sem explicação registrada')}</li>`] : []),
+    ...CHECKS.filter(c => iaAtual.checagens && iaAtual.checagens[c.k]).map(c => `<li><b>Checagem ${c.n.toLowerCase()}</b> · ${(CHK_NIVEIS.find(n => n.v === iaAtual.checagens[c.k]) || {}).l}: ${esc((iaAtual.motivos.checagens && iaAtual.motivos.checagens[c.k]) || 'sem explicação registrada')}</li>`)
+  ];
+  if (iaAtual.em) li.push(`<li>Classificado pela IA em ${fmtData(iaAtual.em)}.</li>`);
+  $('#ia-exp-list').innerHTML = li.join('');
+}
+function renderDiverg(){
+  renderExp();
+  const box = $('#diverg');
+  if (!iaAtual) { box.innerHTML = ''; return; }
+  const divs = divergencias(lerForm(), iaAtual);
+  if (!divs.length) { box.innerHTML = ''; return; }
+  const cards = divs.map(d => {
+    const id = 'mu-' + d.key.replace(':', '-');
+    const resp = iaAtual.respostas && iaAtual.respostas[d.key];
+    return `<div class="dv">
+      <p class="dv-t">${esc(descrDiv(d))}</p>
+      <p class="dv-ia"><b>Por que a IA marcou assim:</b> ${esc(motivoIA(iaAtual, d) || 'sem explicação registrada')}</p>
+      ${resp ? `<p class="dv-resp"><b>Resposta da IA ao seu motivo:</b> ${esc(resp)}</p>` : ''}
+      <div class="fld"><label for="${id}">Seu motivo</label><textarea id="${id}" data-key="${d.key}" rows="2" maxlength="400" placeholder="Por que você está mudando este item">${esc(motivosU[d.key] || '')}</textarea></div>
+      <div class="dv-a"><button type="button" class="btn-s" data-dv="usar-ia" data-key="${d.key}">Usar a escolha da IA</button></div>
+    </div>`;
+  }).join('');
+  box.innerHTML = `<div class="dv-box">
+    <div class="dv-h"><span class="fld-k">Seus ajustes (${divs.length})</span>${sample ? `<button type="button" class="btn ghost" id="btn-reav"${reCtl ? ' disabled' : ''}>${reCtl ? 'Reavaliando…' : 'Reavaliar com IA'}</button>` : ''}</div>
+    <p class="dv-hint">Explique por que mudou. Ao reavaliar, a IA lê os seus motivos e responde se concorda ou mantém a posição dela.</p>
+    ${cards}</div>`;
+}
+function tipTexto(key){
+  if (!iaAtual) return 'Ainda sem explicação da IA para este item. Clique em “Classificar com IA”.';
+  const f = lerForm();
+  const d0 = divergencias(f, iaAtual).find(d => d.key === key);
+  const [tipo, k] = key.split(':');
+  const mo = iaAtual.motivos || {};
+  if (tipo === 'nat') {
+    if (!iaAtual.natureza) return 'A IA ainda não sugeriu a natureza. Clique em “Classificar com IA”.';
+    const dif = f.natureza && f.natureza !== iaAtual.natureza ? `\n\nVocê escolheu: ${NATUREZAS[f.natureza]}.` : '';
+    return `IA sugeriu: ${NATUREZAS[iaAtual.natureza]}. ${mo.natureza || ''}${dif}`;
+  }
+  if (tipo === 'chk') {
+    const v = iaAtual.checagens && iaAtual.checagens[k];
+    if (!v) return 'A IA ainda não avaliou esta checagem. Clique em “Classificar com IA”.';
+    const lbl = x => (CHK_NIVEIS.find(n => n.v === x) || { l:x }).l;
+    const dif = f.checagens[k] && f.checagens[k] !== v ? `\n\nVocê marcou: ${lbl(f.checagens[k])}.` : '';
+    return `IA: ${lbl(v)}. ${(mo.checagens && mo.checagens[k]) || ''}${dif}`;
+  }
+  let s;
+  if (tipo === 'meta') {
+    const m = METAS.find(x => x.k === k);
+    s = `IA ${iaAtual.metas.includes(k) ? 'marcou' : 'não marcou'} ${m ? m.n : k}: ${iaAtual.motivos.metas[k] || 'sem explicação registrada'}`;
+  } else {
+    const c = CRIT.find(x => x.k === k);
+    s = `IA: ${nivelL(snap(iaAtual.dependencias[k], 1), 1)}. ${iaAtual.motivos.dependencias[k] || 'sem explicação registrada'}`;
+    if (d0) s = `${c ? c.n : k} · ` + s;
+  }
+  if (d0) s += `\n\nVocê: ${d0.tipo === 'meta' ? (d0.user ? 'marcou' : 'desmarcou') : nivelL(d0.user, d0.peso)}. ${motivosU[key] ? 'Motivo: ' + motivosU[key] : 'Motivo ainda não informado.'}`;
+  return s;
+}
+function mostrarTip(el){
+  const tip = $('#tip');
+  tip.textContent = tipTexto(el.dataset.tip);
+  tip.hidden = false;
+  const r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+  let top = r.bottom + 6; if (top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 6);
+  const left = Math.min(Math.max(8, r.left), window.innerWidth - w - 8);
+  tip.style.top = top + 'px'; tip.style.left = left + 'px';
+}
+function esconderTip(){ const t = $('#tip'); if (t) t.hidden = true; }
+function promptReavaliar(f, divs){
+  const anterior = { metas: iaAtual.metas, dependencias: iaAtual.dependencias, natureza: iaAtual.natureza || '', checagens: iaAtual.checagens || {}, motivos: iaAtual.motivos };
+  const mudancas = divs.map(d => ({
+    item: d.key,
+    ia: d.tipo === 'meta' ? (d.ia ? 'marcou' : 'não marcou') : nivelL(d.ia, d.peso),
+    pessoa: d.tipo === 'meta' ? (d.user ? 'marcou' : 'desmarcou') : nivelL(d.user, d.peso),
+    motivo_da_pessoa: (motivosU[d.key] || '').trim() || '(não informado)'
+  }));
+  return `Você classificou uma solução de IA usando o framework abaixo. A pessoa responsável mudou alguns itens e explicou por quê. Reavalie com honestidade: concorde quando o argumento for bom ou trouxer informação que você não tinha; mantenha sua posição quando não for, explicando com respeito e de forma objetiva.
+
+PERFIL DA EMPRESA
+${perfilTexto()}
+
+${REGRAS}
+
+SOLUÇÃO
+Área: ${f.setor || '(não informada)'}
+Nome: ${f.nome || '(não informado)'}
+O que faz: ${f.descricao || '(não informado)'}
+O que resolve: ${f.resolve || '(não informado)'}
+Processo atual: ${processoTexto(f)}
+
+SUA CLASSIFICAÇÃO ANTERIOR (dependências: 1 = não depende, 0.5 = em parte, 0 = depende):
+${JSON.stringify(anterior)}
+
+MUDANÇAS DA PESSOA:
+${JSON.stringify(mudancas)}
+
+Devolva a classificação completa revisada (se concordar com uma mudança, adote o valor da pessoa; se não, mantenha o seu), com um motivo curto para TODAS as 6 metas, as 4 dependências, a natureza e as 4 checagens, e uma resposta para cada mudança. Em "respostas", use exatamente as chaves de "item" e comece cada resposta com "Concordo:" ou "Mantenho:".
+
+Responda só com um objeto JSON, sem outro texto, neste formato:
+{"metas":["receita"],"dependencias":{"manual":1,"infra":0.5,"dados":1,"cultura":0.5},${FORMATO_V2},${FORMATO_MOTIVOS},"respostas":{"dep:infra":"Concordo: …"},"justificativa":"Uma frase curta em português explicando a nota."}`;
+}
+async function reavaliarIA(){
+  if (!sample || !iaAtual) return;
+  const f = lerForm();
+  const divs = divergencias(f, iaAtual);
+  if (!divs.length) return;
+  if (reCtl) reCtl.abort();
+  const ctl = new AbortController(); reCtl = ctl;
+  renderDiverg();
+  setIA(`Reavaliando com ${LOCAL.iaNome()}… pode levar até um minuto.`, false);
+  try {
+    const r = await sample.json(promptReavaliar(f, divs), Object.assign({ signal: ctl.signal, cache: false }, IA_OPTS));
+    const ia = normalizarIA(r);
+    if (!ia) throw { code:'invalid_json' };
+    iaAtual = ia;
+    const ainda = new Set(divergencias(lerForm(), iaAtual).map(d => d.key));
+    const concordou = divs.filter(d => !ainda.has(d.key)).length;
+    if (!ainda.size && ia.justificativa) $('#f-just').value = ia.justificativa;
+    setIA(concordou === divs.length ? 'A IA concordou com todos os seus ajustes. Clique em Salvar.'
+      : concordou ? `A IA concordou com ${concordou} de ${divs.length} ajustes. Veja a resposta em cada um e decida.`
+      : 'A IA manteve a posição dela. Veja a resposta em cada ajuste e decida.', false);
+  } catch (e) {
+    const code = e && e.code;
+    if (code === 'cancelled') setIA('Reavaliação interrompida.', false);
+    else if (IA_INDISPONIVEL.includes(code)) { desligarIA(); setIA('A IA não está disponível nesta visualização.', true); }
+    else setIA(IA_FALHA[code] || falhaIA(e, 'A reavaliação falhou por um problema temporário. Tente de novo.'), true);
+  } finally {
+    if (reCtl === ctl) reCtl = null;
+    atualizarLive(); renderDiverg();
+  }
+}
+
+/* ---------- Perfil da empresa ---------- */
+function montarPerfil(){
+  $('#pf-list').innerHTML = PERFIL_ITENS.map(i => `<label for="p-${i.k}"><input type="checkbox" id="p-${i.k}" data-k="${i.k}"><span>${esc(i.l)}</span></label>`).join('');
+  $('#regua').innerHTML = REGUA.map(d => `<div class="rg" id="rg-${d.k}"><div class="rg-h"><label for="r-${d.k}">${esc(d.n)}</label><span>peso ${Math.round(d.peso * 100)}%</span></div>
+    <select id="r-${d.k}"><option value="">Não avaliado</option>${d.niveis.map((t, i) => `<option value="${i + 1}">${i + 1} · ${esc(t)}</option>`).join('')}</select></div>`).join('');
+}
+function lerPerfil(){
+  const p = {};
+  PERFIL_ITENS.forEach(i => { p[i.k] = $('#p-' + i.k).checked; });
+  p.regua = {};
+  REGUA.forEach(d => { const n = nivelRegua($('#r-' + d.k).value); if (n) p.regua[d.k] = n; });
+  p.porte = PORTES[$('#p-porte').value] ? $('#p-porte').value : '';
+  p.obs = $('#p-obs').value.trim();
+  return p;
+}
+function preencherPerfil(){
+  const p = perfil || {};
+  PERFIL_ITENS.forEach(i => { $('#p-' + i.k).checked = !!p[i.k]; });
+  const r = p.regua || {};
+  REGUA.forEach(d => { const n = nivelRegua(r[d.k]); $('#r-' + d.k).value = n ? String(n) : ''; });
+  $('#p-porte').value = PORTES[p.porte] ? p.porte : '';
+  $('#p-obs').value = p.obs || '';
+}
+function renderProntidao(){
+  const r = lerPerfil().regua;
+  REGUA.forEach(d => $('#rg-' + d.k).classList.toggle('um', nivelRegua(r[d.k]) === 1));
+  const pr = prontidao(r);
+  const faltam = REGUA.filter(d => !nivelRegua(r[d.k])).length;
+  const box = $('#pront-box');
+  if (!pr) { box.innerHTML = `<p>Avalie ${faltam === REGUA.length ? 'as seis dimensões' : `as ${faltam} dimensões que faltam`} para ver a prontidão geral da empresa.</p>`; return; }
+  const sug = pr.score > 3.5 ? 'A régua permite tocar mais de uma solução em paralelo.' : 'Pela régua, execute uma solução de cada vez.';
+  box.innerHTML = `<div class="pt"><b>${fmt(pr.score)}</b><span class="meta-inline">de 5</span><strong>${esc(pr.nivel.l)}</strong></div>
+    <p>${esc(pr.nivel.r)} ${sug}</p>
+    ${pr.bloqueios.length ? `<p class="bloq">Bloqueio: ${esc(pr.bloqueios.map(d => d.n).join(', '))} em nível 1. Não comece soluções que dependam disso antes de resolver.</p>` : ''}`;
+}
+function setPf(msg, err){ const s = $('#pf-status'); s.textContent = msg; s.classList.toggle('err', !!err); }
+function renderPerfil(){
+  const pode = !!(db && canWrite && loaded);
+  document.querySelectorAll('#perfil input, #perfil select, #perfil textarea').forEach(el => { el.disabled = !pode; });
+  $('#btn-perfil').hidden = !pode;
+  $('#btn-recalc').hidden = !(pode && sample) || !!recCtl;
+  if (!perfilSujo) preencherPerfil();
+  renderProntidao();
+  if (!$('#pf-status').textContent && perfil && perfil.atualizadoEm) setPf(`Perfil salvo em ${fmtData(perfil.atualizadoEm)}.`, false);
+}
+async function salvarLimite(){
+  if (!db) return;
+  const n = Number($('#f-limite').value) || 1;
+  const p = Object.assign({}, perfil || {}, { limiteExec: n });
+  try { await db.doc('config/perfil').set(p); toast(`Limite em paralelo: ${n}`); }
+  catch (err) { falhaEscrita(err); render(); }
+}
+async function salvarPerfil(){
+  if (!db) return;
+  const p = Object.assign(lerPerfil(), { atualizadoEm: new Date().toISOString() });
+  if (perfil && perfil.limiteExec) p.limiteExec = perfil.limiteExec;
+  PERFIL_LEGADO.forEach(i => { if (perfil && typeof perfil[i.k] === 'boolean' && !p.regua[i.dim]) p[i.k] = perfil[i.k]; });
+  $('#btn-perfil').disabled = true;
+  try { await db.doc('config/perfil').set(p); perfilSujo = false; setPf(`Perfil salvo em ${fmtData(p.atualizadoEm)}.`, false); toast('Perfil da empresa salvo'); }
+  catch (err) { setPf(err && err.code === 'invalid_argument' ? 'Só quem edita a página pode salvar o perfil.' : 'Não foi possível salvar o perfil. Tente de novo.', true); }
+  finally { $('#btn-perfil').disabled = false; }
+}
+function promptRecalc(lista){
+  const dados = lista.map(i => ({
+    id: i.id, setor: i.setor, nome: i.nome, faz: i.descricao || '', resolve: i.resolve || '',
+    metas_atuais: Array.isArray(i.metas) ? i.metas : [],
+    dependencias_atuais: Object.fromEntries(CRIT.map(c => [c.k, nota(i, c) / c.peso])),
+    natureza_atual: i.natureza || undefined,
+    checagens_atuais: i.checagens && Object.keys(i.checagens).length ? i.checagens : undefined,
+    processo: processoTexto(i) !== '(não informado)' ? processoTexto(i) : undefined,
+    ajustes_do_usuario: i.motivosUsuario && Object.keys(i.motivosUsuario).length ? i.motivosUsuario : undefined
+  }));
+  return `Você revisa a classificação de soluções de IA de uma empresa usando o framework abaixo, agora considerando o perfil real da empresa. Mantenha o que continua certo e mude o que o perfil ou as regras do framework justificam; as regras podem ter mudado desde a última classificação.
+
+PERFIL DA EMPRESA
+${perfilTexto()}
+
+${REGRAS}
+
+SOLUÇÕES (JSON):
+${JSON.stringify(dados)}
+
+Quando uma solução tiver "ajustes_do_usuario" (chaves "meta:x" ou "dep:x" com o motivo da pessoa), leve esses motivos em conta. Para cada solução, dê também a natureza e as 4 checagens, e um motivo curto (até 15 palavras) para TODAS as 6 metas, as 4 dependências, a natureza e as 4 checagens.
+
+Responda só com um objeto JSON, sem outro texto, com TODAS as soluções na mesma ordem, neste formato:
+{"solucoes":[{"id":"id-da-solucao","metas":["receita","produtividade"],"dependencias":{"manual":1,"infra":1,"dados":1,"cultura":1},${FORMATO_V2},${FORMATO_MOTIVOS},"justificativa":"Uma frase curta em português explicando a nota considerando o perfil."}]}`;
+}
+async function recalcular(){
+  if (!sample || !db) return;
+  if (perfilSujo) { setPf('Salve o perfil antes de recalcular.', true); return; }
+  const lista = items.filter(i => statusDe(i) !== 'arquivada');
+  if (!lista.length) { setPf('Não há soluções para revisar.', true); return; }
+  const ctl = new AbortController(); recCtl = ctl; propostas = null; $('#recalc-out').innerHTML = '';
+  $('#btn-recalc').hidden = true; $('#btn-recalc-stop').hidden = false;
+  setPf(`Revisando ${lista.length} soluções com ${LOCAL.iaNome()}… pode levar alguns minutos.`, false);
+  try {
+    const r = await sample.json(promptRecalc(lista), Object.assign({
+      signal: ctl.signal,
+      onText: ({ text }) => { const n = (text.match(/"id"\s*:/g) || []).length; setPf(`Recebendo a revisão: ${Math.min(n, lista.length)} de ${lista.length} soluções…`, false); }
+    }, IA_OPTS));
+    const arr = r && Array.isArray(r.solucoes) ? r.solucoes : null;
+    if (!arr) throw { code:'invalid_json' };
+    const mudancas = [];
+    const avaliadas = [];
+    arr.forEach(s => {
+      const it = lista.find(i => i.id === String(s && s.id)); if (!it) return;
+      const ia = normalizarIA(s); if (!ia) return;
+      avaliadas.push({ id: it.id, ia });
+      const metas = ia.metas;
+      const notas = Object.fromEntries(CRIT.map(c => [c.k, ia.dependencias[c.k] * c.peso]));
+      const novo = { metas, notas };
+      const metasMudaram = [...metas].sort().join() !== [...(Array.isArray(it.metas) ? it.metas : [])].sort().join();
+      const notasMudaram = CRIT.filter(c => notas[c.k] !== nota(it, c));
+      if (!metasMudaram && !notasMudaram.length) return;
+      const partes = notasMudaram.map(c => `${c.n.toLowerCase()} ${fmt(nota(it, c))} → ${fmt(notas[c.k])}`);
+      if (metasMudaram) partes.push('metas: ' + (metasDe(novo).map(m => m.n).join(', ') || 'nenhuma'));
+      mudancas.push({ id: it.id, nome: it.nome, antes: total(it), depois: total(novo), metas, notas,
+        justificativa: ia.justificativa, partes });
+    });
+    if (!avaliadas.length) throw { code:'invalid_json' };
+    propostas = mudancas;
+    propostas.avaliadas = avaliadas;
+    renderPropostas();
+    setPf(mudancas.length ? `A IA sugeriu mudanças em ${plural(mudancas.length, 'solução', 'soluções')}. Revise abaixo.` : 'A IA revisou tudo e não sugeriu mudanças de nota.', false);
+  } catch (e) {
+    const code = e && e.code;
+    if (code === 'cancelled') setPf('Revisão interrompida.', false);
+    else if (IA_INDISPONIVEL.includes(code)) { desligarIA(); setPf('A IA não está disponível nesta visualização.', true); }
+    else setPf(IA_FALHA[code] || falhaIA(e, 'A revisão falhou por um problema temporário. Tente de novo.'), true);
+  } finally {
+    if (recCtl === ctl) recCtl = null;
+    $('#btn-recalc-stop').hidden = true;
+    renderPerfil();
+  }
+}
+function renderPropostas(){
+  const out = $('#recalc-out');
+  if (!propostas) { out.innerHTML = ''; return; }
+  const nAval = (propostas.avaliadas || []).length;
+  const linhas = propostas.map((p, i) => {
+    const cls = p.depois > p.antes ? 'up' : p.depois < p.antes ? 'down' : '';
+    return `<label for="rc-${i}"><input type="checkbox" id="rc-${i}" data-i="${i}" checked>
+      <span><span class="rc-n">${esc(p.nome)}</span><p class="rc-d">${esc(p.partes.join(' · '))}</p>${p.justificativa ? `<p class="rc-d">${esc(p.justificativa)}</p>` : ''}</span>
+      <span class="rc-t">${fmt(p.antes)} → <span class="${cls}">${fmt(p.depois)}</span></span></label>`;
+  }).join('');
+  out.innerHTML = `<div class="recalc"><h3>${propostas.length ? 'Mudanças sugeridas pela IA' : 'Nenhuma mudança de nota sugerida'}</h3>
+    ${propostas.length ? `<div class="rc-list">${linhas}</div>` : ''}
+    <p class="rc-d" style="margin:0">Ao aplicar, a explicação da IA fica salva nas ${nAval} soluções revisadas, e a natureza e as checagens ainda vazias recebem a sugestão da IA. Isso pode criar travas. As mudanças de nota que você desmarcar não são aplicadas.</p>
+    <div class="pf-actions"><button type="button" class="btn" id="btn-rc-ok">${propostas.length ? 'Aplicar selecionadas' : 'Salvar explicações'}</button><button type="button" class="btn plain" id="btn-rc-no">Descartar</button></div></div>`;
+  $('#btn-rc-ok').addEventListener('click', aplicarPropostas);
+  $('#btn-rc-no').addEventListener('click', () => { propostas = null; renderPropostas(); setPf('Sugestões descartadas.', false); });
+}
+async function aplicarPropostas(){
+  if (!propostas) return;
+  const avaliadas = propostas.avaliadas || [];
+  const marcadas = new Set([...document.querySelectorAll('#recalc-out input[type="checkbox"]:checked')].map(x => propostas[Number(x.dataset.i)]).filter(Boolean).map(p => p.id));
+  const btn = $('#btn-rc-ok'); if (btn) btn.disabled = true;
+  let ok = 0, falha = 0, alteradas = 0;
+  const agora = new Date().toISOString();
+  for (const a of avaliadas) {
+    const it = items.find(i => i.id === a.id); if (!it) continue;
+    const base = Object.assign({}, it); delete base.id;
+    const campos = { ia: a.ia, atualizadoEm: agora, revisadoPeloPerfilEm: agora };
+    if (!NATUREZAS[it.natureza] && a.ia.natureza) campos.natureza = a.ia.natureza;
+    if (!(it.checagens && Object.keys(it.checagens).length) && Object.keys(a.ia.checagens || {}).length) campos.checagens = a.ia.checagens;
+    if (marcadas.has(a.id)) {
+      campos.metas = a.ia.metas;
+      campos.notas = Object.fromEntries(CRIT.map(c => [c.k, a.ia.dependencias[c.k] * c.peso]));
+      if (a.ia.justificativa) campos.justificativa = a.ia.justificativa;
+      campos.motivosUsuario = {};
+      alteradas++;
+    } else {
+      const ainda = new Set(divergencias(it, a.ia).map(d => d.key));
+      campos.motivosUsuario = Object.fromEntries(Object.entries(it.motivosUsuario || {}).filter(([k]) => ainda.has(k)));
+    }
+    try { await db.collection('solucoes').doc(a.id).set(Object.assign(base, campos)); ok++; } catch (e) { falha++; }
+  }
+  propostas = null; renderPropostas();
+  setPf(falha ? `${ok} soluções atualizadas, ${falha} não puderam ser salvas.` : `${plural(alteradas, 'nota alterada', 'notas alteradas')}; explicações da IA salvas em ${plural(ok, 'solução', 'soluções')}.`, !!falha);
+  toast('Revisão aplicada');
+}
+
+/* ---------- Exportar CSV ---------- */
+async function exportarCSV(){
+  if (!downloads) return;
+  const ordemStatus = { ativa:0, execucao:1, implantada:2, arquivada:3 };
+  const lista = [...items].sort((a, b) => (ordemStatus[statusDe(a)] - ordemStatus[statusDe(b)]) || ordem(a, b));
+  const cab = ['Situação','Área','Solução','Nota','Faixa','Metas','Manual (4)','Infra (3)','Time técnico (2)','Cultura (1)','Justificativa','Responsável','Previsão','Início da execução','Implantada em','Meta (resultado esperado)','Resultado medido','Avaliação','O que faz','O que resolve','Ajustes manuais sobre a IA',
+    'Natureza','Travas','Chk dado','Chk integrações','Chk qualidade','Chk regras','Quem executa','Documentação','Entrada','Carga (h/mês)','Origem dos números','Linha de base validada',
+    'Custo atual (R$/mês)','Ganho conservador (R$/mês)','Ganho provável (R$/mês)','Custo da solução (R$/mês)','Ganho de receita (R$/mês, não validado)','Base da receita',
+    'Indicador','Linha de base do indicador','Prazo (dias)','Método','Cenário conservador','Cenário provável','Cenário otimista'];
+  const r0 = n => n == null ? '' : String(Math.round(n));
+  const n1 = n => n == null ? '' : String(Math.round(n * 10) / 10).replace('.', ',');
+  const chkL = (i, k) => { const v = i.checagens && i.checagens[k]; return v ? (CHK_NIVEIS.find(x => x.v === v) || { l:v }).l : ''; };
+  const extra = i => {
+    const p = i.processo || {}, v = i.valor || {}, m = i.medicao || {};
+    return [NATUREZAS[i.natureza] || '', travas(i).map(t => t.l).join(' | '), ...CHECKS.map(c => chkL(i, c.k)),
+      p.executor || '', DOCS[p.documentado] || '', ENTRADAS[p.entrada] || '', n1(cargaH(i)), CONFS[p.confianca] || '', p.baseValidada ? 'sim' : 'não',
+      r0(custoAtual(i)), r0(ganho(i, 'Conservador')), r0(ganho(i, 'Provavel')), r0(toNum(v.custoSolucao)), r0(toNum(v.receita)), BASES_REC[v.baseReceita] || '',
+      m.indicador || '', m.base || '', r0(toNum(m.prazoDias)), m.metodo || '', m.conservador || '', m.provavel || '', m.otimista || ''];
+  };
+  const ajustes = i => divergencias(i, i.ia).map(d => {
+    const de = d.tipo === 'meta' ? (d.ia ? 'marcou' : 'não marcou') : nivelL(d.ia, d.peso);
+    const para = d.tipo === 'meta' ? (d.user ? 'marcou' : 'desmarcou') : nivelL(d.user, d.peso);
+    const mot = i.motivosUsuario && i.motivosUsuario[d.key];
+    return `${d.n}: IA ${de} → você ${para}${mot ? ' (' + mot + ')' : ''}`;
+  }).join(' | ');
+  const cel = v => { const s = String(v == null ? '' : v); return /[";\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  const num = n => String(n).replace('.', ',');
+  const linhas = lista.map(i => [
+    atrasada(i) ? 'Em execução (atrasada)' : STATUS[statusDe(i)], i.setor || '', i.nome || '', num(total(i)), faixa(i).l,
+    metasDe(i).map(m => m.n).join(', '), ...CRIT.map(c => num(nota(i, c))), i.justificativa || '', i.responsavel || '',
+    fmtDia(i.previsao), i.inicioExecucao ? fmtData(i.inicioExecucao) : '', i.implantadaEm ? fmtData(i.implantadaEm) : '',
+    i.resultadoEsperado || '', i.resultadoMedido || '', AVAL[i.resultadoAvaliacao] ? AVAL[i.resultadoAvaliacao].l : '',
+    i.descricao || '', i.resolve || '', ajustes(i), ...extra(i)
+  ].map(cel).join(';'));
+  const csv = '﻿' + [cab.map(cel).join(';'), ...linhas].join('\r\n');
+  try { await downloads.save({ filename: `solucoes-ia-${hojeYMD()}.csv`, data: csv }); toast('Arquivo CSV salvo'); }
+  catch (e) {
+    const code = e && e.code;
+    if (code === 'declined') return;
+    if (['unavailable','not_granted','capability_disabled','capability_removed'].includes(code)) { downloads = null; render(); toast('A exportação não está disponível nesta visualização.'); return; }
+    toast(code === 'rate_limited' ? 'Já há um download aguardando confirmação.' : 'Não foi possível gerar o arquivo. Tente de novo.');
+  }
+}
+
+/* ---------- Ligações ---------- */
+montarEditor();
+montarPerfil();
+['#lista', '#lista-exec', '#lista-impl', '#arch-lista'].forEach(s => $(s).addEventListener('click', onRowClick));
+$('#btn-nova').addEventListener('click', () => abrirEditor(null));
+$('#btn-csv').addEventListener('click', exportarCSV);
+$('#btn-cancel').addEventListener('click', fecharEditor);
+$('#dlg').addEventListener('close', () => { if (iaCtl) { iaCtl.abort(); iaCtl = null; } });
+$('#frm').addEventListener('submit', salvar);
+$('#frm').addEventListener('change', e => {
+  if (e.target.id === 'p-valid' && e.target.checked) $('#p-conf').value = 'medido';
+  atualizarLive();
+  if (e.target.matches('input[name="meta"], #deps .rad input')) renderDiverg();
+});
+$('#frm').addEventListener('input', e => { if (e.target.matches('#sec-proc input[type="text"], #sec-valor input[type="text"], #m-ind')) atualizarLive(); });
+$('#btn-base').addEventListener('click', () => {
+  const f = lerForm(), t = textoCarga(f);
+  if (!t) { toast('Preencha antes a frequência e os minutos em "Processo e linha de base".'); $('#sec-proc').open = true; return; }
+  $('#m-base').value = t;
+  if (!$('#m-ind').value.trim()) $('#m-ind').value = 'Horas de trabalho por mês no processo';
+  atualizarLive();
+});
+$('#f-limite').addEventListener('change', salvarLimite);
+$('#diverg').addEventListener('input', e => { const k = e.target.dataset && e.target.dataset.key; if (k && e.target.tagName === 'TEXTAREA') motivosU[k] = e.target.value; });
+$('#diverg').addEventListener('click', e => {
+  if (e.target.closest('#btn-reav')) return reavaliarIA();
+  const b = e.target.closest('button[data-dv="usar-ia"]');
+  if (b && iaAtual) { aplicarValoresIA(iaAtual, b.dataset.key); delete motivosU[b.dataset.key]; atualizarLive(); renderDiverg(); }
+});
+$('#dlg').addEventListener('mouseover', e => { const el = e.target.closest('[data-tip]'); if (el) mostrarTip(el); });
+$('#dlg').addEventListener('mouseout', e => { const el = e.target.closest('[data-tip]'); if (el && !(e.relatedTarget && el.contains(e.relatedTarget))) esconderTip(); });
+$('#dlg').addEventListener('focusin', e => { const el = e.target.closest('[data-tip]'); if (el) mostrarTip(el); else esconderTip(); });
+$('.ed-b').addEventListener('scroll', esconderTip);
+$('#btn-ia').addEventListener('click', classificarIA);
+$('#btn-ia-stop').addEventListener('click', () => { if (iaCtl) iaCtl.abort(); });
+$('#btn-perfil').addEventListener('click', salvarPerfil);
+$('#btn-recalc').addEventListener('click', recalcular);
+$('#btn-recalc-stop').addEventListener('click', () => { if (recCtl) recCtl.abort(); });
+['input','change'].forEach(ev => $('#perfil .perfil').addEventListener(ev, e => {
+  if (e.target.closest('#pf-list, #p-porte, #p-obs, #regua')) { perfilSujo = true; setPf('Alterações no perfil ainda não salvas.', false); }
+  if (e.target.closest('#regua')) renderProntidao();
+}));
+$('#v-setor').addEventListener('click', () => { view = 'setor'; try { localStorage.setItem('ranking-ia-view', view); } catch (e) {} render(); });
+$('#v-geral').addEventListener('click', () => { view = 'geral'; try { localStorage.setItem('ranking-ia-view', view); } catch (e) {} render(); });
+$('#filtro-setor').addEventListener('change', e => { filtroSetor = e.target.value; try { localStorage.setItem('ranking-ia-setor', filtroSetor); } catch (err) {} render(); });
+let buscaT = null;
+$('#busca').addEventListener('input', e => { clearTimeout(buscaT); buscaT = setTimeout(() => { busca = e.target.value; render(); }, 120); });
+render();
+
+/* ---------- Versão local: configurações ---------- */
+LOCAL.onCfg(c => {
+  SETORES = c.areas.slice();
+  document.querySelectorAll('.js-empresa').forEach(e => { e.textContent = c.empresa; });
+  $('#ft-ia').textContent = LOCAL.iaNome();
+  render();
+});
+$('#mes-atual').textContent = new Date().toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
+$('#btn-config').addEventListener('click', () => LOCAL.abrirConfig());
+
+/* ---------- Capacidades ---------- */
+(async function init(){
+  const c = window.claude;
+  if (!c || typeof c.use !== 'function') { dbState = 'off'; render(); return; }
+  c.use('sample').then(s => { sample = s || null; $('#ia-box').hidden = !sample; render(); }).catch(() => { sample = null; });
+  c.use('downloads').then(d => { downloads = d || null; render(); }).catch(() => { downloads = null; });
+  const pUser = c.use('user').catch(() => null);
+  db = await c.use('db').catch(() => null);
+  const user = await pUser;
+  if (user) { try { const w = await user.can('data.write'); if (w === false) canWrite = false; else if (w === null) canWrite = null; } catch (e) {} }
+  if (!db) { dbState = 'off'; render(); return; }
+  const timer = setTimeout(() => { if (!loaded) { dbState = 'slow'; render(); } }, 10000);
+  db.collection('solucoes').onSnapshot(snapQ => {
+    items = snapQ.docs.map(d => Object.assign({ id: d.id }, d.data()));
+    loaded = true;
+    if (!snapQ.metadata.fromCache) clearTimeout(timer);
+    dbState = 'ok';
+    render();
+  }, () => { clearTimeout(timer); dbState = 'error'; render(); });
+  db.doc('config/perfil').onSnapshot(s => { perfil = s.exists ? s.data() : null; render(); }, () => {});
+})();
+</script>
+</body>
+</html>

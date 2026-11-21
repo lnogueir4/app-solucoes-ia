@@ -1,0 +1,1361 @@
+{
+ "versao": 1,
+ "solucoes": {
+  "agente-de-cobranca": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "Agente de voz que liga para inadimplentes, negocia dentro das regras e registra o acordo para aprovação.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 0.5
+    },
+    "em": "2026-11-18T19:16:40.192Z",
+    "justificativa": "Mantida: o ERP com API e a TI interna facilitam a integração, restando só a aprovação humana dos acordos.",
+    "metas": [
+     "receita",
+     "margem",
+     "risco"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "Roda em segundo plano, e o time adota bem ferramentas novas.",
+      "dados": "Regras de negociação são configuráveis sem especialista em dados.",
+      "infra": "O ERP tem API, e a TI integra títulos em aberto.",
+      "manual": "Acordos registrados precisam de aprovação humana."
+     },
+     "metas": {
+      "custo": "Reduz ligações manuais, mas o efeito principal é recuperação, não corte de custo.",
+      "margem": "Receita recuperada sem custo proporcional de operadores melhora a margem.",
+      "produtividade": "Ganho indireto; o foco é recuperar receita.",
+      "receita": "Recupera valores inadimplentes que hoje nunca são abordados.",
+      "risco": "Reduz a exposição à inadimplência e registra acordos dentro das regras.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "Os títulos em aberto saem do ERP pela API com apoio da TI, e só a aprovação dos acordos ainda exige alguém.",
+   "metas": [
+    "receita",
+    "margem",
+    "risco"
+   ],
+   "motivosUsuario": {},
+   "nome": "Agente de Cobrança",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 2
+   },
+   "origem": "mapeada",
+   "resolve": "O operador liga um por um, e boa parte da carteira nunca é abordada.",
+   "setor": "Financeiro",
+   "status": "ativa"
+  },
+  "analise-completa-de-seo": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "Auditoria do site, palavras-chave, concorrentes e um plano de melhoria feito pela IA.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 0.5
+    },
+    "em": "2026-11-18T19:16:40.192Z",
+    "justificativa": "Mantida: o perfil não altera a dependência de alguém para executar o plano de SEO.",
+    "metas": [
+     "receita",
+     "produtividade"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "O time adota ferramentas novas sem resistência.",
+      "dados": "O relatório é interpretável sem especialista em dados.",
+      "infra": "Precisa apenas de acesso ao site.",
+      "manual": "Alguém precisa executar o plano de melhoria gerado."
+     },
+     "metas": {
+      "custo": "Não substitui custo relevante de forma direta.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "Elimina a montagem manual de relatórios com várias ferramentas.",
+      "receita": "Melhor posicionamento orgânico tende a trazer mais leads e vendas.",
+      "risco": "Não move de forma direta.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "A pessoa de dados ou BI já interpreta o plano, e a execução das melhorias no site ainda é manual.",
+   "metas": [
+    "receita",
+    "produtividade"
+   ],
+   "motivosUsuario": {},
+   "nome": "Análise Completa de SEO",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 2
+   },
+   "origem": "mapeada",
+   "resolve": "O analista usa uma ferramenta para cada análise e monta o relatório na mão.",
+   "setor": "Marketing",
+   "status": "ativa"
+  },
+  "gerador-de-posts-para-blog": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "Pesquisa, escreve, ilustra e publica posts de blog com IA seguindo uma linha editorial.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 1
+    },
+    "em": "2026-11-18T19:16:40.192Z",
+    "justificativa": "Mantida: a solução é autônoma e independe do perfil técnico da empresa.",
+    "metas": [
+     "receita",
+     "custo"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "Não muda a rotina do time.",
+      "dados": "Não exige perfil de dados.",
+      "infra": "Precisa apenas de um blog existente.",
+      "manual": "Pesquisa, escrita e publicação são automáticas."
+     },
+     "metas": {
+      "custo": "Substitui redação e produção manual de posts.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "Ganho indireto; o efeito principal é o custo.",
+      "receita": "Conteúdo constante gera tráfego orgânico e leads.",
+      "risco": "Não move de forma direta.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "Publica sozinho seguindo a linha editorial; o retorno em receita vem pelo SEO, devagar.",
+   "metas": [
+    "custo",
+    "receita"
+   ],
+   "motivosUsuario": {},
+   "nome": "Gerador de Posts para Blog",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 4
+   },
+   "origem": "mapeada",
+   "resolve": "O blog para na segunda semana, porque alguém precisa achar pauta, escrever e publicar.",
+   "setor": "Marketing",
+   "status": "ativa"
+  },
+  "disparo-de-mensagens-api-oficial": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "Campanhas pela API oficial do app de mensagens, com o seu número, templates aprovados e fluxo para quem responder.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 0.5
+    },
+    "em": "2026-11-18T19:16:40.192Z",
+    "justificativa": "Risco removido: a empresa já tem a API Oficial, então o ganho fica concentrado em receita.",
+    "metas": [
+     "receita"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "Ferramenta simples, e o time adota bem.",
+      "dados": "A segmentação vem do CRM existente, sem especialista.",
+      "infra": "O número na API Oficial já existe.",
+      "manual": "Alguém cria campanhas e templates para aprovação."
+     },
+     "metas": {
+      "custo": "Não move de forma direta.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "Ganho indireto.",
+      "receita": "Campanhas em escala geram vendas e reativações.",
+      "risco": "A empresa já usa a API Oficial, então o risco de bloqueio já está mitigado.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "Risco removido: a empresa já tem a API Oficial, então o ganho fica concentrado em receita.",
+   "metas": [
+    "receita"
+   ],
+   "motivosUsuario": {},
+   "nome": "Disparo de Mensagens pela API Oficial",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 2
+   },
+   "origem": "mapeada",
+   "resolve": "A campanha sai por um número comum e, no meio do disparo, o número é bloqueado.",
+   "setor": "Vendas",
+   "status": "ativa"
+  },
+  "estudio-de-criativos": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "Lê os anúncios que mais venderam, explica por que venceram e gera lotes novos no mesmo padrão, prontos para aprovar e subir pausados.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 0.5
+    },
+    "em": "2026-11-18T19:16:40.192Z",
+    "justificativa": "Mantida: o perfil não altera a necessidade de aprovar os criativos.",
+    "metas": [
+     "receita",
+     "custo",
+     "margem"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "O time adota ferramentas novas sem resistência.",
+      "dados": "A análise dos vencedores é feita pela IA.",
+      "infra": "Basta acesso às contas de anúncio.",
+      "manual": "Os lotes precisam de aprovação humana antes de subir."
+     },
+     "metas": {
+      "custo": "Reduz a demanda de peças ao designer.",
+      "margem": "Melhora o retorno por real investido em mídia.",
+      "produtividade": "Ganho indireto; o efeito principal é receita e custo.",
+      "receita": "Criativos baseados nos vencedores tendem a vender mais.",
+      "risco": "Não move de forma direta.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "TI, BI e um time aberto a ferramentas novas cobrem integração, análise e adoção, e a aprovação das peças segue humana.",
+   "metas": [
+    "receita",
+    "custo",
+    "margem"
+   ],
+   "motivosUsuario": {},
+   "nome": "Estúdio de Criativos",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 2
+   },
+   "origem": "mapeada",
+   "resolve": "Toda semana o gestor tenta adivinhar por que um anúncio vendeu e pede peças ao designer.",
+   "setor": "Marketing",
+   "status": "ativa"
+  },
+  "erp-financeiro-com-ia": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "ERP financeiro e fiscal multi-CNPJ, com vendas e estoque, IA que classifica o extrato e aprovação pelo app de mensagens.",
+   "ia": {
+    "dependencias": {
+     "cultura": 0.5,
+     "dados": 1,
+     "infra": 1,
+     "manual": 0
+    },
+    "em": "2026-11-18T19:16:40.192Z",
+    "justificativa": "Custo removido e infra elevada: a empresa já tem um ERP integrado e TI, então resta pouco ganho além de risco.",
+    "metas": [
+     "risco"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "Trocar um ERP consolidado exige mudar a rotina financeira.",
+      "dados": "Os relatórios financeiros já vêm prontos.",
+      "infra": "A TI interna e a infraestrutura de banco de dados suportam a instalação.",
+      "manual": "Um ERP exige lançamentos e manutenção contínua pela equipe."
+     },
+     "metas": {
+      "custo": "Substituir o ERP atual e seus complementos exige migração, então não há corte claro.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "Ganho marginal sobre o ERP atual, que já tem a conciliação bancária integrada.",
+      "receita": "Não move de forma direta.",
+      "risco": "A classificação de extrato por IA ainda reduz erros de conciliação.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "Custo removido e infra elevada: a empresa já tem um ERP integrado e TI, então resta pouco ganho além de risco.",
+   "metas": [
+    "risco"
+   ],
+   "motivosUsuario": {},
+   "nome": "ERP Financeiro com IA",
+   "notas": {
+    "cultura": 0.5,
+    "dados": 2,
+    "infra": 3,
+    "manual": 0
+   },
+   "origem": "mapeada",
+   "resolve": "Extrato, contas e notas ficam em lugares separados, e o DRE nunca bate com o banco.",
+   "setor": "Financeiro",
+   "status": "ativa"
+  },
+  "crm-com-ia": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "CRM próprio com funil, atendimento por IA, agenda, ligações e automações, numa instalação por empresa.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 0
+    },
+    "em": "2026-11-18T19:16:40.193Z",
+    "justificativa": "Infra e cultura elevadas pela TI e pela boa adoção, mas há sobreposição com o CRM já existente.",
+    "metas": [
+     "produtividade"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "O time adota ferramentas novas sem resistência.",
+      "dados": "Não exige especialista em dados.",
+      "infra": "A TI interna cuida da instalação e das integrações.",
+      "manual": "Um CRM exige alimentação e atualização constante pelo time."
+     },
+     "metas": {
+      "custo": "Não move de forma direta.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "A IA no atendimento e as automações podem agilizar sobre o CRM atual.",
+      "receita": "A empresa já tem CRM, então não há ganho direto de receita.",
+      "risco": "Não move de forma direta.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "Infra e cultura elevadas pela TI e pela boa adoção, mas há sobreposição com o CRM já existente.",
+   "metas": [
+    "produtividade"
+   ],
+   "motivosUsuario": {},
+   "nome": "CRM com IA",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 0
+   },
+   "origem": "mapeada",
+   "resolve": "O lead chega pelo app de mensagens, pelas redes sociais e por e-mail, e ninguém sabe quem respondeu.",
+   "setor": "Vendas",
+   "status": "ativa"
+  },
+  "gestao-de-clientes-portal": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "Carteira com health score, alertas de risco e playbooks, e uma Área do cliente para abrir chamados e trocar documentos.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 0.5
+    },
+    "em": "2026-11-18T19:16:40.193Z",
+    "justificativa": "Cultura elevada: o time adota bem novas ferramentas e já tem equipe dedicada de atendimento.",
+    "metas": [
+     "receita",
+     "risco",
+     "valuation"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "O time adota ferramentas novas sem resistência.",
+      "dados": "Há pessoa de BI para calibrar indicadores, sem dependência forte.",
+      "infra": "O CRM e o BI existentes alimentam o health score.",
+      "manual": "Os playbooks precisam ser executados pela equipe de atendimento."
+     },
+     "metas": {
+      "custo": "Não move de forma direta.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "Ganho indireto via portal.",
+      "receita": "Retenção e expansão da carteira preservam receita.",
+      "risco": "O health score antecipa cancelamentos.",
+      "valuation": "Receita recorrente retida aumenta o valor da empresa."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "Cultura elevada: o time adota bem novas ferramentas e já tem equipe dedicada de atendimento.",
+   "metas": [
+    "receita",
+    "risco",
+    "valuation"
+   ],
+   "motivosUsuario": {},
+   "nome": "Gestão de Clientes + Portal do Cliente",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 2
+   },
+   "origem": "mapeada",
+   "resolve": "O time só descobre o risco quando o cliente pede para cancelar.",
+   "setor": "Atendimento",
+   "status": "ativa"
+  },
+  "gestao-de-projetos-com-ia": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "Kanban e agenda da equipe, com a IA criando tarefas no sistema e pelo app de mensagens e respondendo também no chat interno.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 0.5
+    },
+    "em": "2026-11-18T19:16:40.193Z",
+    "justificativa": "Cultura elevada pela boa adoção de ferramentas do time.",
+    "metas": [
+     "produtividade"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "O time adota ferramentas novas sem resistência.",
+      "dados": "Não exige perfil de dados.",
+      "infra": "Usa o app de mensagens e o chat interno que a equipe já tem.",
+      "manual": "A equipe ainda atualiza o status das tarefas."
+     },
+     "metas": {
+      "custo": "Não move de forma direta.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "Pedidos viram tarefas rastreáveis automaticamente.",
+      "receita": "Não move de forma direta.",
+      "risco": "Não move de forma direta.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "Cultura elevada pela boa adoção de ferramentas do time.",
+   "metas": [
+    "produtividade"
+   ],
+   "motivosUsuario": {},
+   "nome": "Gestão de Projetos com IA",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 2
+   },
+   "origem": "mapeada",
+   "resolve": "O pedido chega pelo app de mensagens, vira linha numa planilha e ninguém mais atualiza.",
+   "setor": "Operação",
+   "status": "ativa"
+  },
+  "gestao-de-rh-completa": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "Da admissão ao desligamento num sistema só, com IA no dia a dia do RH.",
+   "ia": {
+    "dependencias": {
+     "cultura": 0.5,
+     "dados": 1,
+     "infra": 1,
+     "manual": 0
+    },
+    "em": "2026-11-18T19:16:40.193Z",
+    "justificativa": "Infra elevada pela TI interna; a cultura segue parcial porque substitui o sistema de folha já em uso.",
+    "metas": [
+     "custo",
+     "risco"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "Mudar a rotina do sistema de folha atual exige adaptação do RH.",
+      "dados": "Não exige especialista em dados.",
+      "infra": "A TI pode integrar ou migrar a folha do sistema atual.",
+      "manual": "A rotina de RH exige operação diária no sistema."
+     },
+     "metas": {
+      "custo": "Pode consolidar sistemas pagos de RH.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "Ganho indireto.",
+      "receita": "Não move de forma direta.",
+      "risco": "Centraliza documentos e processos trabalhistas.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "Infra elevada pela TI interna; a cultura segue parcial porque substitui o sistema de folha já em uso.",
+   "metas": [
+    "custo",
+    "risco"
+   ],
+   "motivosUsuario": {},
+   "nome": "Gestão de RH Completa",
+   "notas": {
+    "cultura": 0.5,
+    "dados": 2,
+    "infra": 3,
+    "manual": 0
+   },
+   "origem": "mapeada",
+   "resolve": "O RH alterna entre sistemas pagos, planilhas de ponto e comunicados pelo app de mensagens.",
+   "setor": "Pessoas",
+   "status": "ativa"
+  },
+  "gestor-de-trafego": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "Junta as contas de anúncio dos clientes num painel, monta a fila do dia e liga a venda ao anúncio, com agentes de IA dentro de limites.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 0.5
+    },
+    "em": "2026-11-18T19:16:40.193Z",
+    "justificativa": "Infra elevada: o CRM, o BI centralizado e a TI resolvem a integração entre venda e anúncio.",
+    "metas": [
+     "receita",
+     "margem",
+     "produtividade"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "O time adota ferramentas novas sem resistência.",
+      "dados": "O painel é operável sem especialista.",
+      "infra": "O CRM, o BI e a TI viabilizam a integração de vendas.",
+      "manual": "Os agentes atuam dentro de limites, com supervisão do gestor."
+     },
+     "metas": {
+      "custo": "Não move de forma direta.",
+      "margem": "Corta verba de anúncios que não vendem.",
+      "produtividade": "Elimina a troca entre gerenciadores, CRM e planilhas.",
+      "receita": "Ligar a venda ao anúncio permite escalar o que converte.",
+      "risco": "Não move de forma direta.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "Infra elevada: o CRM, o BI centralizado e a TI resolvem a integração entre venda e anúncio.",
+   "metas": [
+    "receita",
+    "margem",
+    "produtividade"
+   ],
+   "motivosUsuario": {},
+   "nome": "Gestor de Tráfego",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 2
+   },
+   "origem": "mapeada",
+   "resolve": "O gestor pula entre o gerenciador de anúncios de cada rede, o CRM, o checkout e a planilha.",
+   "setor": "Marketing",
+   "status": "ativa"
+  },
+  "central-de-suporte-com-ia": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "O e-mail e o formulário do site viram ticket, com prioridade e SLA automáticos, base de conhecimento e pesquisa de satisfação.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 0.5
+    },
+    "em": "2026-11-18T19:16:40.193Z",
+    "justificativa": "Mantida: há equipe dedicada de suporte para operar os tickets.",
+    "metas": [
+     "custo",
+     "risco",
+     "produtividade"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "O time adota ferramentas novas sem resistência.",
+      "dados": "Não exige perfil de dados.",
+      "infra": "Usa o e-mail e o site existentes.",
+      "manual": "A equipe dedicada de suporte responde os tickets."
+     },
+     "metas": {
+      "custo": "A base de conhecimento reduz tickets repetitivos.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "Prioriza e distribui tickets automaticamente.",
+      "receita": "Não move de forma direta.",
+      "risco": "O SLA automático evita pedidos esquecidos.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "A equipe de suporte dedicada adota a ferramenta sem resistência e atende os tickets gerados.",
+   "metas": [
+    "custo",
+    "risco",
+    "produtividade"
+   ],
+   "motivosUsuario": {},
+   "nome": "Central de Suporte com IA",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 2
+   },
+   "origem": "mapeada",
+   "resolve": "O suporte vive num e-mail compartilhado e ninguém sabe quem cuida de cada pedido.",
+   "setor": "Atendimento",
+   "status": "ativa"
+  },
+  "resposta-automatica-a-comentarios": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "Quem comenta uma palavra-chave no post recebe o link ou o material por mensagem direta.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 1
+    },
+    "em": "2026-11-18T19:16:40.193Z",
+    "justificativa": "Mantida: é autônoma e independe do perfil técnico.",
+    "metas": [
+     "receita",
+     "produtividade"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "Não muda a rotina do time.",
+      "dados": "Não exige perfil de dados.",
+      "infra": "Precisa apenas da conta na rede social.",
+      "manual": "Funciona sozinho após a configuração."
+     },
+     "metas": {
+      "custo": "Não move de forma direta.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "Elimina respostas manuais aos comentários.",
+      "receita": "Atende na hora quem demonstra interesse.",
+      "risco": "Não move de forma direta.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "Configura-se uma vez por post; não exige integração pesada nem time de dados.",
+   "metas": [
+    "receita",
+    "produtividade"
+   ],
+   "motivosUsuario": {},
+   "nome": "Resposta Automática a Comentários",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 4
+   },
+   "origem": "mapeada",
+   "resolve": "Centenas de comentários para responder um por um, e quem não é atendido na hora se perde.",
+   "setor": "Vendas",
+   "status": "ativa"
+  },
+  "coach-de-vendas-em-reunioes": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "Dicas e alertas de IA durante a reunião, com base no playbook da empresa.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 1
+    },
+    "em": "2026-11-18T19:16:40.193Z",
+    "justificativa": "Cultura elevada pela boa adoção de ferramentas pelo time.",
+    "metas": [
+     "receita",
+     "produtividade"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "O time adota ferramentas novas sem resistência.",
+      "dados": "Não exige perfil de dados.",
+      "infra": "Funciona nas ferramentas de reunião existentes.",
+      "manual": "As dicas são automáticas, com base no playbook."
+     },
+     "metas": {
+      "custo": "Não move de forma direta.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "Reduz o retrabalho de revisão pelo gestor.",
+      "receita": "Melhora a conversão das reuniões de venda.",
+      "risco": "Não move de forma direta.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "Cultura elevada pela boa adoção de ferramentas pelo time.",
+   "metas": [
+    "receita",
+    "produtividade"
+   ],
+   "motivosUsuario": {},
+   "nome": "Coach de Vendas em Reuniões",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 4
+   },
+   "origem": "mapeada",
+   "resolve": "O vendedor sai da reunião e só depois o gestor descobre o que deu errado.",
+   "setor": "Vendas",
+   "status": "ativa"
+  },
+  "assistente-de-reunioes": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "Reuniões viram ata, decisões e quadro de ações com prazo.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 1
+    },
+    "em": "2026-11-18T19:16:40.193Z",
+    "justificativa": "Mantida: é autônoma e de baixa dependência.",
+    "metas": [
+     "risco",
+     "produtividade"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "Não muda a rotina do time.",
+      "dados": "Não exige perfil de dados.",
+      "infra": "Usa as ferramentas de reunião existentes.",
+      "manual": "Ata e ações são automáticas."
+     },
+     "metas": {
+      "custo": "Não move de forma direta.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "Gera ata e ações sem trabalho manual.",
+      "receita": "Não move de forma direta.",
+      "risco": "Registra decisões e responsáveis.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "Com o time adotando ferramentas novas sem resistência, o uso das atas e do quadro de ações deixa de ser barreira.",
+   "metas": [
+    "risco",
+    "produtividade"
+   ],
+   "motivosUsuario": {},
+   "nome": "Assistente de Reuniões",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 4
+   },
+   "origem": "mapeada",
+   "resolve": "A reunião termina, todo mundo concorda, e uma semana depois ninguém lembra quem ficou com o quê.",
+   "setor": "Operação",
+   "status": "ativa"
+  },
+  "automacao-de-redes-sociais": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "Cria, confere, agenda e publica peças em cinco redes com IA, sempre com a aprovação de uma pessoa.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 0.5
+    },
+    "em": "2026-11-18T19:16:40.194Z",
+    "justificativa": "Mantida: o perfil não altera a aprovação humana das peças.",
+    "metas": [
+     "custo",
+     "produtividade"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "O time adota ferramentas novas sem resistência.",
+      "dados": "Não exige perfil de dados.",
+      "infra": "Precisa apenas das contas das redes.",
+      "manual": "Cada peça exige aprovação humana."
+     },
+     "metas": {
+      "custo": "Reduz a produção manual de peças.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "Cria e adapta para cinco redes automaticamente.",
+      "receita": "Não move de forma direta.",
+      "risco": "Não move de forma direta.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "A TI conecta as redes e o time adota bem, mas cada peça continua precisando de aprovação humana.",
+   "metas": [
+    "custo",
+    "produtividade"
+   ],
+   "motivosUsuario": {},
+   "nome": "Automação de Redes Sociais",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 2
+   },
+   "origem": "mapeada",
+   "resolve": "A equipe pesquisa, escreve, cria arte e adapta para cada rede, e cada peça sai num tom.",
+   "setor": "Marketing",
+   "status": "ativa"
+  },
+  "painel-de-indicadores-sob-demanda": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "Você descreve o que quer ver em uma frase e a IA monta o dashboard ligado aos dados reais da empresa.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 1
+    },
+    "em": "2026-11-18T19:16:40.194Z",
+    "justificativa": "Mantida: os dados já centralizados favorecem a solução.",
+    "metas": [
+     "margem",
+     "risco",
+     "produtividade"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "O time adota ferramentas novas sem resistência.",
+      "dados": "Há pessoa de BI, mas não é necessária.",
+      "infra": "O BI centralizado e o banco de dados do ERP já existem.",
+      "manual": "A IA monta e atualiza os dashboards."
+     },
+     "metas": {
+      "custo": "Não move de forma direta.",
+      "margem": "Dados em tempo real orientam decisões de preço e custo.",
+      "produtividade": "Elimina a montagem manual de planilhas.",
+      "receita": "Não move de forma direta.",
+      "risco": "Antecipa desvios com dados atualizados.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "Os dados já estão centralizados em BI, há uma pessoa de dados e a TI conecta os bancos de dados locais do ERP e do sistema de folha.",
+   "metas": [
+    "margem",
+    "risco",
+    "produtividade"
+   ],
+   "motivosUsuario": {},
+   "nome": "Painel de Indicadores sob Demanda",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 4
+   },
+   "origem": "mapeada",
+   "resolve": "O gestor junta números de várias ferramentas numa planilha, e o dado chega atrasado.",
+   "setor": "Dados",
+   "status": "ativa"
+  },
+  "atendimento-omnichannel": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "Uma caixa de entrada para app de mensagens, redes sociais, e-mail, chat do site e telefone, com agentes de IA no tom da empresa.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 0.5
+    },
+    "em": "2026-11-18T19:16:40.194Z",
+    "justificativa": "Mantida: a API Oficial e a equipe dedicada favorecem a solução.",
+    "metas": [
+     "receita",
+     "custo",
+     "produtividade"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "O time adota ferramentas novas sem resistência.",
+      "dados": "Não exige perfil de dados.",
+      "infra": "A API oficial do app de mensagens já existe.",
+      "manual": "A equipe dedicada assume os casos complexos."
+     },
+     "metas": {
+      "custo": "Os agentes de IA reduzem a carga do atendimento.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "Unifica os canais numa caixa só.",
+      "receita": "Responde fora do horário e recupera oportunidades.",
+      "risco": "Não move de forma direta.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "A API oficial do app de mensagens e a equipe de atendimento dedicada já existem, então falta só operar a caixa unificada.",
+   "metas": [
+    "receita",
+    "custo",
+    "produtividade"
+   ],
+   "motivosUsuario": {},
+   "nome": "Atendimento Omnichannel",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 2
+   },
+   "origem": "mapeada",
+   "resolve": "App de mensagens, mensagens diretas e planilha separados, e a mensagem fora do horário fica sem resposta.",
+   "setor": "Atendimento",
+   "status": "ativa"
+  },
+  "sdr-com-ia": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "SDR de IA que atende os leads pelo app de mensagens, qualifica, move o Kanban e passa a conversa para a equipe.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 1
+    },
+    "em": "2026-11-18T19:16:40.194Z",
+    "justificativa": "Mantida: a infraestrutura existente favorece a solução.",
+    "metas": [
+     "receita",
+     "custo",
+     "produtividade"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "Não muda a rotina do time.",
+      "dados": "Não exige perfil de dados.",
+      "infra": "A API Oficial e o CRM já existem.",
+      "manual": "Atende e qualifica sozinha."
+     },
+     "metas": {
+      "custo": "Substitui parte do trabalho de SDR humano.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "Qualifica e move o funil automaticamente.",
+      "receita": "Atende leads na hora, inclusive à noite.",
+      "risco": "Não move de forma direta.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "O CRM e a API oficial do app de mensagens já existentes cobrem toda a infraestrutura de que o SDR precisa.",
+   "metas": [
+    "receita",
+    "custo",
+    "produtividade"
+   ],
+   "motivosUsuario": {},
+   "nome": "SDR com IA",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 4
+   },
+   "origem": "mapeada",
+   "resolve": "O lead escreve à noite, ninguém responde e de manhã ele já falou com o concorrente.",
+   "setor": "Vendas",
+   "status": "ativa"
+  },
+  "pesquisa-de-satisfacao": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "NPS por e-mail e app de mensagens; cada detrator vira tarefa de acompanhamento.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 0.5
+    },
+    "em": "2026-11-18T19:16:40.194Z",
+    "justificativa": "Mantida: o acompanhamento dos detratores continua manual.",
+    "metas": [
+     "risco"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "O time adota ferramentas novas sem resistência.",
+      "dados": "O NPS é simples de interpretar.",
+      "infra": "A API Oficial e o e-mail já existem.",
+      "manual": "Alguém precisa acompanhar cada detrator."
+     },
+     "metas": {
+      "custo": "Não move de forma direta.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "Ganho indireto.",
+      "receita": "Não move de forma direta.",
+      "risco": "Detecta detratores antes do cancelamento.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "A equipe de atendimento dedicada assume o acompanhamento dos detratores sem barreira de adoção.",
+   "metas": [
+    "risco"
+   ],
+   "motivosUsuario": {},
+   "nome": "Pesquisa de Satisfação",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 2
+   },
+   "origem": "mapeada",
+   "resolve": "A pesquisa sai de vez em quando e ninguém vai atrás de quem deu nota baixa.",
+   "setor": "Atendimento",
+   "status": "ativa"
+  },
+  "proposta-assinatura": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "Proposta preenchida por IA, aceite pelo link e contrato assinado no celular, com trilha e carimbo do tempo.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 1
+    },
+    "em": "2026-11-18T19:16:40.194Z",
+    "justificativa": "Mantida: é autônoma e se apoia no CRM existente.",
+    "metas": [
+     "receita",
+     "custo",
+     "risco"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "Não muda a rotina do time.",
+      "dados": "Não exige perfil de dados.",
+      "infra": "O CRM existente alimenta os dados.",
+      "manual": "A proposta é preenchida pela IA."
+     },
+     "metas": {
+      "custo": "Elimina a redigitação de contratos.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "Ganho indireto.",
+      "receita": "Acelera o fechamento e reduz desistências.",
+      "risco": "Trilha e carimbo do tempo dão validade jurídica.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "Com o time adotando ferramentas novas sem resistência, a troca do editor de texto pelo link de aceite deixa de ser barreira.",
+   "metas": [
+    "receita",
+    "custo",
+    "risco"
+   ],
+   "motivosUsuario": {},
+   "nome": "Proposta + Assinatura",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 4
+   },
+   "origem": "mapeada",
+   "resolve": "A proposta sai do editor de texto, o sim chega pelo app de mensagens e o contrato é redigitado.",
+   "setor": "Vendas",
+   "status": "ativa"
+  },
+  "prospeccao-com-ia": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "Você descreve o público, de empresas ou de pessoas, recebe a lista com telefone, e-mail e redes e aborda pelo app de mensagens ou por e-mail.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 0.5
+    },
+    "em": "2026-11-18T19:16:40.194Z",
+    "justificativa": "Mantida: o perfil não altera a abordagem feita pelo vendedor.",
+    "metas": [
+     "receita"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "O time adota ferramentas novas sem resistência.",
+      "dados": "Não exige perfil de dados.",
+      "infra": "A API Oficial e o CRM já existem.",
+      "manual": "O vendedor conduz a abordagem."
+     },
+     "metas": {
+      "custo": "Não move de forma direta.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "Ganho indireto.",
+      "receita": "Gera novas oportunidades com contatos válidos.",
+      "risco": "Não move de forma direta.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "O CRM e a API oficial do app de mensagens recebem as listas, mas a abordagem comercial ainda depende do vendedor.",
+   "metas": [
+    "receita"
+   ],
+   "motivosUsuario": {},
+   "nome": "Prospecção com IA",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 2
+   },
+   "origem": "mapeada",
+   "resolve": "O vendedor passa o dia procurando contato, e boa parte vai em número que não funciona.",
+   "setor": "Vendas",
+   "status": "ativa"
+  },
+  "recrutamento-com-ia": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "Vagas, triagem de candidatos com IA, entrevistas e proposta.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 0.5
+    },
+    "em": "2026-11-18T19:16:40.194Z",
+    "justificativa": "Mantida: o perfil não altera a solução.",
+    "metas": [
+     "custo",
+     "produtividade"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "O time adota ferramentas novas sem resistência.",
+      "dados": "Não exige perfil de dados.",
+      "infra": "Não exige infraestrutura nova.",
+      "manual": "As entrevistas e decisões ficam com o recrutador."
+     },
+     "metas": {
+      "custo": "Reduz o tempo gasto em triagem.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "A IA filtra os perfis fora da vaga.",
+      "receita": "Não move de forma direta.",
+      "risco": "Não move de forma direta.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "O time adota bem a ferramenta, e as entrevistas e a decisão final continuam com o recrutador.",
+   "metas": [
+    "custo",
+    "produtividade"
+   ],
+   "motivosUsuario": {},
+   "nome": "Recrutamento com IA",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 2
+   },
+   "origem": "mapeada",
+   "resolve": "O recrutador junta planilha, e-mail e currículos e passa horas lendo perfis fora da vaga.",
+   "setor": "Pessoas",
+   "status": "ativa"
+  },
+  "qualificacao-de-leads-por-conversa": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "O lead responde a uma conversa guiada, ganha uma nota de A a F e chega ao CRM na hora, com a origem registrada.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 1
+    },
+    "em": "2026-11-18T19:16:40.194Z",
+    "justificativa": "Mantida: integra direto ao CRM existente.",
+    "metas": [
+     "receita",
+     "produtividade"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "Não muda a rotina do time.",
+      "dados": "Não exige perfil de dados.",
+      "infra": "O CRM já existe.",
+      "manual": "Qualifica e envia ao CRM sozinho."
+     },
+     "metas": {
+      "custo": "Não move de forma direta.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "Elimina a triagem manual de contatos.",
+      "receita": "Prioriza os leads com perfil para o comercial.",
+      "risco": "Não move de forma direta.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "Roda sozinho depois de definir os critérios de A a F; só precisa integrar com o CRM.",
+   "metas": [
+    "receita",
+    "produtividade"
+   ],
+   "motivosUsuario": {},
+   "nome": "Qualificação de Leads por Conversa",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 4
+   },
+   "origem": "mapeada",
+   "resolve": "O anúncio traz contatos, e o comercial passa o dia separando quem tem perfil.",
+   "setor": "Vendas",
+   "status": "ativa"
+  },
+  "coach-de-vendas-em-ligacoes": {
+   "atualizadoEm": "2026-11-18T19:19:07.206Z",
+   "criadoEm": "2026-11-18T12:00:00.000Z",
+   "descricao": "Transcreve ao vivo a ligação feita pelo app de mensagens e mostra o que ainda falta cobrir.",
+   "ia": {
+    "dependencias": {
+     "cultura": 1,
+     "dados": 1,
+     "infra": 1,
+     "manual": 1
+    },
+    "em": "2026-11-18T19:16:40.194Z",
+    "justificativa": "Cultura elevada pela boa adoção de ferramentas pelo time.",
+    "metas": [
+     "receita",
+     "risco"
+    ],
+    "modelo": "claude-opus-5-5",
+    "motivos": {
+     "dependencias": {
+      "cultura": "O time adota ferramentas novas sem resistência.",
+      "dados": "Não exige perfil de dados.",
+      "infra": "Usa o app de mensagens que a equipe já tem.",
+      "manual": "A transcrição e os alertas são automáticos."
+     },
+     "metas": {
+      "custo": "Não move de forma direta.",
+      "margem": "Não move de forma direta.",
+      "produtividade": "Ganho indireto.",
+      "receita": "Guia o vendedor a cobrir os pontos que fecham a venda.",
+      "risco": "Deixa registro das ligações de vendas.",
+      "valuation": "Não move de forma direta."
+     }
+    },
+    "respostas": {}
+   },
+   "justificativa": "Cultura elevada pela boa adoção de ferramentas pelo time.",
+   "metas": [
+    "receita",
+    "risco"
+   ],
+   "motivosUsuario": {},
+   "nome": "Coach de Vendas em Ligações",
+   "notas": {
+    "cultura": 1,
+    "dados": 2,
+    "infra": 3,
+    "manual": 4
+   },
+   "origem": "mapeada",
+   "resolve": "Ligações de vendas pelo app de mensagens não deixam registro.",
+   "setor": "Vendas",
+   "status": "ativa"
+  }
+ }
+}
