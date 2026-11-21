@@ -53,7 +53,13 @@ O navegador nunca recebe a chave: quem fala com o provedor é o servidor local.
 
 ## Prompts da IA
 
-Os prompts ficam em `public/index.html`, nas funções `promptIA` (classificar uma solução), `promptReavaliar` (reavaliar com as suas justificativas) e `promptRecalc` (revisar todas com o perfil da empresa). Eles usam os blocos `perfilTexto`, `REGRAS`, `processoTexto`, `FORMATO_V2` e `FORMATO_MOTIVOS`. O texto é o mesmo para todos os provedores. Depois de editar, basta recarregar a página.
+Os prompts ficam em `public/index.html`, nas funções `promptIA` (classificar uma solução), `promptReavaliar` (reavaliar com as suas justificativas) e `promptRecalc` (revisar todas com o perfil da empresa). Eles usam os blocos `perfilTexto`, `REGRAS`, `processoTexto`, `contextoTexto`, `FORMATO_V2` e `FORMATO_MOTIVOS`. O texto é o mesmo para todos os provedores. Depois de editar, basta recarregar a página.
+
+- **Réguas:** `REGRAS` diz o que vale 1, 0,5 e 0 em cada uma das quatro notas.
+- **Contexto da solução:** `contextoTexto` manda até onde o agente vai, o dado pessoal e as soluções de que ela depende. A dependência não baixa nota, porque o app já trava a solução até a base ser implantada.
+- **Nota Infra:** a IA usa o campo "O que já funciona e o que ainda não está ligado", do perfil da empresa (seção 06). O que já funciona não conta como peça nova.
+- **Exemplos:** ao classificar uma solução, a IA vê 8 já classificadas, até 5 da mesma área, espalhadas da menor à maior nota, com a natureza e a justificativa.
+- **Revisar todas:** "Recalcular notas com o perfil" manda as soluções em partes de 12 (`LOTE_RECALC`). Se uma parte falhar, as outras seguem, e a tela diz quantas ficaram sem revisão.
 
 ## Exemplos ou do zero
 

@@ -623,6 +623,8 @@
           </div>
           <div class="fld"><label for="p-obs">Observações</label><textarea id="p-obs" rows="2" maxlength="600" placeholder="Ex.: usamos um ERP próprio e um CRM na nuvem; o comercial atende por um app de mensagens comum"></textarea></div>
         </div>
+        <div class="fld"><label for="p-ligado">O que já funciona e o que ainda não está ligado</label><textarea id="p-ligado" rows="3" maxlength="800" placeholder="Ex.: já funcionam o atendimento pelo app de mensagens, a leitura do ERP e o CRM; ainda não estão ligados a gravação no ERP, a folha de pagamento e o extrato do banco"></textarea></div>
+        <p class="ed-hint">A IA usa esta lista na nota Infra: o que já funciona não conta como peça nova.</p>
         <p class="pf-k">Limites do valor (R$ por mês)</p>
         <div class="pf-row">
           <div class="fld"><label for="p-valto">Valor alto a partir de</label><input type="text" inputmode="decimal" id="p-valto" maxlength="12" placeholder="Ex.: 5000"></div>
@@ -2300,7 +2302,7 @@ function perfilTexto(){
   const p = perfil || {};
   const r = p.regua || {};
   const algumaDim = REGUA.some(d => nivelRegua(r[d.k]));
-  const algum = algumaDim || PERFIL_ITENS.some(i => typeof p[i.k] === 'boolean') || p.porte || p.obs;
+  const algum = algumaDim || PERFIL_ITENS.some(i => typeof p[i.k] === 'boolean') || p.porte || p.obs || p.jaLigado;
   if (!algum) return 'Perfil não informado: considere uma empresa de pequeno ou médio porte, sem time de dados dedicado e sem sistemas integrados.';
   const linhas = [];
   if (algumaDim) {
@@ -2314,20 +2316,34 @@ function perfilTexto(){
   PERFIL_ITENS.forEach(i => linhas.push(`- ${i.l}: ${p[i.k] ? 'sim' : 'não'}`));
   if (p.porte && PORTES[p.porte]) linhas.push(`- Porte: ${PORTES[p.porte]}`);
   if (p.obs) linhas.push(`- Observações: ${String(p.obs).slice(0, 600)}`);
+  if (p.jaLigado) linhas.push(`- O que já funciona e o que ainda não está ligado: ${String(p.jaLigado).slice(0, 800)}`);
   return linhas.join('\n');
 }
 const REGRAS = `PASSO 1. Metas que o projeto move de forma direta e clara (pode ser nenhuma):
 - primárias: "receita" (aumentar receita), "custo" (diminuir custo), "margem" (aumentar margem)
 - secundárias: "risco" (diminuir risco), "produtividade" (aumentar produtividade), "valuation" (aumentar valuation/equity)
 
-PASSO 2. Para cada dependência, diga quanto o projeto depende dela para funcionar e se manter NESTA empresa, considerando o que ela já tem: 1 = não depende, 0.5 = depende em parte, 0 = depende.
-- "manual": para continuar funcionando, precisa de trabalho manual recorrente? Conta: alimentar dados ou documentos na mão, conferir e corrigir respostas com frequência, manter atualizados a base de conhecimento, as regras ou os prompts. Uma solução que age sozinha também precisa de alguém conferindo o que ela faz. Não conta: a revisão humana exigida por segurança ou por lei (avaliada na checagem "regras") nem o trabalho que as pessoas fazem com o resultado, como a abordagem do vendedor ou a execução de um plano; esse tempo reduz o ganho, não esta nota. (peso 4)
-- "infra": precisa de muita infra, integração ou tecnologia que a empresa ainda não tem? Uma IA usada por API quase não exige servidor; pese a integração com os sistemas e o acesso aos dados. (peso 3)
-- "dados": precisa de gente técnica para dar continuidade (dados, integração ou IA: ajustar prompts, avaliar a qualidade das respostas, manter as integrações)? Aqui conta se existe quem saiba consertar e evoluir a solução; o volume de trabalho repetido fica em "manual". (peso 2)
-- "cultura": precisa de mudança de cultura e comportamento? (peso 1)
+PASSO 2. Para cada dependência, diga quanto o projeto depende dela para funcionar e se manter NESTA empresa, considerando o que ela já tem: 1 = não depende, 0.5 = depende em parte, 0 = depende. Use as âncoras abaixo. Se a solução ficar entre dois níveis, escolha o mais próximo e diga a dúvida no motivo.
+- "manual" (peso 4): trabalho manual recorrente para a solução continuar funcionando.
+  1 = o resultado vai para uma pessoa que decide ou age, e as entradas vêm dos sistemas ou de quem já faz o processo.
+  0.5 = a solução conversa sozinha com cliente, fornecedor ou colaborador e precisa de alguém conferindo o que ela faz; ou alguém precisa alimentar à mão um cadastro, documento ou encaminhamento que nenhum sistema captura; ou a base, as regras ou os prompts mudam com frequência.
+  0 = uma pessoa precisa operar a solução todo dia para ela existir.
+  Não conta: a revisão humana exigida por segurança ou por lei (avaliada na checagem "regras") nem o trabalho que as pessoas fazem com o resultado, como a abordagem do vendedor ou a execução de um plano; esse tempo reduz o ganho, não esta nota.
+- "infra" (peso 3): infra, integração ou tecnologia que a empresa ainda não tem. Uma IA usada por API quase não exige servidor; pese a integração com os sistemas e o acesso aos dados. Use o que o perfil diz que já funciona e o que ainda não está ligado.
+  1 = usa só o que já funciona, dado público, áudio, um cadastro próprio da solução ou o resultado de outras soluções.
+  0.5 = uma peça nova: gravar num sistema que hoje só é lido, ler um sistema ainda não ligado, uma caixa de e-mail, a guarda de documento sensível ou uma ferramenta nova.
+  0 = várias peças novas de uma vez.
+- "dados" (peso 2): gente técnica para dar continuidade depois de implantada (ajustar prompts, avaliar a qualidade das respostas, manter as integrações). A existência e a qualidade do dado não entram aqui: ficam nas checagens "dado" e "qualidade". O volume de trabalho repetido fica em "manual".
+  1 = regra fixa sobre no máximo um sistema, ou só um canal que já funciona, dado público ou áudio, sem ajuste técnico recorrente.
+  0.5 = ajuste periódico de prompt ou regra da IA, conferência técnica da qualidade da resposta, gravação em sistema ou duas integrações.
+  0 = três ou mais sistemas ou soluções integrados, uma base de dados para construir e manter, ou regras que mudam por lei.
+- "cultura" (peso 1): mudança de cultura e comportamento.
+  1 = as pessoas recebem o resultado no canal e no formato que já usam.
+  0.5 = uma função muda a rotina ou passa a seguir um passo novo.
+  0 = várias áreas mudam o jeito de trabalhar, ou a solução mexe com o controle ou a avaliação de pessoas.
 
 PASSO 3. Natureza da solução ("natureza"), uma destas:
-- "ia": texto repetido, leitura de documentos, triagem, busca em base de conhecimento ou apoio a decisões, sempre com revisão humana
+- "ia": texto repetido, leitura de documentos, triagem, busca em base de conhecimento ou apoio a decisões (até onde ela age sozinha está em "Até onde vai")
 - "automacao": dado estruturado e regra clara (relatório, painel, integração, importação, alerta, cópia entre sistemas)
 - "ia_automacao": a IA lê ou interpreta e uma regra grava no sistema
 - "processo": o problema é falta de padrão, de responsável ou de documentação; tecnologia só depois
@@ -2338,8 +2354,10 @@ PASSO 4. Checagens técnicas ("checagens"), cada uma "ok", "parcial", "falha" ou
 - "dado": a informação necessária existe e dá para ler e gravar nos sistemas?
 - "integracoes": os sistemas envolvidos permitem integração?
 - "qualidade": o histórico está completo e padronizado o suficiente?
-- "regras": há exigência legal, fiscal ou regulatória, e ela está atendida? Pagamentos, exclusão de dados, concessão de acessos, decisões fiscais, jurídicas ou de RH e mensagens a clientes sem revisão exigem revisão humana: use no máximo "parcial" e diga isso no motivo.
-Use "desconhecido" quando faltar informação; não invente.`;
+- "regras": há exigência legal, fiscal ou regulatória, e ela está atendida? Use "Até onde vai" e "Dado pessoal" da solução. Pagamentos, exclusão de dados, concessão de acessos, decisões fiscais, jurídicas ou de RH e mensagens a clientes exigem revisão humana: se a solução faz isso sem uma pessoa aprovar antes (faz e uma pessoa confere depois, ou faz sozinho), ou se "Até onde vai" não foi informado, use no máximo "parcial" e diga isso no motivo. Dado sensível sem regra de acesso aprovada também fica no máximo em "parcial".
+Use "desconhecido" quando faltar informação; não invente.
+
+As soluções de que esta depende ("Depende de") não baixam nenhuma nota: o app já trava a solução até a base ser implantada. Avalie como se a base já existisse.`;
 function processoTexto(f){
   const p = f.processo || {};
   const l = [], ex = executoresDe(f), conf = confDe(f);
@@ -2349,6 +2367,16 @@ function processoTexto(f){
   const c = textoCarga(f); if (c) l.push(`Carga: ${c}${CONFS[conf] ? ' (' + CONFS[conf] + ')' : ''}`);
   if (procsComCarga(f).length > 1) l.push(`Processos: ${detalheProcs(f).join('; ')}`);
   return l.length ? l.join('; ') : '(não informado)';
+}
+function contextoTexto(f){
+  const a = autDe(f), d = dadoPDe(f), deps = depsDe(f);
+  const regra = d.nivel === 'sensivel' ? (regraOk(f) ? '; regra de acesso aprovada' : '; regra de acesso ainda não aprovada') : '';
+  const l = [
+    `Até onde vai: ${a.nivel ? AUTONOMIA[a.nivel].l + (a.comPessoa ? '. Fica com uma pessoa: ' + a.comPessoa : '') : '(não informado)'}`,
+    `Dado pessoal: ${d.nivel ? DADOS_P[d.nivel] + (d.qual ? ' (' + d.qual + ')' : '') + regra : '(não informado)'}`
+  ];
+  if (deps.length) l.push(`Depende de: ${deps.map(x => `${rotulo(x)} (${(STATUS[statusDe(x)] || '').toLowerCase()})`).join('; ')}`);
+  return l.join('\n');
 }
 const FORMATO_V2 = `"natureza":"ia_automacao","checagens":{"dado":"ok","integracoes":"parcial","qualidade":"desconhecido","regras":"ok"}`;
 const IA_FALHA = {
@@ -2369,10 +2397,25 @@ function desligarIA(){ sample = null; $('#ia-box').hidden = true; $('#btn-recalc
 
 /* ---------- IA: classificar uma solução ---------- */
 function setIA(msg, err){ const s = $('#ia-status'); s.textContent = msg; s.classList.toggle('err', !!err); }
+/* n soluções espalhadas da menor à maior facilidade */
+function espalhados(arr, n){
+  if (n <= 0) return [];
+  const s = [...arr].sort((a, b) => total(a) - total(b));
+  if (s.length <= n) return s;
+  if (n === 1) return [s[Math.floor(s.length / 2)]];
+  return Array.from({ length:n }, (_, k) => s[Math.round(k * (s.length - 1) / (n - 1))]);
+}
+function exemplosIA(f){
+  const pool = items.filter(i => statusDe(i) !== 'arquivada' && i.id !== editId);
+  const mesma = pool.filter(i => f.setor && i.setor === f.setor), outras = pool.filter(i => !mesma.includes(i));
+  const a = espalhados(mesma, 5);
+  return [...a, ...espalhados(outras, 8 - a.length)].sort((x, y) => total(y) - total(x)).map(i => {
+    const j = String(i.justificativa || '').trim().slice(0, 200);
+    return `- ${i.nome} (${i.setor}): metas=${JSON.stringify(Array.isArray(i.metas) ? i.metas : [])}; manual=${nota(i, CRIT[0])}/4, infra=${nota(i, CRIT[1])}/3, dados=${nota(i, CRIT[2])}/2, cultura=${nota(i, CRIT[3])}/1; natureza=${NATUREZAS[i.natureza] ? i.natureza : '(não informada)'}${j ? '. Por quê: ' + j : ''}`;
+  }).join('\n');
+}
 function promptIA(f){
-  const exemplos = items.filter(i => statusDe(i) !== 'arquivada' && i.id !== editId).sort(ordem).slice(0, 8).map(i =>
-    `- ${i.nome} (${i.setor}): metas=${JSON.stringify(Array.isArray(i.metas) ? i.metas : [])}; manual=${nota(i, CRIT[0])}/4, infra=${nota(i, CRIT[1])}/3, dados=${nota(i, CRIT[2])}/2, cultura=${nota(i, CRIT[3])}/1`
-  ).join('\n');
+  const exemplos = exemplosIA(f);
   return `Você classifica soluções de IA para uma empresa usando o framework abaixo. Seja criterioso e consistente com os exemplos.
 
 PERFIL DA EMPRESA
@@ -2380,7 +2423,7 @@ ${perfilTexto()}
 
 ${REGRAS}
 
-Exemplos já classificados (pontos = fator x peso):
+Exemplos já classificados, da menor à maior nota quando possível (pontos = fator x peso):
 ${exemplos || '- (nenhum ainda)'}
 
 SOLUÇÃO A CLASSIFICAR
@@ -2389,6 +2432,7 @@ Nome: ${f.nome || '(não informado)'}
 O que faz: ${f.descricao || '(não informado)'}
 O que resolve: ${f.resolve || '(não informado)'}
 Processo atual: ${processoTexto(f)}
+${contextoTexto(f)}
 
 Dê um motivo curto para TODAS as 6 metas (por que move ou não move), as 4 dependências (por que esse nível), a natureza e as 4 checagens.
 
@@ -2583,6 +2627,7 @@ Nome: ${f.nome || '(não informado)'}
 O que faz: ${f.descricao || '(não informado)'}
 O que resolve: ${f.resolve || '(não informado)'}
 Processo atual: ${processoTexto(f)}
+${contextoTexto(f)}
 
 SUA CLASSIFICAÇÃO ANTERIOR (dependências: 1 = não depende, 0.5 = em parte, 0 = depende):
 ${JSON.stringify(anterior)}
@@ -2639,6 +2684,7 @@ function lerPerfil(){
   REGUA.forEach(d => { const n = nivelRegua($('#r-' + d.k).value); if (n) p.regua[d.k] = n; });
   p.porte = PORTES[$('#p-porte').value] ? $('#p-porte').value : '';
   p.obs = $('#p-obs').value.trim();
+  p.jaLigado = $('#p-ligado').value.trim();
   const va = toNum($('#p-valto').value), vm = toNum($('#p-vmedio').value);
   if (va > 0) p.valorAlto = va;
   if (vm > 0) p.valorMedio = vm;
@@ -2651,6 +2697,7 @@ function preencherPerfil(){
   REGUA.forEach(d => { const n = nivelRegua(r[d.k]); $('#r-' + d.k).value = n ? String(n) : ''; });
   $('#p-porte').value = PORTES[p.porte] ? p.porte : '';
   $('#p-obs').value = p.obs || '';
+  $('#p-ligado').value = p.jaLigado || '';
   $('#p-valto').value = numTxt(p.valorAlto); $('#p-vmedio').value = numTxt(p.valorMedio);
 }
 function renderProntidao(){
@@ -2708,6 +2755,7 @@ function promptRecalc(lista){
     natureza_atual: i.natureza || undefined,
     checagens_atuais: i.checagens && Object.keys(i.checagens).length ? i.checagens : undefined,
     processo: processoTexto(i) !== '(não informado)' ? processoTexto(i) : undefined,
+    contexto: contextoTexto(i),
     ajustes_do_usuario: i.motivosUsuario && Object.keys(i.motivosUsuario).length ? i.motivosUsuario : undefined
   }));
   return `Você revisa a classificação de soluções de IA de uma empresa usando o framework abaixo, agora considerando o perfil real da empresa. Mantenha o que continua certo e mude o que o perfil ou as regras do framework justificam; as regras podem ter mudado desde a última classificação.
@@ -2725,6 +2773,7 @@ Quando uma solução tiver "ajustes_do_usuario" (chaves "meta:x" ou "dep:x" com 
 Responda só com um objeto JSON, sem outro texto, com TODAS as soluções na mesma ordem, neste formato:
 {"solucoes":[{"id":"id-da-solucao","metas":["receita","produtividade"],"dependencias":{"manual":1,"infra":1,"dados":1,"cultura":1},${FORMATO_V2},${FORMATO_MOTIVOS},"justificativa":"Uma frase curta em português explicando a nota considerando o perfil."}]}`;
 }
+const LOTE_RECALC = 12; /* soluções por chamada na revisão de todas */
 async function recalcular(){
   if (!sample || !db) return;
   if (perfilSujo) { setPf('Salve o perfil antes de recalcular.', true); return; }
@@ -2733,13 +2782,29 @@ async function recalcular(){
   const ctl = new AbortController(); recCtl = ctl; propostas = null; $('#recalc-out').innerHTML = '';
   $('#btn-recalc').hidden = true; $('#btn-recalc-stop').hidden = false;
   setPf(`Revisando ${lista.length} soluções com ${LOCAL.iaNome()}… pode levar alguns minutos.`, false);
+  const lotes = [];
+  for (let k = 0; k < lista.length; k += LOTE_RECALC) lotes.push(lista.slice(k, k + LOTE_RECALC));
   try {
-    const r = await sample.json(promptRecalc(lista), Object.assign({
-      signal: ctl.signal,
-      onText: ({ text }) => { const n = (text.match(/"id"\s*:/g) || []).length; setPf(`Recebendo a revisão: ${Math.min(n, lista.length)} de ${lista.length} soluções…`, false); }
-    }, IA_OPTS));
-    const arr = r && Array.isArray(r.solucoes) ? r.solucoes : null;
-    if (!arr) throw { code:'invalid_json' };
+    const arr = [];
+    let ultimoErro = null;
+    for (let k = 0; k < lotes.length; k++) {
+      const lote = lotes[k], feitas = k * LOTE_RECALC, parte = lotes.length > 1 ? ` (parte ${k + 1} de ${lotes.length})` : '';
+      try {
+        const r = await sample.json(promptRecalc(lote), Object.assign({
+          signal: ctl.signal,
+          onText: ({ text }) => { const n = (text.match(/"id"\s*:/g) || []).length; setPf(`Recebendo a revisão: ${Math.min(feitas + n, lista.length)} de ${lista.length} soluções${parte}…`, false); }
+        }, IA_OPTS));
+        const sol = r && Array.isArray(r.solucoes) ? r.solucoes : null;
+        if (!sol) throw { code:'invalid_json' };
+        const ids = new Set(lote.map(i => i.id));
+        sol.forEach(s => { if (s && ids.has(String(s.id))) arr.push(s); });
+      } catch (e) {
+        const code = e && e.code;
+        if (code === 'cancelled' || IA_INDISPONIVEL.includes(code) || ['no_key','auth_failed','model_not_found','server_down','network'].includes(code)) throw e;
+        ultimoErro = e;
+      }
+    }
+    if (!arr.length) throw ultimoErro || { code:'invalid_json' };
     const mudancas = [];
     const avaliadas = [];
     arr.forEach(s => {
@@ -2761,7 +2826,9 @@ async function recalcular(){
     propostas = mudancas;
     propostas.avaliadas = avaliadas;
     renderPropostas();
-    setPf(mudancas.length ? `A IA sugeriu mudanças em ${plural(mudancas.length, 'solução', 'soluções')}. Revise abaixo.` : 'A IA revisou tudo e não sugeriu mudanças de nota.', false);
+    const semRev = lista.length - avaliadas.length;
+    const aviso = semRev ? ` ${plural(semRev, 'solução ficou', 'soluções ficaram')} sem revisão porque a IA não respondeu direito; rode de novo para tentar.` : '';
+    setPf((mudancas.length ? `A IA sugeriu mudanças em ${plural(mudancas.length, 'solução', 'soluções')}. Revise abaixo.` : semRev ? 'A IA não sugeriu mudanças de nota nas soluções que revisou.' : 'A IA revisou tudo e não sugeriu mudanças de nota.') + aviso, !!semRev);
   } catch (e) {
     const code = e && e.code;
     if (code === 'cancelled') setPf('Revisão interrompida.', false);
@@ -3194,7 +3261,7 @@ $('#btn-perfil').addEventListener('click', salvarPerfil);
 $('#btn-recalc').addEventListener('click', recalcular);
 $('#btn-recalc-stop').addEventListener('click', () => { if (recCtl) recCtl.abort(); });
 ['input','change'].forEach(ev => $('#perfil .perfil').addEventListener(ev, e => {
-  if (e.target.closest('#pf-list, #p-porte, #p-obs, #regua, #p-valto, #p-vmedio')) { perfilSujo = true; setPf('Alterações no perfil ainda não salvas.', false); }
+  if (e.target.closest('#pf-list, #p-porte, #p-obs, #p-ligado, #regua, #p-valto, #p-vmedio')) { perfilSujo = true; setPf('Alterações no perfil ainda não salvas.', false); }
   if (e.target.closest('#regua')) renderProntidao();
 }));
 $('#v-setor').addEventListener('click', () => { view = 'setor'; try { localStorage.setItem('ranking-ia-view', view); } catch (e) {} render(); });
