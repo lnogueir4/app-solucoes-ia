@@ -627,7 +627,9 @@
           <div class="fld"><label for="p-obs">Observações</label><textarea id="p-obs" rows="2" maxlength="600" placeholder="Ex.: usamos um ERP próprio e um CRM na nuvem; o comercial atende por um app de mensagens comum"></textarea></div>
         </div>
         <div class="fld"><label for="p-ligado">O que já funciona e o que ainda não está ligado</label><textarea id="p-ligado" rows="3" maxlength="800" placeholder="Ex.: já funcionam o atendimento pelo app de mensagens, a leitura do ERP e o CRM; ainda não estão ligados a gravação no ERP, a folha de pagamento e o extrato do banco"></textarea></div>
-        <p class="ed-hint">A IA usa esta lista na nota Infra: o que já funciona não conta como peça nova.</p>
+        <div class="fld"><label for="p-rotinas">Como as pessoas trabalham hoje</label><textarea id="p-rotinas" rows="3" maxlength="600" placeholder="Ex.: o comercial registra tudo no CRM; a equipe de campo usa o app de mensagens; a gestão se reúne uma vez por mês"></textarea></div>
+        <div class="fld"><label for="p-leis">Exigências legais do negócio</label><textarea id="p-leis" rows="2" maxlength="400" placeholder="Ex.: normas de segurança do trabalho, obrigações fiscais e trabalhistas, proteção de dados pessoais"></textarea></div>
+        <p class="ed-hint">A IA usa estes três campos ao classificar: o que já funciona na nota Infra (o que já funciona não conta como peça nova), como as pessoas trabalham na nota Cultura (o resultado chega no canal que elas já usam?) e as exigências legais na checagem de regras.</p>
         <p class="pf-k">Limites do valor (R$ por mês)</p>
         <div class="pf-row">
           <div class="fld"><label for="p-valto">Valor alto a partir de</label><input type="text" inputmode="decimal" id="p-valto" maxlength="12" placeholder="Ex.: 5000"></div>
@@ -679,7 +681,7 @@
             <li><span class="rng">Manual</span><span><b>Não depende:</b> o resultado vai para uma pessoa que decide ou age, e as entradas vêm dos sistemas.<br><b>Em parte:</b> a solução conversa sozinha com cliente, fornecedor ou colaborador e alguém confere; ou alguém alimenta à mão um dado que nenhum sistema captura; ou as regras mudam com frequência.<br><b>Depende:</b> uma pessoa precisa operar a solução todo dia.</span></li>
             <li><span class="rng">Infra</span><span><b>Não depende:</b> usa só o que já funciona (seção 06), dado público, um cadastro próprio ou o resultado de outras soluções.<br><b>Em parte:</b> uma peça nova, como gravar num sistema que hoje só é lido, ler um sistema ainda não ligado, uma caixa de e-mail ou uma ferramenta nova.<br><b>Depende:</b> várias peças novas de uma vez.</span></li>
             <li><span class="rng">Técnico</span><span><b>Não depende:</b> regra fixa sobre no máximo um sistema, sem ajuste técnico recorrente.<br><b>Em parte:</b> ajuste periódico de prompt ou regra, conferência técnica das respostas, gravação em sistema ou duas integrações.<br><b>Depende:</b> três ou mais sistemas ou soluções integrados, uma base de dados para construir e manter, ou regras que mudam por lei. A qualidade do dado não entra aqui: vai nas checagens.</span></li>
-            <li><span class="rng">Cultura</span><span><b>Não depende:</b> as pessoas recebem o resultado no canal e no formato que já usam.<br><b>Em parte:</b> uma função muda a rotina ou passa a seguir um passo novo.<br><b>Depende:</b> várias áreas mudam o jeito de trabalhar, ou a solução mexe com o controle ou a avaliação de pessoas.</span></li>
+            <li><span class="rng">Cultura</span><span><b>Não depende:</b> as pessoas recebem o resultado no canal e no formato que já usam (seção 06).<br><b>Em parte:</b> uma função muda a rotina ou passa a seguir um passo novo.<br><b>Depende:</b> várias áreas mudam o jeito de trabalhar, ou a solução mexe com o controle ou a avaliação de pessoas.</span></li>
           </ul>
         </div>
         <div class="lg">
@@ -2315,7 +2317,7 @@ function perfilTexto(){
   const p = perfil || {};
   const r = p.regua || {};
   const algumaDim = REGUA.some(d => nivelRegua(r[d.k]));
-  const algum = algumaDim || PERFIL_ITENS.some(i => typeof p[i.k] === 'boolean') || p.porte || p.obs || p.jaLigado;
+  const algum = algumaDim || PERFIL_ITENS.some(i => typeof p[i.k] === 'boolean') || p.porte || p.obs || p.jaLigado || p.rotinas || p.exigencias;
   if (!algum) return 'Perfil não informado: considere uma empresa de pequeno ou médio porte, sem time de dados dedicado e sem sistemas integrados.';
   const linhas = [];
   if (algumaDim) {
@@ -2330,6 +2332,8 @@ function perfilTexto(){
   if (p.porte && PORTES[p.porte]) linhas.push(`- Porte: ${PORTES[p.porte]}`);
   if (p.obs) linhas.push(`- Observações: ${String(p.obs).slice(0, 600)}`);
   if (p.jaLigado) linhas.push(`- O que já funciona e o que ainda não está ligado: ${String(p.jaLigado).slice(0, 800)}`);
+  if (p.rotinas) linhas.push(`- Como as pessoas trabalham hoje: ${String(p.rotinas).slice(0, 600)}`);
+  if (p.exigencias) linhas.push(`- Exigências legais do negócio: ${String(p.exigencias).slice(0, 400)}`);
   return linhas.join('\n');
 }
 const REGRAS = `PASSO 1. Metas que o projeto move de forma direta e clara (pode ser nenhuma):
@@ -2350,7 +2354,7 @@ PASSO 2. Para cada dependência, diga quanto o projeto depende dela para funcion
   1 = regra fixa sobre no máximo um sistema, ou só um canal que já funciona, dado público ou áudio, sem ajuste técnico recorrente.
   0.5 = ajuste periódico de prompt ou regra da IA, conferência técnica da qualidade da resposta, gravação em sistema ou duas integrações.
   0 = três ou mais sistemas ou soluções integrados, uma base de dados para construir e manter, ou regras que mudam por lei.
-- "cultura" (peso 1): mudança de cultura e comportamento.
+- "cultura" (peso 1): mudança de cultura e comportamento. Use o que o perfil diz sobre como as pessoas trabalham hoje.
   1 = as pessoas recebem o resultado no canal e no formato que já usam.
   0.5 = uma função muda a rotina ou passa a seguir um passo novo.
   0 = várias áreas mudam o jeito de trabalhar, ou a solução mexe com o controle ou a avaliação de pessoas.
@@ -2367,7 +2371,7 @@ PASSO 4. Checagens técnicas ("checagens"), cada uma "ok", "parcial", "falha" ou
 - "dado": a informação necessária existe e dá para ler e gravar nos sistemas?
 - "integracoes": os sistemas envolvidos permitem integração?
 - "qualidade": o histórico está completo e padronizado o suficiente?
-- "regras": há exigência legal, fiscal ou regulatória, e ela está atendida? Use "Até onde vai" e "Dado pessoal" da solução. Pagamentos, exclusão de dados, concessão de acessos, decisões fiscais, jurídicas ou de RH e mensagens a clientes exigem revisão humana: se a solução faz isso sem uma pessoa aprovar antes (faz e uma pessoa confere depois, ou faz sozinho), ou se "Até onde vai" não foi informado, use no máximo "parcial" e diga isso no motivo. Dado sensível sem regra de acesso aprovada também fica no máximo em "parcial".
+- "regras": há exigência legal, fiscal ou regulatória, e ela está atendida? Use "Até onde vai" e "Dado pessoal" da solução. Pagamentos, exclusão de dados, concessão de acessos, decisões fiscais, jurídicas ou de RH e mensagens a clientes exigem revisão humana: se a solução faz isso sem uma pessoa aprovar antes (faz e uma pessoa confere depois, ou faz sozinho), ou se "Até onde vai" não foi informado, use no máximo "parcial" e diga isso no motivo. Dado sensível sem regra de acesso aprovada também fica no máximo em "parcial". Use as exigências legais do perfil, quando houver.
 Use "desconhecido" quando faltar informação; não invente.
 
 As soluções de que esta depende ("Depende de") não baixam nenhuma nota: o app já trava a solução até a base ser implantada. Avalie como se a base já existisse.`;
@@ -2698,6 +2702,8 @@ function lerPerfil(){
   p.porte = PORTES[$('#p-porte').value] ? $('#p-porte').value : '';
   p.obs = $('#p-obs').value.trim();
   p.jaLigado = $('#p-ligado').value.trim();
+  p.rotinas = $('#p-rotinas').value.trim();
+  p.exigencias = $('#p-leis').value.trim();
   const va = toNum($('#p-valto').value), vm = toNum($('#p-vmedio').value);
   if (va > 0) p.valorAlto = va;
   if (vm > 0) p.valorMedio = vm;
@@ -2711,6 +2717,8 @@ function preencherPerfil(){
   $('#p-porte').value = PORTES[p.porte] ? p.porte : '';
   $('#p-obs').value = p.obs || '';
   $('#p-ligado').value = p.jaLigado || '';
+  $('#p-rotinas').value = p.rotinas || '';
+  $('#p-leis').value = p.exigencias || '';
   $('#p-valto').value = numTxt(p.valorAlto); $('#p-vmedio').value = numTxt(p.valorMedio);
 }
 function renderProntidao(){
@@ -3274,7 +3282,7 @@ $('#btn-perfil').addEventListener('click', salvarPerfil);
 $('#btn-recalc').addEventListener('click', recalcular);
 $('#btn-recalc-stop').addEventListener('click', () => { if (recCtl) recCtl.abort(); });
 ['input','change'].forEach(ev => $('#perfil .perfil').addEventListener(ev, e => {
-  if (e.target.closest('#pf-list, #p-porte, #p-obs, #p-ligado, #regua, #p-valto, #p-vmedio')) { perfilSujo = true; setPf('Alterações no perfil ainda não salvas.', false); }
+  if (e.target.closest('#pf-list, #p-porte, #p-obs, #p-ligado, #p-rotinas, #p-leis, #regua, #p-valto, #p-vmedio')) { perfilSujo = true; setPf('Alterações no perfil ainda não salvas.', false); }
   if (e.target.closest('#regua')) renderProntidao();
 }));
 $('#v-setor').addEventListener('click', () => { view = 'setor'; try { localStorage.setItem('ranking-ia-view', view); } catch (e) {} render(); });

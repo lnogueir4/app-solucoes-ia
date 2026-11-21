@@ -50,6 +50,42 @@ O navegador nunca recebe a chave: quem fala com o provedor é o servidor local.
   - Com o Claude, o app usa o SDK oficial. Nos modelos que aceitam, ele liga o fallback do servidor (`fallbacks: "default"`), que tenta outro modelo quando o filtro de segurança recusa o pedido.
 - **Empresa e logo:** o nome da empresa e as logos dos modos claro e escuro (PNG, JPG, WebP, GIF ou SVG, até 2 MB). Sem logo própria no modo escuro, vale a do modo claro. Sem nenhuma logo, aparece a logo padrão do app.
 - **Áreas:** a lista de áreas sugeridas no cadastro, uma por linha, na ordem de exibição. Também dá para digitar uma área nova direto no cadastro de uma solução.
+- **Setores dono:** os setores de cada área, uma linha por área, no formato "Área: Setor A, Setor B". Use quando uma área tem mais de um gestor. A área com setores ganha o campo "Setor dono" no cadastro e o filtro por setor na fila.
+
+## O que cada solução guarda
+
+Além do nome, do que ela faz e das notas, cada solução guarda o que precisa para decidir e acompanhar. Tudo é
+preenchido em **Editar**. A seção 07 da página explica cada regra em detalhe.
+
+- **Código:** um apelido curto, como "VE-02". Aparece antes do nome, funciona na busca e não pode se repetir.
+- **Setor dono:** um ou mais setores da área que cuidam da solução. O campo só aparece quando a área tem setores em
+  Configurações, e a fila ganha um filtro por setor.
+- **Situação:** no roadmap, aguardando decisão, em execução, implantada ou arquivada. Cada situação tem a sua seção
+  na página, e os botões de cada solução a levam de uma para outra.
+- **Aguardando decisão:** quem decide, o que falta decidir e desde quando. A solução parada há mais de 30 dias fica
+  em vermelho.
+- **Em execução e implantada:** o responsável, a previsão de entrega, a data real de início, a data real de
+  implantação, a meta e o resultado medido. Ao marcar uma solução, o app usa a data de hoje, e você troca pela data
+  real se ela for outra.
+- **Depende de:** as soluções que precisam estar implantadas antes. Enquanto a base não estiver implantada, a
+  solução fica travada. A solução de que outras dependem ganha o selo "Base de N soluções" e sobe na fila.
+- **Processos:** os processos que a solução ataca, um por vez, com quem executa, quantas vezes e quantos minutos. As
+  horas de todos são somadas no valor em reais.
+- **Tempo de quem opera depois:** quantas horas por semana a solução vai pedir de cada função depois de implantada,
+  para aprovar, conferir ou corrigir. O app soma esse tempo por função nas soluções em execução e implantadas e
+  avisa, ao iniciar uma solução, se alguma função passa do limite de horas por semana (seção 03).
+- **Dado pessoal:** se a solução trata nenhum dado pessoal, dado pessoal ou dado sensível (como saúde), e qual.
+  Com dado sensível, a solução fica travada até alguém aprovar a regra de quem pode ver o quê. Essa aprovação tem
+  nome e data e só é feita pela tela: a importação não a muda.
+- **Até onde o agente vai:** prepara e uma pessoa faz; sugere e uma pessoa aprova antes; faz e uma pessoa confere
+  depois; ou faz sozinho. Também diz o que fica sempre com uma pessoa. Se o agente faz sozinho numa solução com a meta
+  Risco, o app pede confirmação ao iniciar.
+
+**Classificar com IA** preenche as metas, as quatro notas de facilidade, a natureza, as quatro checagens e a
+justificativa, e mostra o motivo de cada item ao passar o mouse. Ela substitui o que já estiver marcado nesses campos,
+mas nada é gravado antes de você clicar em Salvar. Os outros campos ficam com você. Preencha antes o dado pessoal, até
+onde o agente vai e o "Depende de": a IA lê esses três campos e, sem eles, deixa a checagem de regras em no máximo
+"parcial".
 
 ## Como a nota e a fila são calculadas
 
@@ -184,7 +220,7 @@ Os prompts ficam em `public/index.html`, nas funções `promptIA` (classificar u
 
 - **Réguas:** `REGRAS` diz o que vale 1, 0,5 e 0 em cada uma das quatro notas.
 - **Contexto da solução:** `contextoTexto` manda até onde o agente vai, o dado pessoal e as soluções de que ela depende. A dependência não baixa nota, porque o app já trava a solução até a base ser implantada.
-- **Nota Infra:** a IA usa o campo "O que já funciona e o que ainda não está ligado", do perfil da empresa (seção 06). O que já funciona não conta como peça nova.
+- **Perfil da empresa (seção 06):** além da régua e dos sistemas marcados, a IA usa três campos de texto. "O que já funciona e o que ainda não está ligado" entra na nota Infra: o que já funciona não conta como peça nova. "Como as pessoas trabalham hoje" entra na nota Cultura e "Exigências legais do negócio", na checagem de regras.
 - **Exemplos:** ao classificar uma solução, a IA vê 8 já classificadas, até 5 da mesma área, espalhadas da menor à maior nota, com a natureza e a justificativa.
 - **Revisar todas:** "Recalcular notas com o perfil" manda as soluções em partes de 12 (`LOTE_RECALC`). Se uma parte falhar, as outras seguem, e a tela diz quantas ficaram sem revisão.
 
