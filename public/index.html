@@ -111,6 +111,18 @@
   .filters { display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin:28px 0 0; padding:14px 16px; border:1px solid var(--line); border-radius:12px; background:var(--surface); }
   .filters .l, .filters .r { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
   .filters .lbl { font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+  hr.rule + .filters { margin-top:0; }
+  @media (min-width:901px){
+    .filters { flex-wrap:nowrap; }
+    .filters .l { flex:1 1 auto; flex-wrap:nowrap; min-width:0; }
+    .filters .r { flex:none; flex-wrap:nowrap; }
+    .filters #busca { flex:1 1 150px; width:auto; min-width:130px; max-width:280px; }
+    .filters #filtro-setor { flex:none; }
+    .filters #filtro-dono { flex:0 1 auto; min-width:110px; }
+  }
+  .filters + .ficha { margin-top:14px; }
+  .k-filtro { font-family:var(--font-mono); font-size:11.5px; color:var(--muted); margin:8px 0 0; }
+  .k-filtro b { color:var(--ink-soft); font-weight:600; }
 
   section.sec { margin-top:46px; scroll-margin-top:24px; }
   .sec-head { display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
@@ -198,7 +210,23 @@
   .grp-h { display:flex; align-items:baseline; justify-content:space-between; gap:8px 16px; flex-wrap:wrap; margin:0 0 10px; }
   .grp-h h3 { margin:0; font-size:17px; font-weight:660; letter-spacing:-.01em; }
   .sol-list { display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
-  .sol { display:grid; grid-template-columns:76px minmax(0,1fr) 236px; gap:18px; padding:18px 20px; background:var(--surface); }
+  .sol { display:grid; grid-template-columns:minmax(0,1fr); gap:12px 28px; padding:16px 20px; background:var(--surface); cursor:pointer; }
+  .sol.n2 { grid-template-columns:minmax(0,1fr) 236px; grid-template-areas:"main main" "det notas" "acts acts"; }
+  .sol.n2 .sol-main { grid-area:main; }
+  .sol.n2 .notas-col { grid-area:notas; }
+  .sol.n2 .sol-det { grid-area:det; min-width:0; }
+  .sol.n2 .acts { grid-area:acts; }
+  .sol-det > :first-child { margin-top:0; }
+  .sol-main > .chips:last-child { margin-bottom:0; }
+  .sol.n0 { padding:12px 20px; }
+  .sol.n0 .sol-main > .when:last-child { margin-bottom:0; }
+  .sol:hover { background:color-mix(in srgb,var(--surface-2) 45%,var(--surface)); }
+  .sol-tgs { margin-left:auto; display:inline-flex; flex-wrap:wrap; gap:6px; }
+  .sol-tg { display:inline-flex; align-items:center; gap:6px; font:inherit; font-family:var(--font-mono); font-size:10.5px; letter-spacing:.04em; color:var(--muted); background:none; border:1px solid var(--line); border-radius:999px; padding:3px 9px; cursor:pointer; white-space:nowrap; }
+  .sol-tg:hover, .sol-tg:focus-visible { color:var(--accent-ink); border-color:var(--accent); }
+  .sol-tg .chev { width:6px; height:6px; border-right:1.5px solid currentColor; border-bottom:1.5px solid currentColor; transform:rotate(45deg) translateY(-2px); }
+  .sol-tg.up .chev { transform:rotate(-135deg) translate(-1px,-1px); }
+  .pos-in { font-family:var(--font-mono); font-size:11px; color:var(--muted); }
   .score { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; border-radius:10px; padding:12px 6px; height:max-content; }
   .score b { font-family:var(--font-display); font-size:25px; line-height:1; font-variant-numeric:tabular-nums; font-weight:700; }
   .score span { font-family:var(--font-mono); font-size:10.5px; opacity:.85; }
@@ -231,13 +259,19 @@
   .bar { height:6px; border-radius:3px; background:var(--surface-2); overflow:hidden; }
   .bar i { display:block; height:100%; border-radius:3px; background:var(--good); }
   .bar i.h { background:var(--warn); }
-  .notas-col .tot { display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:11px; color:var(--muted); border-top:1px solid var(--line); padding-top:6px; margin-top:2px; }
-  .acts { grid-column:2 / -1; display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end; margin-top:-8px; }
+  .notas-col .tot { display:flex; justify-content:space-between; align-items:baseline; font-family:var(--font-mono); font-size:11px; color:var(--muted); border-top:1px solid var(--line); padding-top:6px; margin-top:2px; }
+  .notas-col .tot b { font-size:13px; font-weight:700; }
+  .notas-col .tot.good b { color:var(--good); }
+  .notas-col .tot.acc b { color:var(--accent-ink); }
+  .notas-col .tot.warn b { color:var(--warn); }
+  .notas-col .tot.crit b { color:var(--crit); }
+  .notas-col .tot b.out { text-decoration:line-through; }
+  .acts { grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end; }
   .acts .btn-s { font-size:10.5px; padding:4px 9px; white-space:nowrap; }
   @media (max-width:760px){
-    .sol { grid-template-columns:60px minmax(0,1fr); gap:14px; padding:16px; }
-    .notas-col { grid-column:1 / -1; }
-    .acts { grid-column:1 / -1; margin-top:-4px; }
+    .sol { gap:12px; padding:16px; }
+    .sol.n2 { grid-template-columns:minmax(0,1fr); grid-template-areas:"main" "notas" "det" "acts"; }
+    .sol.n0 { padding:12px 16px; }
     .score b { font-size:21px; }
   }
 
@@ -506,17 +540,6 @@
 
   <hr class="rule">
 
-  <dl class="ficha" id="kpis">
-    <div><dt title="Soluções no roadmap">Roadmap</dt><dd id="k-roadmap">–</dd></div>
-    <div><dt title="Valor alto e facilidade de 7 a 10, sem trava (sem valor informado: facilidade de 9 a 10)">Começar já</dt><dd id="k-comecar">–</dd></div>
-    <div><dt title="Soluções em execução">Em execução</dt><dd id="k-exec">–</dd></div>
-    <div><dt title="Em execução com previsão vencida">Atrasadas</dt><dd id="k-atraso">–</dd></div>
-    <div><dt title="Soluções implantadas">Implantadas</dt><dd id="k-impl">–</dd></div>
-    <div><dt title="Facilidade média do roadmap">Facilidade média</dt><dd id="k-media">–</dd></div>
-    <div><dt title="Prontidão da empresa para IA (régua de 1 a 5)">Prontidão</dt><dd id="k-pront">–</dd></div>
-  </dl>
-  <p class="legend-link">Como as notas e as faixas são definidas: <a href="#legenda">veja a metodologia</a>. As dependências consideram o <a href="#perfil">perfil da empresa</a>.</p>
-
   <div class="filters" role="search">
     <div class="l">
       <span class="lbl">Filtrar</span>
@@ -531,6 +554,18 @@
     </div>
   </div>
 
+  <dl class="ficha" id="kpis">
+    <div><dt title="Soluções no roadmap">Roadmap</dt><dd id="k-roadmap">–</dd></div>
+    <div><dt title="Valor alto e facilidade de 7 a 10, sem trava (sem valor informado: facilidade de 9 a 10)">Começar já</dt><dd id="k-comecar">–</dd></div>
+    <div><dt title="Soluções em execução">Em execução</dt><dd id="k-exec">–</dd></div>
+    <div><dt title="Em execução com previsão vencida">Atrasadas</dt><dd id="k-atraso">–</dd></div>
+    <div><dt title="Soluções implantadas">Implantadas</dt><dd id="k-impl">–</dd></div>
+    <div><dt title="Facilidade média do roadmap">Facilidade média</dt><dd id="k-media">–</dd></div>
+    <div><dt title="Prontidão da empresa para IA (régua de 1 a 5)">Prontidão</dt><dd id="k-pront">–</dd></div>
+  </dl>
+  <p class="k-filtro" id="k-filtro" hidden></p>
+  <p class="legend-link">Como as notas e as faixas são definidas: <a href="#legenda">veja a metodologia</a>. As dependências consideram o <a href="#perfil">perfil da empresa</a>.</p>
+
   <div class="sec-tools" role="group" aria-label="Mostrar ou esconder as seções 01 a 07">
     <span class="lbl">Seções</span>
     <div class="seg">
@@ -539,35 +574,9 @@
     </div>
   </div>
 
-  <!-- 01 Roadmap -->
-  <section class="sec" id="roadmap">
-    <div class="sec-head">
-      <h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-roadmap"><span class="chev" aria-hidden="true"></span><span class="sec-num">01</span><span>Roadmap das soluções</span></button></h2><span class="sec-count" id="c-roadmap"></span>
-      <div class="seg spacer" role="group" aria-label="Forma de exibição do roadmap">
-        <button type="button" id="v-setor" aria-pressed="true">Por área</button>
-        <button type="button" id="v-geral" aria-pressed="false">Ranking geral</button>
-      </div>
-    </div>
-    <div class="sec-body" id="sb-roadmap">
-      <p class="sec-intro">Soluções ainda não iniciadas, em ordem de prioridade: primeiro o valor para a empresa, depois quantas soluções cada uma destrava e, por fim, a facilidade.</p>
-      <div id="lista">
-        <div class="empty"><strong>Carregando as soluções…</strong>A lista aparece aqui assim que o banco da página responder.</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 02 Aguardando decisão -->
-  <section class="sec" id="aguardando">
-    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-aguardando"><span class="chev" aria-hidden="true"></span><span class="sec-num">02</span><span>Aguardando decisão</span></button></h2><span class="sec-count" id="c-aguard"></span></div>
-    <div class="sec-body" id="sb-aguardando">
-      <p class="sec-intro">Soluções paradas à espera de uma pessoa: quem decide e o que falta decidir. As mais antigas aparecem primeiro. Elas não entram na fila até a decisão sair.</p>
-      <div id="lista-aguard"></div>
-    </div>
-  </section>
-
-  <!-- 03 Em execução -->
+  <!-- 01 Em execução -->
   <section class="sec" id="execucao">
-    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-execucao"><span class="chev" aria-hidden="true"></span><span class="sec-num">03</span><span>Soluções em execução</span></button></h2><span class="sec-count" id="c-exec"></span>
+    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-execucao"><span class="chev" aria-hidden="true"></span><span class="sec-num">01</span><span>Soluções em execução</span></button></h2><span class="sec-count" id="c-exec"></span>
       <label class="lim spacer" for="f-limite">Em paralelo, no máximo
         <select id="f-limite"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
       </label>
@@ -580,6 +589,32 @@
       <p class="fila" id="fila" aria-live="polite"></p>
       <div class="tempo-func" id="tempo-func"></div>
       <div id="lista-exec"></div>
+    </div>
+  </section>
+
+  <!-- 02 Aguardando decisão -->
+  <section class="sec" id="aguardando">
+    <div class="sec-head"><h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-aguardando"><span class="chev" aria-hidden="true"></span><span class="sec-num">02</span><span>Aguardando decisão</span></button></h2><span class="sec-count" id="c-aguard"></span></div>
+    <div class="sec-body" id="sb-aguardando">
+      <p class="sec-intro">Soluções paradas à espera de uma pessoa: quem decide e o que falta decidir. As mais antigas aparecem primeiro. Elas não entram na fila até a decisão sair.</p>
+      <div id="lista-aguard"></div>
+    </div>
+  </section>
+
+  <!-- 03 Roadmap -->
+  <section class="sec" id="roadmap">
+    <div class="sec-head">
+      <h2 class="sec-t"><button type="button" class="sec-tg" aria-expanded="true" aria-controls="sb-roadmap"><span class="chev" aria-hidden="true"></span><span class="sec-num">03</span><span>Roadmap das soluções</span></button></h2><span class="sec-count" id="c-roadmap"></span>
+      <div class="seg spacer" role="group" aria-label="Forma de exibição do roadmap">
+        <button type="button" id="v-setor" aria-pressed="true">Por área</button>
+        <button type="button" id="v-geral" aria-pressed="false">Ranking geral</button>
+      </div>
+    </div>
+    <div class="sec-body" id="sb-roadmap">
+      <p class="sec-intro">Soluções ainda não iniciadas, em ordem de prioridade: primeiro o valor para a empresa, depois quantas soluções cada uma destrava e, por fim, a facilidade.</p>
+      <div id="lista">
+        <div class="empty"><strong>Carregando as soluções…</strong>A lista aparece aqui assim que o banco da página responder.</div>
+      </div>
     </div>
   </section>
 
@@ -726,7 +761,7 @@
             <li><span class="st good"><span class="dot"></span>Implantada</span><span class="rng">em uso; registre o resultado medido em Editar</span></li>
             <li><span class="st mute"><span class="dot"></span>Arquivada</span><span class="rng">fora das listas</span></li>
           </ul>
-          <p class="hint" style="margin:12px 0 0">Execução em série: a página pede confirmação ao iniciar uma solução quando o número em execução já chegou ao limite da seção 03, quando a solução tem trava, quando uma função passa do limite de horas por semana da seção 03 ou quando o agente faz sozinho numa solução com a meta Risco.</p>
+          <p class="hint" style="margin:12px 0 0">Execução em série: a página pede confirmação ao iniciar uma solução quando o número em execução já chegou ao limite da seção 01, quando a solução tem trava, quando uma função passa do limite de horas por semana da seção 01 ou quando o agente faz sozinho numa solução com a meta Risco.</p>
         </div>
         <div class="lg">
           <h3>Travas</h3>
@@ -1594,7 +1629,11 @@ const ACOES = {
   implantada:[['editar','Editar'], ['voltar-execucao','Voltar para execução'], ['arquivar','Arquivar'], ['excluir','Excluir','danger']],
   arquivada: [['restaurar','Restaurar','go'], ['excluir','Excluir','danger']]
 };
+// Nível de detalhe de cada card: 0 = título e dependências, 1 = + descrição, resolve, metas e botões, 2 = tudo.
+const nivelCard = new Map();
+const CARD_TG = [[[1, 'Ver descrição']], [[2, 'Ver detalhes e notas'], [0, 'Recolher']], [[0, 'Recolher']]];
 function rowHTML(it, pos, modo){
+  const nv = nivelCard.get(it.id) || 0;
   const fx = faixa(it), t = total(it), out = !metasDe(it).length;
   const metas = metasDe(it).map(m => `<span class="mt${m.p ? ' p' : ''}" title="${esc(m.d)}">${esc(m.n)}</span>`).join('');
   const crit = CRIT.map(c => {
@@ -1655,21 +1694,20 @@ function rowHTML(it, pos, modo){
     if (linhas.length || pills.length) resu = `<div class="plano"><p class="pk">Plano de medição</p>${pills.join('')}${linhas.join('') || '<p>Defina indicador, linha de base, meta e prazo em Editar.</p>'}</div>`;
   }
 
-  return `<article class="sol">
-    <div><div class="score ${fx.c}${out ? ' out' : ''}" title="Facilidade de 0 a 10: quanto menos a solução depende de trabalho manual, infra, gente técnica e mudança de cultura, maior a nota"><b>${fmt(t)}</b><span>de 10</span></div>${pos ? `<div class="pos">#${pos}</div>` : ''}</div>
+  const tg = `<span class="sol-tgs">${CARD_TG[nv].map(([ir, l]) => `<button type="button" class="sol-tg${ir ? '' : ' up'}" data-ir="${ir}" aria-expanded="${!ir}">${l}<span class="chev" aria-hidden="true"></span></button>`).join('')}</span>`;
+  const posTop = pos ? `<span class="pos-in" title="Posição na fila">#${pos}</span>` : '';
+  return `<article class="sol n${nv}" data-id="${esc(it.id)}" data-pos="${pos || 0}" data-modo="${modo}">
     <div class="sol-main">
-      <div class="sol-top"><h4>${codigoDe(it) ? `<span class="cod" title="${esc(TIP_COD)}">${esc(codigoDe(it))}</span>` : ''}${esc(it.nome || 'Sem nome')}</h4>${pill}${setorPill}</div>
-      ${info.length ? `<p class="when">${info.join(' · ')}</p>` : ''}
+      <div class="sol-top">${posTop}<h4>${codigoDe(it) ? `<span class="cod" title="${esc(TIP_COD)}">${esc(codigoDe(it))}</span>` : ''}${esc(it.nome || 'Sem nome')}</h4>${pill}${setorPill}${tg}</div>
+      ${nv === 2 && info.length ? `<p class="when">${info.join(' · ')}</p>` : ''}
       ${liga.length ? `<p class="when">${liga.join(' · ')}</p>` : ''}
-      ${it.descricao ? `<p class="sol-desc">${esc(it.descricao)}</p>` : ''}
-      ${it.resolve ? `<p class="sol-res"><span>Resolve</span>${esc(it.resolve)}</p>` : ''}
-      <div class="chips">${metas || '<span class="mt">Nenhuma meta</span>'}</div>
-      ${facts}
-      ${it.justificativa ? `<p class="sol-why">${esc(it.justificativa)}</p>` : ''}
-      ${resu}
+      ${nv >= 1 && it.descricao ? `<p class="sol-desc">${esc(it.descricao)}</p>` : ''}
+      ${nv >= 1 && it.resolve ? `<p class="sol-res"><span>Resolve</span>${esc(it.resolve)}</p>` : ''}
+      ${nv >= 1 ? `<div class="chips">${metas || '<span class="mt">Nenhuma meta</span>'}</div>` : ''}
     </div>
-    <div class="notas-col">${crit}<div class="tot"><span>Facilidade</span><span>${fmt(t)} / 10</span></div></div>
-    ${acts}
+    ${nv === 2 ? `<div class="notas-col">${crit}<div class="tot ${fx.c}" title="Facilidade de 0 a 10: quanto menos a solução depende de trabalho manual, infra, gente técnica e mudança de cultura, maior a nota${out ? '. Sem meta: fora da fila' : ''}"><span>Facilidade</span><b class="${out ? 'out' : ''}">${fmt(t)} / 10</b></div></div>
+    <div class="sol-det">${facts}${it.justificativa ? `<p class="sol-why">${esc(it.justificativa)}</p>` : ''}${resu}</div>` : ''}
+    ${nv >= 1 ? acts : ''}
   </article>`;
 }
 
@@ -1755,20 +1793,11 @@ function render(){
 
   if (loaded) {
     const comecar = roadmap.filter(i => faixa(i) === FAIXAS.comecar).length;
-    const media = roadmap.length ? roadmap.reduce((s,i) => s + total(i), 0) / roadmap.length : 0;
-    $('#k-roadmap').textContent = roadmap.length;
-    $('#k-comecar').textContent = comecar;
-    $('#k-exec').innerHTML = `${exec.length} <small>de ${lim}</small>`;
-    $('#k-exec').classList.toggle('alert', exec.length > lim);
     const fila = $('#fila');
     const proxV = prox && nivelValor(prox) ? `valor ${VALORES[nivelValor(prox)].l}, ` : '';
     if (exec.length > lim) fila.innerHTML = `<span class="over">${exec.length} soluções em execução, acima do limite de ${lim}.</span> Conclua ou devolva ao roadmap antes de iniciar outra.`;
     else if (exec.length === lim) fila.innerHTML = `Limite atingido (${exec.length} de ${lim}).${prox ? ` Quando uma entrar em uso, a próxima da fila é <b>${esc(rotulo(prox))}</b> (${proxV}facilidade ${fmt(total(prox))}).` : ''}`;
     else fila.innerHTML = prox ? `Há espaço para iniciar ${plural(lim - exec.length, 'solução', 'soluções')}. Próxima da fila: <b>${esc(rotulo(prox))}</b> (${esc(prox.setor || 'sem área')}, ${proxV}facilidade ${fmt(total(prox))}).` : `Há espaço para iniciar ${plural(lim - exec.length, 'solução', 'soluções')}, mas nenhuma do roadmap está em "Começar já" sem trava.`;
-    $('#k-atraso').textContent = atrasadas;
-    $('#k-atraso').classList.toggle('alert', atrasadas > 0);
-    $('#k-impl').textContent = impl.length;
-    $('#k-media').innerHTML = roadmap.length ? `${fmt(media)} <small>de 10</small>` : '–';
     $('#b-comecar').textContent = plural(comecar, 'solução para começar já', 'soluções para começar já');
     $('#b-exec').textContent = plural(exec.length, 'em execução', 'em execução');
     $('#b-impl').textContent = plural(impl.length, 'implantada', 'implantadas');
@@ -1818,6 +1847,27 @@ function render(){
     .filter(i => !q || [codigoDe(i), i.nome, i.descricao, i.resolve, i.setor, ...donosDe(i), i.responsavel, statusDe(i) === 'aguardando' ? decisaoDe(i).quem : ''].join(' ').toLowerCase().includes(q));
   const filtrando = !!(filtroSetor || filtroDono || q);
   const contagem = (vis, tot) => filtrando ? `${vis} de ${tot}` : plural(tot, 'solução', 'soluções');
+
+  // Indicadores: seguem os filtros. A prontidão é da empresa e não muda.
+  const kf = $('#k-filtro');
+  if (loaded) {
+    const rF = filtrar(roadmap), eF = filtrar(exec), iF = filtrar(impl), aF = eF.filter(atrasada).length;
+    const medF = rF.length ? rF.reduce((s,i) => s + total(i), 0) / rF.length : 0;
+    $('#k-roadmap').textContent = rF.length;
+    $('#k-comecar').textContent = rF.filter(i => faixa(i) === FAIXAS.comecar).length;
+    $('#k-exec').innerHTML = filtrando ? String(eF.length) : `${exec.length} <small>de ${lim}</small>`;
+    $('#k-exec').classList.toggle('alert', !filtrando && exec.length > lim);
+    $('#k-atraso').textContent = aF;
+    $('#k-atraso').classList.toggle('alert', aF > 0);
+    $('#k-impl').textContent = iF.length;
+    $('#k-media').innerHTML = rF.length ? `${fmt(medF)} <small>de 10</small>` : '–';
+    const partes = [];
+    if (filtroSetor) partes.push(`área <b>${esc(filtroSetor)}</b>`);
+    if (filtroDono) partes.push(`setor <b>${esc(filtroDono === SEM_DONO ? 'sem setor dono' : filtroDono)}</b>`);
+    if (q) partes.push(`busca <b>“${esc(busca.trim())}”</b>`);
+    kf.hidden = !filtrando;
+    kf.innerHTML = filtrando ? `Indicadores do filtro: ${partes.join(' · ')}. A prontidão e o limite de execução valem para a empresa toda.` : '';
+  } else kf.hidden = true;
 
   const lista = $('#lista'), lAguard = $('#lista-aguard'), lExec = $('#lista-exec'), lImpl = $('#lista-impl');
   if (!loaded) {
@@ -1882,7 +1932,23 @@ let toastT = null;
 function toast(msg, ms){ const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, ms || 3200); }
 
 /* ---------- Ações nas linhas ---------- */
+function alternarCard(e){
+  const art = e.target.closest('article.sol'); if (!art) return false;
+  const tg = e.target.closest('.sol-tg');
+  if (!tg && e.target.closest('button, a, input, select, textarea, summary, label')) return false;
+  if (!tg && String(window.getSelection ? window.getSelection() : '').trim()) return false;
+  const it = items.find(i => i.id === art.dataset.id); if (!it) return false;
+  const nv = tg ? Number(tg.dataset.ir) || 0 : ((nivelCard.get(it.id) || 0) + 1) % 3;
+  if (nv) nivelCard.set(it.id, nv); else nivelCard.delete(it.id);
+  const tmp = document.createElement('div');
+  tmp.innerHTML = rowHTML(it, Number(art.dataset.pos) || 0, art.dataset.modo);
+  const novo = tmp.firstElementChild;
+  art.replaceWith(novo);
+  if (tg) novo.querySelector('.sol-tg').focus();
+  return true;
+}
 function onRowClick(e){
+  if (!e.target.closest('button[data-act]')) { alternarCard(e); return; }
   const b = e.target.closest('button[data-act]'); if (!b || !db) return;
   const id = b.dataset.id, act = b.dataset.act;
   const it = items.find(i => i.id === id); if (!it) return;
@@ -2098,7 +2164,7 @@ function atualizarOper(f){
   const inc = f.operacao.some(x => !x.funcao || !(x.horasSemana > 0));
   let t = linhas.length ? linhas.join('<br>') : 'Nenhum tempo informado. Preencha quando a solução vai pedir trabalho fixo de alguém depois de implantada.';
   if (inc) t += ' Há uma linha incompleta: falta a função ou as horas.';
-  if (linhas.length && !limH) t += ' Defina o limite por função na seção 03 para o app avisar quando alguém passar dele.';
+  if (linhas.length && !limH) t += ' Defina o limite por função na seção 01 para o app avisar quando alguém passar dele.';
   $('#calc-oper').innerHTML = t;
   $('#sr-oper').textContent = ops.length ? `${fmt(horasOper(f))} h por semana` : 'não informado';
 }

@@ -52,6 +52,17 @@ O navegador nunca recebe a chave: quem fala com o provedor é o servidor local.
 - **Áreas:** a lista de áreas sugeridas no cadastro, uma por linha, na ordem de exibição. Também dá para digitar uma área nova direto no cadastro de uma solução.
 - **Setores dono:** os setores de cada área, uma linha por área, no formato "Área: Setor A, Setor B". Use quando uma área tem mais de um gestor. A área com setores ganha o campo "Setor dono" no cadastro e o filtro por setor na fila.
 
+## O painel
+
+- **Filtros no topo:** área, setor dono e busca ficam acima dos indicadores, ao lado de Configurações, Exportar CSV e
+  Nova solução. Os indicadores seguem o filtro. A prontidão e o limite de execução são da empresa e não mudam com ele.
+- **Cards em três níveis:** cada solução começa mostrando só o título, a situação e de quem depende. Um clique mostra o
+  que ela faz, o que resolve, as metas e os botões (Editar, Iniciar execução e os outros). Outro clique mostra o resto:
+  a nota e as barras de facilidade, os números e as checagens. O terceiro clique, ou o botão Recolher, fecha o card.
+- **Ordem das seções:** primeiro o que pede ação hoje. 01 Em execução (com o limite em paralelo e o tempo por função),
+  02 Aguardando decisão, 03 Roadmap (a fila), 04 Implantadas (o resultado medido), depois Arquivadas, Perfil e a
+  metodologia.
+
 ## O que cada solução guarda
 
 Além do nome, do que ela faz e das notas, cada solução guarda o que precisa para decidir e acompanhar. Tudo é
@@ -73,7 +84,7 @@ preenchido em **Editar**. A seção 07 da página explica cada regra em detalhe.
   horas de todos são somadas no valor em reais.
 - **Tempo de quem opera depois:** quantas horas por semana a solução vai pedir de cada função depois de implantada,
   para aprovar, conferir ou corrigir. O app soma esse tempo por função nas soluções em execução e implantadas e
-  avisa, ao iniciar uma solução, se alguma função passa do limite de horas por semana (seção 03).
+  avisa, ao iniciar uma solução, se alguma função passa do limite de horas por semana (seção 01).
 - **Dado pessoal:** se a solução trata nenhum dado pessoal, dado pessoal ou dado sensível (como saúde), e qual.
   Com dado sensível, a solução fica travada até alguém aprovar a regra de quem pode ver o quê. Essa aprovação tem
   nome e data e só é feita pela tela: a importação não a muda.
